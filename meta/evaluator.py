@@ -1,0 +1,20 @@
+from sys import argv
+
+def help():
+    print "has to give two args: taskPath and solutionPath, prints score to stdout"
+
+def evaluate(task, solution):
+    #has to be implemented according to current ICFPC
+    raise NotImplementedError("NYI")
+
+def main():
+    if len(argv) < 3:
+        help()
+        return
+    task = argv[1]
+    solution = argv[2]
+    print(evaluate(task, solution))
+
+if __name__ == "__main__":
+    main()
+
