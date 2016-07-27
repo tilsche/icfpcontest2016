@@ -1,7 +1,11 @@
+#!/usr/bin/python3
+
 from sys import argv
 
 def help():
-    print "has to give two args: taskPath and solutionPath, prints score to stdout"
+    print("Evaluates a solution for some task.")
+    print("Needs two arguments: taskFile and solutionFile.")
+    print("Prints score to stdout.")
 
 def evaluate(task, solution):
     #has to be implemented according to current ICFPC
