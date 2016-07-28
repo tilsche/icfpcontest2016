@@ -17,7 +17,7 @@ def main():
         return
     programFile = argv[1]
     taskFile = argv[2]
-    print(execute(programFile, taskFile))
+    print(execute(programFile, taskFile), end = "")
 
 if __name__ == "__main__":
     main()
