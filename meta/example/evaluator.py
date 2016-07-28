@@ -22,10 +22,11 @@ def evaluate(task, solution):
     with open(task) as t, open(solution) as s:
         score = 0
         for lT, lS in zip_longest(t, s):
-            if lS is None:
-                break
             expected = sorted([int(i) for i in lT.split()])
-            actual = [int(i) for i in lS.split()]
+            if lS is None:
+                actual = [0] * len(expected)
+            else:
+                actual = [int(i) for i in lS.split()]
             score += score_line(expected, actual)
         return score
 
