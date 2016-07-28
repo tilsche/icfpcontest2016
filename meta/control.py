@@ -13,7 +13,7 @@ def help():
     print("\tquick <version>\texecutes <version> to solve each task once")
 
 def tasks():
-    conn = sqlite3.connect("db.db")
+    conn = sqlite3.connect("./.icfpc/db.db")
     cursor = conn.cursor()
     result = cursor.execute("SELECT rowid, task FROM tasks").fetchall()
     conn.commit()
@@ -21,7 +21,7 @@ def tasks():
     return result
 
 def save_run(versionPath, task, solution, score):
-    conn = sqlite3.connect("db.db")
+    conn = sqlite3.connect("./.icfpc/db.db")
     cursor = conn.cursor()
     result = cursor.execute("INSERT INTO runs (task, version, solution, score) VALUES(?, ?, ?, ?)", (task, versionPath, solution, score))
     conn.commit()

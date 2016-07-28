@@ -10,7 +10,7 @@ def help():
     print("\tversion <path>...\tadds version")
 
 def add_task(paths):
-    conn = sqlite3.connect("db.db")
+    conn = sqlite3.connect("./.icfpc/db.db")
     cursor = conn.cursor()
     for p in paths:
         cursor.execute("INSERT INTO tasks (task) VALUES (?)", (p,))
@@ -19,7 +19,7 @@ def add_task(paths):
 
 def add_version(paths):
     print(paths)
-    conn = sqlite3.connect("db.db")
+    conn = sqlite3.connect("./.icfpc/db.db")
     cursor = conn.cursor()
     for p in paths:
         cursor.execute("INSERT INTO versions (version) VALUES (?)", (p,))
