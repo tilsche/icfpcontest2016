@@ -12,14 +12,17 @@ def help():
 def add_task(paths):
     conn = sqlite3.connect("db.db")
     cursor = conn.cursor()
-    cursor.executemany("INSERT INTO tasks (task) VALUES (?)", paths)
+    for p in paths:
+        cursor.execute("INSERT INTO tasks (task) VALUES (?)", (p,))
     conn.commit()
     conn.close()
 
 def add_version(paths):
+    print(paths)
     conn = sqlite3.connect("db.db")
     cursor = conn.cursor()
-    cursor.executemany("INSERT INTO versions (version) VALUES (?)", paths)
+    for p in paths:
+        cursor.execute("INSERT INTO versions (version) VALUES (?)", (p,))
     conn.commit()
     conn.close()
 
