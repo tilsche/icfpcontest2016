@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 from sys import argv
 import sqlite3
@@ -6,7 +6,7 @@ import sqlite3
 def help():
     print("Adds a task or a version to the database.")
     print("subcommands:")
-    print("\ttask <path>...\tadds tasks")
+    print("\ttask <path>...\t\tadds tasks")
     print("\tversion <path>...\tadds version")
 
 def add_task(paths):

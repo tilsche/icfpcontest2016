@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 from sys import argv
 
@@ -8,7 +8,7 @@ def help():
     print("\tadd task <path>...\tadds tasks")
     print("\tadd version <path>...\tadds program versions")
     print("\thelp\t\t\tshows this help")
-    print("\tquick <version>\t\texecutes <version> to solve all tasks once")
+    print("\tquick <version>\t\texecutes <version> to solve each tasks once")
     print("\treport\t\t\tshows summary information about tasks, solutions and scores")
 
 def report():
