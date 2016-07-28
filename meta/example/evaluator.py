@@ -12,7 +12,7 @@ def help():
 
 def score_line(expected, actual):
     "compute the difference of each element"
-    if (actual == None):
+    if actual is None:
         actual = [0] * len(expected)
     return - sum(starmap(lambda x, y : abs(x - y), zip_longest(expected, actual, fillvalue = 0)))
 
@@ -22,7 +22,7 @@ def evaluate(task, solution):
     with open(task) as t, open(solution) as s:
         score = 0
         for lT, lS in zip_longest(t, s):
-            if (lS == None):
+            if lS is None:
                 break
             expected = sorted([int(i) for i in lT.split()])
             actual = [int(i) for i in lS.split()]
