@@ -17,13 +17,13 @@ def create_db():
     conn = sqlite3.connect("./.icfpc/db.db")
     cursor = conn.cursor()
     cursor.execute("PRAGMA foreign_keys = ON")
-    cursor.execute("CREATE table versions ("
+    cursor.execute("CREATE table IF NOT EXISTS versions ("
                         "id INTEGER PRIMARY KEY,"
                         "path TEXT UNIQUE ON CONFLICT IGNORE)")
-    cursor.execute("CREATE table tasks ("
+    cursor.execute("CREATE table IF NOT EXISTS tasks ("
                         "id INTEGER PRIMARY KEY,"
                         "path TEXT UNIQUE ON CONFLICT IGNORE)")
-    cursor.execute("CREATE table runs("
+    cursor.execute("CREATE table IF NOT EXISTS runs("
                         "id INTEGER PRIMARY KEY,"
                         "version INTEGER,"
                         "task INTEGER,"
