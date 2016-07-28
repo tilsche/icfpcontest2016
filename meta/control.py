@@ -12,36 +12,45 @@ def help():
     print("Available subcommands:")
     print("\tquick <version>\texecutes <version> to solve each task once")
 
-def tasks():
+def get_tasks():
     conn = sqlite3.connect("./.icfpc/db.db")
     cursor = conn.cursor()
-    result = cursor.execute("SELECT rowid, task FROM tasks").fetchall()
+    result = cursor.execute("SELECT id, path FROM tasks").fetchall()
     conn.commit()
     conn.close()
     return result
 
-def save_run(versionPath, task, solution, score):
+def get_version(versionPath):
     conn = sqlite3.connect("./.icfpc/db.db")
     cursor = conn.cursor()
-    result = cursor.execute("INSERT INTO runs (task, version, solution, score) VALUES(?, ?, ?, ?)", (task, versionPath, solution, score))
+    result = cursor.execute("SELECT id, path FROM versions WHERE path = ?", (versionPath,)).fetchone()
+    conn.commit()
+    conn.close()
+    return result
+
+def save_run(version_id, task_id, solutionPath, score):
+    conn = sqlite3.connect("./.icfpc/db.db")
+    cursor = conn.cursor()
+    result = cursor.execute("INSERT INTO runs (id, task, version, path, score) VALUES(NULL, ?, ?, ?, ?)", (task_id, version_id, solutionPath, score))
     conn.commit()
     conn.close()
 
 def quick(versionPath):
     children = []
-    for t in tasks():
-       children.append((subprocess.Popen(["./executor.py", versionPath, t[1]], universal_newlines=True, stdout=subprocess.PIPE), t))
+    tasks = get_tasks()
+    for t in tasks:
+       children.append(subprocess.Popen(["./executor.py", versionPath, t[1]], universal_newlines=True, stdout=subprocess.PIPE))
     print("done with creating threads")
     #sequentially waiting, bad for already using early results 
-    for c in children:
-        print(c[0].wait())
-        out = c[0].communicate()[0]
-        solution = tempfile.NamedTemporaryFile(dir="./solutions", delete=False)
+    for c,t in zip(children, tasks):
+        out = c.communicate()[0]
+        solution = tempfile.NamedTemporaryFile(dir="./.icfpc/solutions", delete=False)
         solution.write(bytes(out, "utf-8"))
         solution.close()
-        score = subprocess.check_output(["./evaluator.py", c[1][1], solution.name], universal_newlines=True)
-        print("score:" + score)
-        save_run(versionPath, c[1][1], solution.name, score)
+        score = subprocess.check_output(["./evaluator.py", t[1], solution.name], universal_newlines=True)
+        print("task:\t" + t[1])
+        print("score:\t" + score)
+        save_run(get_version(versionPath)[0], t[0], solution.name, score)
 
 def main():
     if len(argv) < 3:

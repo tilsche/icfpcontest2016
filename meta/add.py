@@ -13,16 +13,15 @@ def add_task(paths):
     conn = sqlite3.connect("./.icfpc/db.db")
     cursor = conn.cursor()
     for p in paths:
-        cursor.execute("INSERT INTO tasks (task) VALUES (?)", (p,))
+        cursor.execute("INSERT INTO tasks (id, path) VALUES (NULL, ?)", (p,))
     conn.commit()
     conn.close()
 
 def add_version(paths):
-    print(paths)
     conn = sqlite3.connect("./.icfpc/db.db")
     cursor = conn.cursor()
     for p in paths:
-        cursor.execute("INSERT INTO versions (version) VALUES (?)", (p,))
+        cursor.execute("INSERT INTO versions (id, path) VALUES (NULL, ?)", (p,))
     conn.commit()
     conn.close()
 
