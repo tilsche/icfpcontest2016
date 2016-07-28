@@ -5,6 +5,7 @@ import subprocess
 import sqlite3
 import time
 import tempfile
+import pathlib
 
 def help():
     print("Executes multiple different combinations of versions and tasks.")
@@ -50,7 +51,8 @@ def quick(versionPath):
         score = subprocess.check_output(["./evaluator.py", t[1], solution.name], universal_newlines=True)
         print("task:\t" + t[1])
         print("score:\t" + score)
-        save_run(get_version(versionPath)[0], t[0], solution.name, score)
+        solutionPath = pathlib.Path(solution.name).relative_to(pathlib.Path().resolve())
+        save_run(get_version(versionPath)[0], t[0], str(solutionPath), score)
 
 def main():
     if len(argv) < 3:
