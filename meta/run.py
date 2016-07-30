@@ -40,7 +40,7 @@ def quick(versionPath):
     children = []
     tasks = get_tasks()
     for t in tasks:
-       children.append(subprocess.Popen(["./executor.py", versionPath, t[1]], universal_newlines=True, stdout=subprocess.PIPE))
+       children.append(subprocess.Popen(["./execute.py", versionPath, t[1]], universal_newlines=True, stdout=subprocess.PIPE))
     print("done with creating threads")
     #sequentially waiting, bad for already using early results 
     for c,t in zip(children, tasks):
@@ -48,7 +48,7 @@ def quick(versionPath):
         solution = tempfile.NamedTemporaryFile(dir="./.icfpc/solutions", delete=False)
         solution.write(bytes(out, "utf-8"))
         solution.close()
-        score = subprocess.check_output(["./evaluator.py", t[1], solution.name], universal_newlines=True)
+        score = subprocess.check_output(["./evaluate.py", t[1], solution.name], universal_newlines=True)
         print("task:\t" + t[1])
         print("score:\t" + score)
         solutionPath = pathlib.Path(solution.name).relative_to(pathlib.Path().resolve())
