@@ -8,7 +8,7 @@ import tempfile
 import pathlib
 
 def help():
-    print("Executes multiple different combinations of versions and tasks.")
+    print("Executes multiple different combinations of versions and tasks in parallel.")
     print("Saves solutions in db")
     print("Available subcommands:")
     print("\tquick <version>\texecutes <version> to solve each task once")

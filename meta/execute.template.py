@@ -9,6 +9,9 @@ def help():
     print("Prints solution to stdout.")
 
 def execute(programFile, taskFile):
+    #change timeout to current ICFPC rules
+    #if your program does not print just one solution at the end
+    #  but continually spits out solutions, you should just print the best solution
     return subprocess.check_output([programFile, taskFile], timeout=60*2, universal_newlines=True)
 
 def main():
