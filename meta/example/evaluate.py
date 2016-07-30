@@ -3,12 +3,14 @@
 from sys import argv
 from itertools import zip_longest, starmap
 
+def help():
+    print("Evaluates a solution for some task.")
+    print("Needs two arguments: taskFile and solutionFile.")
+    print("Prints score to stdout.")
+
 def quantify(iterable, pred=bool):
     "Count how many times the predicate is true"
     return sum(map(pred, iterable))
-
-def help():
-    print("has to give two args: task and solution")
 
 def score_line(expected, actual):
     "compute the difference of each element"
