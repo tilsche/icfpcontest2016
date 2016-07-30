@@ -10,6 +10,7 @@ def help():
 def get_statistics():
     conn = sqlite3.connect("./.icfpc/db.db")
     cursor = conn.cursor()
+    cursor.execute("PRAGMA foreign_keys = ON")
     result = cursor.execute("SELECT "
         "version, versions.path, task, tasks.path, MIN(score), AVG(score), MAX(score) "
         "FROM runs, versions, tasks "

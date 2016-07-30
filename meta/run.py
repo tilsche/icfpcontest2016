@@ -32,6 +32,7 @@ def get_version(versionPath):
 def save_run(version_id, task_id, solutionPath, score):
     conn = sqlite3.connect("./.icfpc/db.db")
     cursor = conn.cursor()
+    cursor.execute("PRAGMA foreign_keys = ON")
     result = cursor.execute("INSERT INTO runs (id, task, version, path, score) VALUES(NULL, ?, ?, ?, ?)", (task_id, version_id, solutionPath, score))
     conn.commit()
     conn.close()
