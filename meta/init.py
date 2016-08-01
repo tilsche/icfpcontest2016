@@ -14,8 +14,8 @@ def create_dir():
         p.mkdir()
 
 def create_subdirs():
-    for s in ["./.icfpc/solutions/"]:
-        p = pathlib.Path(s)
+    for s in ["solutions/", "git/", "versions/"]:
+        p = pathlib.Path("./.icfpc/" + s)
         if not p.exists():
             p.mkdir()
 
