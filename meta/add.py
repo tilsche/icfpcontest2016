@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from sys import argv
-import sqlite3
+from models import *
 
 def help():
     print("Adds a task or a version to the database.")
@@ -10,20 +10,16 @@ def help():
     print("\tversion <path>...\tadds version")
 
 def add_task(paths):
-    conn = sqlite3.connect("./.icfpc/db.db")
-    cursor = conn.cursor()
+    connect()
     for p in paths:
-        cursor.execute("INSERT INTO tasks (id, path) VALUES (NULL, ?)", (p,))
-    conn.commit()
-    conn.close()
+        Task.create(path=p)
+    close()
 
 def add_version(paths):
-    conn = sqlite3.connect("./.icfpc/db.db")
-    cursor = conn.cursor()
+    connect()
     for p in paths:
-        cursor.execute("INSERT INTO versions (id, path) VALUES (NULL, ?)", (p,))
-    conn.commit()
-    conn.close()
+        Version.create(path=p)
+    close()
 
 def add(args):
     if args[0] == "task":
