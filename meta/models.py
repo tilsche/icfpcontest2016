@@ -20,6 +20,9 @@ class Run(BaseModel):
     path = TextField(unique=True)
     score = FloatField()
 
+class Tag(BaseModel):
+    name = TextField(unique=True)
+
 def connect():
     database.connect()
 
@@ -27,5 +30,5 @@ def close():
     database.close()
 
 def create_tables():
-    database.create_tables([Task, Version, Run])
+    database.create_tables([Task, Version, Run, Tag])
 
