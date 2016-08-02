@@ -36,7 +36,7 @@ def report():
             rows.append([s[1]] + [""] * (len(headers) - 1))
         #this line should be more robust than the next 
         #in case no run exists for some version and task
-        rows[-1][headers.index(s[3]):] = [str(s[4]) + "/" + str(s[5]) + "/" + str(s[6])]
+        rows[-1][headers.index(s[3])] = str(s[4]) + "/" + str(s[5]) + "/" + str(s[6])
         #rows[-1].append(str(s[4]) + "/" + str(s[5]) + "/" + str(s[6]))
 
     print("In each row, you can see one of your versions, in each column you see how it did on some task over multiple runs")
