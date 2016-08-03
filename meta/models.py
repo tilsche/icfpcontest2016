@@ -12,11 +12,16 @@ class Task(BaseModel):
     path = TextField(unique=True)
 
 class Version(BaseModel):
-    path = TextField(unique=True)
+    reference = TextField(unique=True)
+
+class Constraint(BaseModel):
+    runtime_ms = IntegerField()
+    cores = IntegerField()
 
 class Run(BaseModel):
     task = ForeignKeyField(Task, related_name='runs')
     version = ForeignKeyField(Version, related_name='runs')
+    constraint = ForeignKeyField(Constraint, related_name='runs')
     path = TextField(unique=True)
     score = FloatField()
 
@@ -27,5 +32,5 @@ def close():
     database.close()
 
 def create_tables():
-    database.create_tables([Task, Version, Run])
+    database.create_tables([Task, Version, Constraint, Run, ])
 
