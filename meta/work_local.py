@@ -13,7 +13,7 @@ def get_work():
     connect()
     #try queue
     work = Work.deque()
-    if work not None:
+    if work is not None:
         close()
         return work.task, work.version, work.constraint, random.randrange(1e10)
     #randomly select task, constraint, version
