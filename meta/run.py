@@ -44,7 +44,7 @@ def quick(versionPath):
         return c[0].poll() is not None
 
     connect()
-    version = Version.get(Version.path == versionPath)
+    version = Version.get(Version.reference == versionPath)
     tasks = list(Task.select())
     close()
 
@@ -54,7 +54,7 @@ def quick(versionPath):
     while True:
         while tasks and len(children) < max_tasks:
             task = tasks.pop()
-            children.append((subprocess.Popen(["./execute.py", versionPath, task.path], universal_newlines=True, stdout=subprocess.PIPE), task))
+            children.append((subprocess.Popen(["./execute.py", versionPath, task.path, 60*2*1000, 1], universal_newlines=True, stdout=subprocess.PIPE), task))
             print("Created a thread for task", task.path, file=sys.stderr)
 
         for ct in filter(done, children):

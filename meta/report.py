@@ -31,7 +31,7 @@ def table():
     for run in runs:
         if run.version_id not in seenVersions:
             seenVersions.add(run.version_id)
-            rows.append([run.version.path] + [""] * (len(headers) - 1))
+            rows.append([run.version.reference] + [""] * (len(headers) - 1))
         rows[-1][headers.index(run.task.path)] = str(run.min) + "/" + str(run.avg) + "/" + str(run.max)
     out = tabulate(rows, headers, tablefmt="fancy_grid")
     close()
