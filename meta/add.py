@@ -4,10 +4,11 @@ from sys import argv
 from models import *
 
 def help():
-    print("Adds a task or a version to the database.")
+    print("Adds a task, a version or a constraint to the database.")
     print("subcommands:")
-    print("\ttask <path>...\t\tadds tasks")
-    print("\tversion <path>...\tadds version")
+    print("\ttask <path>...\t\t\tadds tasks")
+    print("\tversion <path>...\t\tadds version")
+    print("\tconstraint <runtime_ms> <cores>\tadds constraint")
 
 def add_task(paths):
     connect()
@@ -21,11 +22,18 @@ def add_version(paths):
         Version.create(path=p)
     close()
 
+def add_constraint(runtime_ms, cores):
+    connect()
+    Constraint.create(runtime_ms, cores)
+    close()
+
 def add(args):
     if args[0] == "task":
         add_task(args[1:])
     elif args[0] == "version":
         add_version(args[1:])
+    elif args[0] == "constraint":
+        help() if len(args) < 3 else add_constraint(args[1], args[2])
     else:
         help()
 
