@@ -8,7 +8,7 @@ def help():
     print("subcommands:")
     print("\ttask <path>...\t\t\tadds tasks")
     print("\tversion <path>...\t\tadds version")
-    print("\tconstraint <runtime_ms> <cores>\tadds constraint")
+    print("\tconstraint <name> <runtime_ms> <cores>\tadds constraint")
 
 def add_task(paths):
     connect()
@@ -22,9 +22,9 @@ def add_version(paths):
         Version.create(path=p)
     close()
 
-def add_constraint(runtime_ms, cores):
+def add_constraint(name, runtime_ms, cores):
     connect()
-    Constraint.create(runtime_ms, cores)
+    Constraint.create(runtime_ms=runtime_ms, cores=cores, name=name)
     close()
 
 def add(args):
@@ -33,7 +33,7 @@ def add(args):
     elif args[0] == "version":
         add_version(args[1:])
     elif args[0] == "constraint":
-        help() if len(args) < 3 else add_constraint(args[1], args[2])
+        help() if len(args) < 4 else add_constraint(args[1], args[2], args[3])
     else:
         help()
 
