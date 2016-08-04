@@ -17,6 +17,7 @@ class Version(BaseModel):
 class Constraint(BaseModel):
     runtime_ms = IntegerField()
     cores = IntegerField()
+    name = TextField(unique=True)
 
 class Work(BaseModel):
     task = ForeignKeyField(Task, related_name='work')
@@ -37,7 +38,7 @@ class Work(BaseModel):
         except Work.DoesNotExist:
             return None
     def enque(task, version, constraint, priority, count):
-        Work.create(task=task, version=version, constraint=constraint, priority=priority, count=count)
+        return Work.create(task=task, version=version, constraint=constraint, priority=priority, count=count)
 
 class Run(BaseModel):
     task = ForeignKeyField(Task, related_name='runs')
@@ -46,6 +47,9 @@ class Run(BaseModel):
     path = TextField(unique=True)
     score = FloatField()
 
+class Tag(BaseModel):
+    name = TextField(unique=True)
+
 def connect():
     database.connect()
 
@@ -53,5 +57,5 @@ def close():
     database.close()
 
 def create_tables():
-    database.create_tables([Task, Version, Constraint, Run, Work, ])
+    database.create_tables([Task, Version, Constraint, Run, Work, Tag, ])
 
