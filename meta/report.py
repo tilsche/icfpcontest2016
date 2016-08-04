@@ -25,7 +25,7 @@ def report():
     for run in runs:
         if run.version_id not in seenVersions:
             seenVersions.add(run.version_id)
-            rows.append([run.version.path] + [""] * (len(headers) - 1))
+            rows.append([run.version.reference] + [""] * (len(headers) - 1))
         rows[-1][headers.index(run.task.path)] = str(run.min) + "/" + str(run.avg) + "/" + str(run.max)
 
     print("In each row, you can see one of your versions, in each column you see how it did on some task over multiple runs")

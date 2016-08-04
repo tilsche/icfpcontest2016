@@ -19,7 +19,7 @@ def add_task(paths):
 def add_version(paths):
     connect()
     for p in paths:
-        Version.create(path=p)
+        Version.create(reference=p)
     close()
 
 def add_constraint(name, runtime_ms, cores):
