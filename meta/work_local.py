@@ -11,8 +11,12 @@ def get_work():
     """Returns Task, Version, Constraint, seed"""
 
     connect()
-    #let's just randomly select task, constraint, version
-    #we can add queue later
+    #try queue
+    work = Work.deque()
+    if work not None:
+        close()
+        return work.task, work.version, work.constraint, random.randrange(1e10)
+    #randomly select task, constraint, version
     task = Task.select().order_by(fn.Random()).limit(1).get()
     version = Version.select().order_by(fn.Random()).limit(1).get()
     constraint = Constraint.select().order_by(fn.Random()).limit(1).get()
@@ -48,6 +52,7 @@ def serve():
         return True
     #pickling over xml over rpc, yeah
     #we need to pickle because xmlrpcserver only understands few types
+    #Dunno if this server can serve multiple requests concurrently
     server = xmlrpc.server.SimpleXMLRPCServer(("localhost", 8000), use_builtin_types=True)
     print("Listening on port 8000...")
     server.register_function(get_work_pickled, "get_work_pickled")
