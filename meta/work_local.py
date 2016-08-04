@@ -1,11 +1,15 @@
 import tempfile
 import pathlib
+import pickle
 import random
 import subprocess
+import xmlrpc.server
 
 from models import *
 
 def get_work():
+    """Returns Task, Version, Constraint, seed"""
+
     connect()
     #let's just randomly select task, constraint, version
     #we can add queue later
@@ -16,17 +20,37 @@ def get_work():
     return task, version, constraint, random.randrange(1e10)
 
 def submit_work(task, version, constraint, seed, solution):
-    #save solution
-    #evaluate solution
-    solutionPath = save_solution(solution)
+    """Accepts Task, Version, Constraint, seed, solution
+    Saves the solution to DB
+    """
+
+    with tempfile.NamedTemporaryFile(dir=".icfpc/solutions", delete=False) as f:
+        f.write(bytes(solution, "utf-8"))
+    solutionPath = pathlib.Path(f.name).relative_to(pathlib.Path().resolve())
+
     score = subprocess.check_output(["./evaluate.py", task.path, str(solutionPath)], universal_newlines=True)
+
+    print("version:\t" + version.reference)
     print("task:\t" + task.path)
     print("score:\t" + score)
 
+    connect()
     Run.create(task=task, version=version, constraint=constraint, seed=seed, path=solutionPath, score=score)
+    close()
 
-def save_solution(solution):
-    with tempfile.NamedTemporaryFile(dir=".icfpc/solutions", delete=False) as f:
-        f.write(bytes(solution, "utf-8"))
-    return pathlib.Path(f.name).relative_to(pathlib.Path().resolve())
+def serve():
+    """Starts a server listening for Slaves requesting or submitting work"""
+
+    def get_work_pickled():
+        return tuple(map(pickle.dumps, get_work()))
+    def submit_work_pickled(*args):
+        submit_work(*tuple(map(pickle.loads, args)))
+        return True
+    #pickling over xml over rpc, yeah
+    #we need to pickle because xmlrpcserver only understands few types
+    server = xmlrpc.server.SimpleXMLRPCServer(("localhost", 8000), use_builtin_types=True)
+    print("Listening on port 8000...")
+    server.register_function(get_work_pickled, "get_work_pickled")
+    server.register_function(submit_work_pickled, "submit_work_pickled")
+    server.serve_forever()
 
