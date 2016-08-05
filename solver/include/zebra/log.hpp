@@ -2,7 +2,7 @@
 
 #include <nitro/log/log.hpp>
 
-#include <nitro/log/sink/stdout_mt.hpp>
+#include <nitro/log/sink/stderr_mt.hpp>
 
 #include <nitro/log/attribute/message.hpp>
 #include <nitro/log/attribute/severity.hpp>
@@ -44,7 +44,7 @@ namespace log
     }
 
     typedef nitro::log::logger<detail::record, detail::zebra_log_formater,
-                               nitro::log::sink::stdout_mt, detail::zebra_log_filter>
+                               nitro::log::sink::stderr_mt, detail::zebra_log_filter>
         logging;
 
     inline void set_min_severity_level(nitro::log::severity_level sev)

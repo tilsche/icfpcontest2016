@@ -41,12 +41,12 @@ namespace log
     {
         static std::mutex stderr_mutex;
 
-        class stderr
+        class stderr_mt
         {
         public:
             void sink(std::string formatted_record)
             {
-                std::lock_guard<std::mutex> my_lock(stdout_mutex);
+                std::lock_guard<std::mutex> my_lock(stderr_mutex);
 
                 std::cerr << formatted_record << std::endl;
             }
