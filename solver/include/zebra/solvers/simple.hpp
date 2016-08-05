@@ -1,0 +1,5 @@
+
+#ifndef SOLVER_SIMPLE_HPP
+#define SOLVER_SIMPLE_HPP
+
+#endif //SOLVER_SIMPLE_HPP
