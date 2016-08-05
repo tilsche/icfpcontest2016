@@ -2,16 +2,20 @@
 #ifndef SOLVER_POLYGON_HPP
 #define SOLVER_POLYGON_HPP
 
-#include "base.hpp"
+#include "kernel.hpp"
 
 #include <vector>
 
 namespace zebra
 {
 
-class polygon : kernel::polygon_2
+class polygon : kernel::Polygon_2
 {
 public:
+    template <class CONTAINER>
+    polygon(const CONTAINER& c) : kernel::Polygon_2(c.begin(), c.end())
+    {
+    }
 };
 }
 

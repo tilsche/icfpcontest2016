@@ -9,13 +9,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
-#include "point.hpp"
-#include "polygon.hpp"
-#include "line_segment.hpp"
-
+#include "geometry.hpp"
 
 namespace zebra {
-
 
 struct task {
 
