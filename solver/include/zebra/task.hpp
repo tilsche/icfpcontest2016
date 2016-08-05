@@ -10,36 +10,99 @@
 #include <boost/filesystem.hpp>
 
 #include "point.hpp"
+#include "polygon.hpp"
+#include "line_segment.hpp"
 
 
 namespace zebra {
 
-bool for_each_line(const std::string& filename, std::function<bool(const std::string&)> cb)
+
+struct task {
+
+    task() {}
+
+    task(std::vector<polygon> polys, std::vector<line_segment> edgs) :
+        polygons{polys}, edges{edgs} {}
+
+    std::vector<polygon> polygons;
+    std::vector<line_segment> edges;
+};
+
+bool for_n_lines(std::ifstream& in, uint64_t number_of_lines, std::function<bool(const std::string&)> cb)
 {
-    std::ifstream in {filename};
     if (!in) {
         return false;
     }
 
-    for (std::string line; getline(in, line);) {
+    for (std::string line; getline(in, line) && number_of_lines > 0; --number_of_lines) {
         if (! cb(line)) {
             break;
         }
     }
+
     return true;
 }
 
 
-std::vector<point> read_task(const std::string& taskfile)
+polygon read_polygon(std::ifstream& in)
 {
-    std::vector<point> data;
+    std::string line;
+    getline(in, line);
+    uint64_t num_vertices = std::stoull(line);
+    std::vector<point> points(num_vertices);
 
-    for_each_line(taskfile, [&](const std::string& line) {
-            data.emplace_back(point::from_string(line));
-            return true;
-        });
+    for_n_lines(in, num_vertices, [&](const std::string& line) {
+                      points.push_back(point::from_string(line));
+                      return true;
+                });
 
-    return data;
+    return polygon{points};
+}
+
+
+std::vector<polygon> read_polygons(std::ifstream& in, uint64_t num_polygons)
+{
+    std::vector<polygon> polys;
+    while (num_polygons) {
+        polys.emplace_back(read_polygon(in));
+        --num_polygons;
+    }
+
+    return polys;
+}
+
+
+std::vector<line_segment> read_line_segements(std::ifstream& in)
+{
+    std::string line;
+    getline(in, line);
+    uint64_t num_edges = std::stoull(line);
+    std::vector<line_segment> edges(num_edges);
+
+    for_n_lines(in, num_edges, [&](const std::string& line) {
+                edges.emplace_back(line_segment::from_string(line));
+                return true;
+            });
+
+    return edges;
+}
+
+
+task read_task(const std::string& taskfile)
+{
+    std::ifstream in {taskfile};
+    if (!in) {
+        return;
+    }
+
+    std::string line;
+    getline(in, line);
+    uint64_t num_polygons = std::stoull(line);
+
+    auto polygons = read_polygons(in, num_polygons);
+    auto edges = read_line_segements(in);
+
+    return task {polygons, edges};
 }
 
 
