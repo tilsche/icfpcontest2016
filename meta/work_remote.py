@@ -69,6 +69,7 @@ def main():
         print(out)
         #build
         print("building")
+        print(path)
         out = subprocess.check_output(["./build.sh", path], universal_newlines=True)
         print(str(out))
     #execute
