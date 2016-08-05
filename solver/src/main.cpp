@@ -5,7 +5,8 @@
 
 #include <boost/program_options.hpp>
 #include <zebra/solver.hpp>
-#include <zebra/stupidsolver.hpp>
+#include <zebra/solvers/simple.hpp>
+#include <zebra/solvers/stupid.hpp>
 
 namespace po = boost::program_options;
 
@@ -26,7 +27,9 @@ int main(int argc, char** argv)
     po::options_description options("");
     // clang-format off
     options.add_options()("help", "show help message")
-            ("task-file", po::value<std::string>(), "File containing the task.");
+            ("task-file", po::value<std::string>(), "File containing the task.")
+            ("runtime", po::value<long long>, "runtime")
+            ("cores", po::value<int>, "core count");
     // clang-format on
 
     po::variables_map vm;
@@ -47,7 +50,7 @@ int main(int argc, char** argv)
     zebra::logging::info() << "filename: " << filename;
     // do something useful
     auto t = zebra::read_task(filename);
-    std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::stupidsolver>();
+    std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::stupid>();
 
     zebra::logging::info() << "solving...";
     auto solu = (*solve)(t);
