@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import tempfile
 import pathlib
 import pickle
@@ -27,6 +29,7 @@ REPO = "https://github.com/na-oma/test.git"
 
 def main():
     #pull work package
+    print("pulling work package")
     task, version, constraint, seed = get_work()
     print("Work package " + str(task.path))
     #clone git
