@@ -64,8 +64,9 @@ public:
         for (auto edge_it = poly.edges_begin(); edge_it != poly.edges_end(); edge_it++)
         {
             const auto& edge = *edge_it;
-            transofrmation move(CGAL::TRANSLATION, edge.source());
-            auto moved = move(*this);
+            transofrmation move(CGAL::TRANSLATION, seg.source() - edge.source());
+            auto moved = *this;
+            moved.poly = CGAL::transform(move, moved.poly);
             results.push_back(moved);
         }
         return results;
@@ -76,7 +77,7 @@ public:
         return poly.size();
     }
 
-    polygon poly = { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 0 } };
+    polygon poly = make_polygon_1();
 };
 }
 

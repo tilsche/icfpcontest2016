@@ -28,8 +28,8 @@ int main(int argc, char** argv)
     // clang-format off
     options.add_options()("help", "show help message")
             ("task-file", po::value<std::string>(), "File containing the task.")
-            ("runtime", po::value<long long>, "runtime")
-            ("cores", po::value<int>, "core count");
+            ("runtime", po::value<long>(), "runtime")
+            ("cores", po::value<int>(), "core count");
     // clang-format on
 
     po::variables_map vm;
