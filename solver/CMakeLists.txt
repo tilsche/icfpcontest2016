@@ -17,13 +17,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 find_package(GMP REQUIRED)
 
+find_package(Boost 1.58 REQUIRED COMPONENTS program_options system filesystem)
+
 include_directories(include)
 
-include_directories(${GMP_INCLUDE_DIRS})
+include_directories(${GMP_INCLUDE_DIRS} ${BOOST_INCLUDE_DIRS})
 
 file(GLOB SOURCE_FILES src/*.cpp)
 add_executable(solver ${SOURCE_FILES})
 
-target_link_libraries(solver ${GMP_LIBRARIES})
+target_link_libraries(solver ${GMP_LIBRARIES} ${BOOST_LIBRARIES})
 
 add_subdirectory(tests)
