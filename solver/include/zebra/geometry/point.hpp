@@ -1,16 +1,43 @@
 #ifndef ZEBRA_POINT_HPP
 #define ZEBRA_POINT_HPP
 
+#include "kernel.hpp"
+
+#include <CGAL/Gmpq.h>
+
 #include <cassert>
-#include <gmpxx.h>
 #include <iostream>
 #include <string>
 
 namespace zebra
 {
 
-class point
+class point : public kernel::Point_2
 {
+public:
+    point(const std::string& s) : kernel::Point_2(read_string(s))
+    {
+    }
+
+    static kernel::Point_2 read_string(std::string s)
+    {
+        for (int i = 0; i < s.size(); i += 1)
+        {
+            if (s[i] == ',')
+            {
+                s[i] = ' ';
+            }
+        }
+        std::stringstream ss(s);
+        CGAL::Gmpq x, y;
+        ss >> x;
+        ss >> y;
+        return kernel::Point_2(x, y);
+    }
+};
+}
+
+/*
 public:
     mpq_class x, y;
 
@@ -86,5 +113,5 @@ std::ostream& operator<<(std::ostream& o, const point& p)
 }
 
 };
-
+*/
 #endif // ZEBRA_POINT_HPP

@@ -2,21 +2,16 @@
 #ifndef SOLVER_POLYGON_HPP
 #define SOLVER_POLYGON_HPP
 
-#include "point.hpp"
+#include "base.hpp"
 
 #include <vector>
 
 namespace zebra
 {
 
-class polygon
+class polygon : kernel::polygon_2
 {
 public:
-    polygon(std::vector<point> ps) : points(ps)
-    {
-    }
-
-    std::vector<point> points;
 };
 }
 
