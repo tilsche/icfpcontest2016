@@ -46,12 +46,12 @@ public:
         return *this;
     }
 
-    bool slopeInf() const {
+    bool slope_inf() const {
         return (a - b).x == 0;
     }
 
     mpq_class slope() const {
-        assert(slopeInf() == false);
+        assert(slope_inf() == false);
 
         point aa, bb;
         if (a.x <= b.x) {
@@ -90,6 +90,18 @@ public:
 };
 
 bool is_disjoint(const line_segment& l, const line_segment& m) {
+    if (l.slope_inf() && m.slope_inf()) {
+        // pass
+    } else if (l.slope_inf() || m.slope_inf()) {
+        return false;
+    } else if (l.slope() != m.slope()) {
+        return false
+    }
+
+
+
+}
+
 return false;
 }
 
