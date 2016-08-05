@@ -24,7 +24,7 @@ public:
     {
     }
 
-    point operator=(const point& rhs)
+    point& operator=(const point& rhs)
     {
         x = rhs.x;
         y = rhs.y;
