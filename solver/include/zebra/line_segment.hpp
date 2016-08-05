@@ -13,9 +13,31 @@ public:
     line_segment(const line_segment& s) : a(s.a), b(s.b) {}
     line_segment(const point& a_, const point& b_) : a(a_), b(b_) {}
 
+    line_segment operator+(const point& rhs) const
+    {
+        return line_segment(a + rhs, b + rhs);
+    }
+    line_segment operator-(const point& rhs) const
+    {
+        return line_segment(a - rhs, b - rhs);
+    }
+    line_segment operator*(const mpq_class f) const
+    {
+        return line_segment(a * f, b * f);
+    }
     bool operator==(const line_segment& rhs) const
     {
         return a == rhs.a && b == rhs.b;
+    }
+    bool operator!=(const line_segment& rhs) const
+    {
+        return !(*this == rhs);
+    }
+
+    line_segment& operator=(const line_segment& rhs) {
+        a = rhs.a;
+        b = rhs.b;
+        return *this;
     }
 
     static line_segment from_string(const std::string& s)
