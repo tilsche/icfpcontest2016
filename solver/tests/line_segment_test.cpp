@@ -44,8 +44,8 @@ void test_slope() {
 
     assert(l1.slope() == 1);
     assert(l2.slope() == 1);
-    assert(l3.slopeInf() == true);
-    assert(l4.slopeInf() == true);
+    assert(l3.slope_inf() == true);
+    assert(l4.slope_inf() == true);
 }
 
 void test_disjoint() {
