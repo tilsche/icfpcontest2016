@@ -1,9 +1,16 @@
 #ifndef SOLVER_GEOMETRY_HPP
 #define SOLVER_GEOMETRY_HPP
 
-
-#include "geometry/point.hpp"
+#include "geometry/kernel.hpp"
 #include "geometry/line_segment.hpp"
+#include "geometry/point.hpp"
 #include "geometry/polygon.hpp"
 
-#endif //SOLVER_GEOMETRY_HPP
+#include <CGAL/Aff_transformation_2.h>
+
+namespace zebra
+{
+using transofrmation = CGAL::Aff_transformation_2<kernel>;
+}
+
+#endif // SOLVER_GEOMETRY_HPP
