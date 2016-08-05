@@ -4,6 +4,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 #include "geometry.hpp"
 #include "task.hpp"
@@ -29,7 +30,7 @@ namespace zebra {
         }
 
         std::pair<T, T> point;
-        std::vector<bw_segment<T>> segments;
+        std::vector<std::shared_ptr<bw_segment<T>>> segments;
     };
 
     template<typename T>
@@ -57,6 +58,25 @@ namespace zebra {
             point_lst.emplace_back(edge.target(), edge.source());
             //auto direction = edge.direction();
             //auto normal = Kernel::Direction_2(-direction.dy(), direction.dx());
+        }
+
+        std::vector<point> pvec;
+        std::vector<bw_point<CGAL::Gmpq>> bwvec;
+
+        for (const auto& elem : point_lst)
+        {
+            auto it = std::find(pvec.begin(), pvec.end(), elem.first);
+            if (it == pvec.end()) {
+                pvec.push_back(elem.first);
+                bwvec.emplace_back(elem.first.x(), elem.first.y());
+            }
+
+            it = std::find(pvec.begin(), pvec.end(), elem.second);
+            if (it == pvec.end()) {
+                pvec.push_back(elem.second);
+                bwvec.emplace_back(elem.second.x(), elem.second.y());
+            }
+
         }
 
 
