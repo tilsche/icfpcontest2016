@@ -53,33 +53,34 @@ PATH_GIT_REMOTE = ".icfpc/git_remote/"
 REPO = "git@github.com:tilsche/icfpcontest2016.git"
 
 def main():
-    #pull work package
-    print("pulling work package")
-    task, version, constraint, seed = get_work(cpu_count())
-    print("Work package " + str(task.path))
-    #clone git
-    path = PATH_GIT_REMOTE + version.reference + "/"
-    if not pathlib.Path(path).exists():
-        print("cloning into " + path)
-        out = subprocess.check_output(["git", "clone", REPO, path], universal_newlines=True)
-        print(out)
-        #pull from git
-        print("checkout " + version.reference)
-        out = subprocess.check_output(["git", "-C", path, "checkout", version.reference], universal_newlines=True)
-        print(out)
-        #build
-        print("building")
-        print(path)
-        out = subprocess.check_output(["./build.sh", str(path)], universal_newlines=True)
+    while True:
+        #pull work package
+        print("pulling work package")
+        task, version, constraint, seed = get_work(cpu_count())
+        print("Work package " + str(task.path))
+        #clone git
+        path = PATH_GIT_REMOTE + version.reference + "/"
+        if not pathlib.Path(path).exists():
+            print("cloning into " + path)
+            out = subprocess.check_output(["git", "clone", REPO, path], universal_newlines=True)
+            print(out)
+            #pull from git
+            print("checkout " + version.reference)
+            out = subprocess.check_output(["git", "-C", path, "checkout", version.reference], universal_newlines=True)
+            print(out)
+            #build
+            print("building")
+            print(path)
+            out = subprocess.check_output(["./build.sh", str(path)], universal_newlines=True)
+            print(str(out))
+        #execute
+        print("executing " + path + "solver/build/solver")
+        print(constraint)
+        print(constraint.runtime_ms)
+        out = execute.execute(path + "solver/build/solver", "../tasks/" + task.path, constraint.runtime_ms, constraint.cores, seed)
         print(str(out))
-    #execute
-    print("executing " + path + "solver/build/solver")
-    print(constraint)
-    print(constraint.runtime_ms)
-    out = execute.execute(path + "solver/build/solver", "../tasks/" + task.path, constraint.runtime_ms, constraint.cores, seed)
-    print(str(out))
 
-    submit_work(task, version, constraint, seed, out)
+        submit_work(task, version, constraint, seed, out)
 
 if __name__ == "__main__":
     main()
