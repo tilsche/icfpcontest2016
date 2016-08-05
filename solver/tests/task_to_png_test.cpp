@@ -12,15 +12,22 @@ int main(int argc, const char** args)
 
     auto t = zebra::read_task(args[1]);
 
-    ofstream silo("sil.dat");
-    for (const auto& polygon : t.sil.polygons) {
+    for (int i = 0; i < t.sil.polygons.size(); i += 1) {
+        const auto& polygon = t.sil.polygons[i];
+
+        stringstream s;
+        s << "sil_poly_" << i << ".dat";
+
+        ofstream f(s.str());
 
         for (auto v = polygon.edges_begin(); v != polygon.edges_end(); ++v) {
             point a = v->source();
             point b = v->target();
 
-            silo << gmpq_to_double(a.x()) << ' ' << gmpq_to_double(a.y()) << ' ' << gmpq_to_double(b.x()) << ' ' << gmpq_to_double(b.y()) << endl;
+            f << gmpq_to_double(a.x()) << ' ' << gmpq_to_double(a.y()) << ' ' << gmpq_to_double(b.x()) << ' ' << gmpq_to_double(b.y()) << endl;
         }
+
+        f.close();
 
     }
 
@@ -31,15 +38,21 @@ int main(int argc, const char** args)
 
         skelo << gmpq_to_double(a.x()) << ' ' << gmpq_to_double(a.y()) << ' ' << gmpq_to_double(b.x()) << ' ' << gmpq_to_double(b.y()) << endl;
     }
+    skelo.close();
 
     char *f = strdup(args[1]);
 
     ofstream o("a.plot");
 
-    o << "set terminal pngcairo size 1280,800" << endl;
+    o << "set terminal pngcairo size 800,800" << endl;
     o << "set output \"" << basename(f) << ".png\"" << endl;
-    o << "plot \"sil.dat\" using 1:2:($3-$1):($4-$2) title \"Silhouette\" with vectors nohead lw 3, \\" << endl;
-    o << "     \"skel.dat\" using 1:2:($3-$1):($4-$2) title \"Skeleton\" with vectors nohead lw 3" << endl;
+    o << "plot ";
+
+    for (int i = 0; i < t.sil.polygons.size(); i += 1) {
+        o << "\"sil_poly_" << i << ".dat\" using 1:2:($3-$1):($4-$2) title \"Silhouette_Polygon" << i << "\" with vectors nohead lw 3, \\" << endl;
+    }
+
+    o << " \"skel.dat\" using 1:2:($3-$1):($4-$2) title \"Skeleton\" with vectors nohead lw 3" << endl;
 
     o.close();
 
@@ -47,7 +60,13 @@ int main(int argc, const char** args)
 
     system("gnuplot a.plot");
 
-    unlink("sil.dat");
+    unlink("a.plot");
+
+    for (int i = 0; i < t.sil.polygons.size(); i += 1) {
+        stringstream ss;
+        ss << "sil_poly_" << i << ".dat";
+        unlink(ss.str().c_str());
+    }
     unlink("skel.dat");
 
     return 0;

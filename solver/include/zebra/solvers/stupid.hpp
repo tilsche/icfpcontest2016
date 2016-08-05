@@ -6,7 +6,7 @@
 
 namespace zebra
 {
-class stupidsolver : public solver
+class stupid : public solver
 {
 public:
     solution operator()(task t) override
