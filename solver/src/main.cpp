@@ -1,7 +1,9 @@
 #include <iostream>
 
+#include <zebra/log.hpp>
+
 int main()
 {
-    std::cout << "Hello, World!" << std::endl;
+    zebra::logging::info() << "Hello, World!";
     return 0;
 }
