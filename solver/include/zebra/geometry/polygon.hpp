@@ -4,16 +4,18 @@
 
 #include "kernel.hpp"
 
+#include <CGAL/Polygon_2.h>
+
 #include <vector>
 
 namespace zebra
 {
 
-class polygon : kernel::Polygon_2
+class polygon : public CGAL::Polygon_2<kernel>
 {
 public:
     template <class CONTAINER>
-    polygon(const CONTAINER& c) : kernel::Polygon_2(c.begin(), c.end())
+    polygon(const CONTAINER& c) : CGAL::Polygon_2<kernel>(c.begin(), c.end())
     {
     }
 };
