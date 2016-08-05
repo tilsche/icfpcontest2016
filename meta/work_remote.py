@@ -9,12 +9,13 @@ import xmlrpc.client
 import execute
 
 from models import *
+from run import cpu_count
 
-def get_work():
+def get_work(cores_max):
     """Get work from Master, see work_local.py"""
 
     proxy = xmlrpc.client.ServerProxy("http://localhost:8000/", use_builtin_types=True)
-    return tuple(map(pickle.loads, proxy.get_work_pickled()))
+    return tuple(map(pickle.loads, proxy.get_work_pickled(cores_max)))
 
 def submit_work(task, version, constraint, seed, solution):
     """Submit work to Master, see work_local.py"""
@@ -30,7 +31,7 @@ REPO = "https://github.com/na-oma/test.git"
 def main():
     #pull work package
     print("pulling work package")
-    task, version, constraint, seed = get_work()
+    task, version, constraint, seed = get_work(cpu_count())
     print("Work package " + str(task.path))
     #clone git
     path = PATH_GIT_REMOTE + version.reference + "/"
