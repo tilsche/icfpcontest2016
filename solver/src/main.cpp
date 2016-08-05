@@ -3,6 +3,8 @@
 #include <zebra/log.hpp>
 #include <zebra/task.hpp>
 
+#include <zebra/backward_solve.hpp>
+
 #include <boost/program_options.hpp>
 #include <zebra/solver.hpp>
 #include <zebra/solvers/simple.hpp>
@@ -50,15 +52,18 @@ int main(int argc, char** argv)
     zebra::logging::info() << "filename: " << filename;
     // do something useful
     auto t = zebra::read_task(filename);
-    std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::simple>();
+    auto ng = zebra::node_graph(t);
+    zebra::print_node_graph(ng);
+    //std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::simple>();
 
-    zebra::logging::info() << "solving...";
-    auto solu = (*solve)(t);
-    zebra::logging::info() << "solution found...";
+    //zebra::logging::info() << "solving...";
+    //auto solu = (*solve)(t);
+    //zebra::logging::info() << "solution found...";
 
     // std::ofstream ofs(filename_out);
     // ofs << solu;
-    std::cout << solu;
+    //std::cout << solu;
+
 
     return 0;
 }
