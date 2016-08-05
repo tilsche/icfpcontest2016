@@ -4,11 +4,16 @@
 
 #include <vector>
 
+#include "geometry/polygon.hpp"
+
 namespace zebra
 {
 class silhouette
 {
 public:
+    silhouette()
+    {
+    }
     silhouette(std::vector<polygon> p) : polygons(p)
     {
     }

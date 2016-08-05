@@ -15,7 +15,7 @@ namespace zebra
 
 using point = kernel::Point_2;
 
-point point_from_string(const std::string& s_)
+inline point point_from_string(std::string s)
 {
     std::string s(s_);
     for (int i = 0; i < s.size(); i += 1)
