@@ -11,7 +11,7 @@
 namespace zebra
 {
 using transofrmation = CGAL::Aff_transformation_2<kernel>;
-
+using vector = kernel::Vector_2;
 }
 
 #endif // SOLVER_GEOMETRY_HPP
