@@ -70,12 +70,14 @@ def main():
         #build
         print("building")
         print(path)
-        out = subprocess.check_output(["./build.sh", path], universal_newlines=True)
+        out = subprocess.check_output(["./build.sh", str(path)], universal_newlines=True)
         print(str(out))
     #execute
     print("executing " + path + "solver/build/solver")
+    print(constraint)
+    print(constraint.runtime_ms)
     out = execute.execute(path + "solver/build/solver", task.path, constraint.runtime_ms, constraint.cores, seed)
-    print(out)
+    print(str(out))
 
     submit_work(task, version, constraint, seed, out)
 
