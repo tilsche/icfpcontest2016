@@ -20,16 +20,20 @@ int main(int argc, char** argv)
 {
     zebra::logging::info() << "Hello, World!";
 
+    po::positional_options_description positional_options;
+    positional_options.add("task-file", -1);
+
     po::options_description options("");
     // clang-format off
     options.add_options()("help", "show help message")
-            ("task-file", po::value<std::string>(), "File containing the task.")
-            ("output-file", po::value<std::string>(), "File containing the output.");
+            ("task-file", po::value<std::string>(), "File containing the task.");
     // clang-format on
 
     po::variables_map vm;
 
-    po::store(po::command_line_parser(argc, argv).options(options).run(), vm);
+    po::store(
+        po::command_line_parser(argc, argv).options(options).positional(positional_options).run(),
+        vm);
 
     if (vm.count("help"))
     {
@@ -39,19 +43,19 @@ int main(int argc, char** argv)
 
     po::notify(vm);
 
-    assert(vm.count("task-file"));
-    assert(vm.count("output-file"));
-
     auto filename = vm["task-file"].as<std::string>();
-    auto filename_out = vm["output-file"].as<std::string>();
-    zebra::logging::info() << "filename: " << filename << "\n";
+    zebra::logging::info() << "filename: " << filename;
     // do something useful
     auto t = zebra::read_task(filename);
     std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::stupidsolver>();
-    auto solu = (*solve)(t);
 
-    std::ofstream ofs(filename_out);
-    ofs << solu;
+    zebra::logging::info() << "solving...";
+    auto solu = (*solve)(t);
+    zebra::logging::info() << "solution found...";
+
+    // std::ofstream ofs(filename_out);
+    // ofs << solu;
+    std::cout << solu;
 
     return 0;
 }
