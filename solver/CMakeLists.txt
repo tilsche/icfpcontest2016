@@ -19,7 +19,7 @@ find_package(GMP REQUIRED)
 
 find_package(Steven REQUIRED)
 
-find_package(Boost 1.55 REQUIRED COMPONENTS program_options system filesystem)
+find_package(Boost 1.54 REQUIRED COMPONENTS program_options system filesystem)
 
 include_directories(include)
 
