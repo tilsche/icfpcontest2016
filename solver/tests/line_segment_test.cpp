@@ -1,4 +1,4 @@
-#include <zebra/line_segment.hpp>
+#include <zebra/geometry/line_segment.hpp>
 using namespace zebra;
 
 #include <sstream>
