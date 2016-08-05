@@ -11,6 +11,29 @@ import execute
 from models import *
 from run import cpu_count
 
+#http://code.activestate.com/recipes/577376-simple-way-to-execute-multiple-process-in-parallel/
+def cpu_count():
+    ''' Returns the number of CPUs in the system
+    '''
+    num = 1
+    if sys.platform == 'win32':
+        try:
+            num = int(os.environ['NUMBER_OF_PROCESSORS'])
+        except (ValueError, KeyError):
+            pass
+    elif sys.platform == 'darwin':
+        try:
+            num = int(os.popen('sysctl -n hw.ncpu').read())
+        except ValueError:
+            pass
+    else:
+        try:
+            num = os.sysconf('SC_NPROCESSORS_ONLN')
+        except (ValueError, OSError, AttributeError):
+            pass
+
+    return num
+
 def get_work(cores_max):
     """Get work from Master, see work_local.py"""
 
@@ -49,7 +72,7 @@ def main():
         print(str(out))
     #execute
     print("executing " + path + "solver/build/solver")
-    out = execute.execute(path + "solver/build/solver", task.path, constraint.runtime_ms, constraint.cores, seed)
+    out = execute.execute(path + "solver/build/solver", task.path, "--runtime", constraint.runtime_ms, "--cores", constraint.cores, "--seed", seed)
     print(out)
 
     submit_work(task, version, constraint, seed, out)
