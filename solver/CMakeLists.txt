@@ -25,3 +25,5 @@ file(GLOB SOURCE_FILES src/*.cpp)
 add_executable(solver ${SOURCE_FILES})
 
 target_link_libraries(solver ${GMP_LIBRARIES})
+
+add_subdirectory(tests)
