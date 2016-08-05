@@ -9,16 +9,18 @@ import xmlrpc.server
 
 from models import *
 
-def get_work():
+def get_work(cores_max):
     """Returns Task, Version, Constraint, seed"""
 
     connect()
     #try queue
-    work = Work.deque()
+    print(cores_max)
+    work = Work.deque(cores_max)
     if work is not None:
         close()
         return work.task, work.version, work.constraint, random.randrange(1e10)
     #randomly select task, constraint, version
+    print("Selecting random Work")
     task = Task.select().order_by(fn.Random()).limit(1).get()
     version = Version.select().order_by(fn.Random()).limit(1).get()
     constraint = Constraint.select().order_by(fn.Random()).limit(1).get()
@@ -47,8 +49,8 @@ def submit_work(task, version, constraint, seed, solution):
 def serve():
     """Starts a server listening for Slaves requesting or submitting work"""
 
-    def get_work_pickled():
-        return tuple(map(pickle.dumps, get_work()))
+    def get_work_pickled(cores_max):
+        return tuple(map(pickle.dumps, get_work(cores_max)))
     def submit_work_pickled(*args):
         submit_work(*tuple(map(pickle.loads, args)))
         return True

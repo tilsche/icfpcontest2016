@@ -25,10 +25,12 @@ class Work(BaseModel):
     constraint = ForeignKeyField(Constraint, related_name='work')
     priority = IntegerField()
     count = IntegerField()
-    def deque():
+    def deque(cores_max):
         try:
             with database.atomic():
-                work = Work.select().order_by(Work.priority).limit(1).get()
+                work = (Work.select().join(Constraint)
+                .where(Constraint.cores <= cores_max)
+                .order_by(Work.priority).limit(1).get())
                 if work.count > 1:
                     work.count -= 1
                     work.save()
