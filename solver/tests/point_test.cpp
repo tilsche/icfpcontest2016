@@ -17,7 +17,7 @@ void test1()
     assert(p.y().numerator() == 3);
     assert(p.y().denominator() == 4);
 
-    std::cerr << zebra::point_to_string(p);
+    //std::cerr << zebra::point_to_string(p);
     assert(zebra::point_to_string(p) == "1/2,3/4");
 
     zebra::point q(p);
@@ -32,6 +32,6 @@ void test1()
     assert(p.y().numerator()   == 2);
     assert(p.y().denominator() == 1);
 
-    std::cerr <<zebra::point_to_string(p);
+    //std::cerr <<zebra::point_to_string(p);
     assert(zebra::point_to_string(p) == "1,2");
 }
