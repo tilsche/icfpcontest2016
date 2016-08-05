@@ -4,6 +4,7 @@
 
 #include <zebra/solver.hpp>
 
+#include <zebra/log.hpp>
 #include <zebra/origami.hpp>
 
 namespace zebra
@@ -13,9 +14,9 @@ class simple : public solver
 public:
     solution operator()(task t) override
     {
+        logging::info() << "Simple solver starting..";
         solution s;
         s.source_positions = make_polygon_1();
-        s.destination_positions = make_polygon_1();
         s.facets.push_back({ 0, 1, 2, 3 });
 
         assert(t.sil.polygons.size() == 1);
@@ -37,8 +38,13 @@ public:
                 }
             }
         }
-        logging::info() << "Simple found best resemblence " << best_r;
+        auto vector = best_ori.poly.vertex(0) - ori.poly.vertex(0);
+        logging::info() << "Simple found best resemblence " << best_r
+                        << " vector: " << gmpq_to_string(vector.hx()) << ", "
+                        << gmpq_to_string(vector.hy());
 
+        transofrmation move(CGAL::TRANSLATION, vector);
+        s.destination_positions = CGAL::transform(move, s.source_positions);
         //        s.destination_positions
         return s;
     }
