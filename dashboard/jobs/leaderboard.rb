@@ -34,7 +34,7 @@ SCHEDULER.every '5s' do
                     end
                 }
             end
-            if user["username"] == 191 then
+            if user["username"] == "191" then
                 leaderboard.push label: "#{i}. Zebra Infused Hamsters", value: user["score"]
                 has_zih = true
             end
