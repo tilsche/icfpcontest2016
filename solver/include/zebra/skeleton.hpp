@@ -78,25 +78,54 @@ skeleton skeleton_fold(const skeleton& s, const line_segment& fold) {
 
     // determine which half to fold
 
-    //auto left_side = [](const line_segment& fold, const line_segment& l) -> bool {
-    //    auto left_side(const line_segment& fold, const point& p) -> bool {
-    //    }
+    std::vector<line_segment> v1;
+    std::vector<line_segment> v2;
 
+    auto left_side = [](const line_segment& fold, const line_segment& l) -> bool {
 
-    //    if (left_side(fold, l.source())
+        auto distance = [](const line_segment& fold, const point& p) -> CGAL::Gmpq {
+            auto x1 = fold.source().x();
+            auto y1 = fold.source().y();
+            auto x2 = fold.target().x();
+            auto y2 = fold.target().y();
+            auto x  = p.x();
+            auto y  = p.y();
 
-    //};
+            return (x - x1)*(y2 - y1) - (y - y1)*(x2 - x1);
+        };
+
+        if (distance(fold, l.source()) <= 0 && distance(fold, l.target()) <= 0) {
+            return true;
+        } else {
+            return false;
+        }
+    };
 
     for (const auto& l : t) {
-
-        std::cerr << CGAL::squared_distance(fold, l.source());
-
+        if (left_side(fold, l)) {
+            v1.push_back(l);
+        } else {
+            v2.push_back(l);
+        }
     }
 
+    std::cerr << "left segments: " << std::endl;
+    for (const auto& l : v1) {
+        std::cerr << "  " << line_segment_to_string(l) << std::endl;
+    }
 
+    std::cerr << "right segments: " << std::endl;
+    for (const auto& l : v2) {
+        std::cerr << "  " << line_segment_to_string(l) << std::endl;
+    }
+
+    // TODO mirror left side
+
+    // TODO unify mirrored left side and right side
+
+    // TODO deduplicate segments
 
     return skeleton();
-
 }
 
 }
