@@ -17,16 +17,16 @@ using line_segment = kernel::Segment_2;
 inline line_segment line_segment_from_string(const std::string& s)
 {
     int space = -1;
-    for (int i = 0; i < s.size(); i += 1)
+    for (std::size_t i = 0; i < s.size(); i += 1)
     {
         if (space == -1 && s[i] == ' ')
         {
-            space = i;
+            space = (int) i;
         }
 
         assert(s[i] == ',' || s[i] == '/' || s[i] == ' ' || s[i] == '-' ||
                (s[i] >= '0' && s[i] <= '9'));
-        assert(!(space != -1 && s[i] == ' ' && space != i));
+        assert(!(space != -1 && s[i] == ' ' && space != (int) i));
     }
 
     assert(space != -1);

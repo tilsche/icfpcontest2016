@@ -12,7 +12,7 @@ int main(int argc, const char** args)
 
     auto t = zebra::read_task(args[1]);
 
-    for (int i = 0; i < t.sil.polygons.size(); i += 1) {
+    for (std::size_t i = 0; i < t.sil.polygons.size(); i += 1) {
         const auto& polygon = t.sil.polygons[i];
 
         stringstream s;
@@ -48,7 +48,7 @@ int main(int argc, const char** args)
     o << "set output \"" << basename(f) << ".png\"" << endl;
     o << "plot ";
 
-    for (int i = 0; i < t.sil.polygons.size(); i += 1) {
+    for (std::size_t i = 0; i < t.sil.polygons.size(); i += 1) {
         o << "\"sil_poly_" << i << ".dat\" using 1:2:($3-$1):($4-$2) title \"Silhouette_Polygon" << i << "\" with vectors nohead lw 3, \\" << endl;
     }
 
@@ -62,7 +62,7 @@ int main(int argc, const char** args)
 
     unlink("a.plot");
 
-    for (int i = 0; i < t.sil.polygons.size(); i += 1) {
+    for (std::size_t i = 0; i < t.sil.polygons.size(); i += 1) {
         stringstream ss;
         ss << "sil_poly_" << i << ".dat";
         unlink(ss.str().c_str());
