@@ -132,6 +132,7 @@ inline std::ostream& operator<<(std::ostream& os, const solution& s)
     os << s.facets.size() << "\n";
     for (const auto& facet : s.facets)
     {
+        os << facet.size() << " ";
         for (auto vertex_id : facet)
         {
             os << vertex_id << " ";
