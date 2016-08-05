@@ -2,6 +2,8 @@ FILE(GLOB TESTS *_test.cpp)
 
 include(CTest)
 
+include_directories(../include)
+
 foreach(TEST ${TESTS})
 
     get_filename_component(TEST_NAME ${TEST} NAME_WE)
