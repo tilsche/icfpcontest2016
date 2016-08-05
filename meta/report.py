@@ -7,7 +7,13 @@ from tabulate import tabulate
 def help():
     print("Reports information about tasks, versions, runs, scores")
 
-def report():
+def explanation():
+    return "\n".join(["In each row, you can see one of your versions, in each column you see how it did on some task over multiple runs",
+        "Format is",
+        "\tMinimum Score / Average Score / Maximum Score",
+        "over all runs of this Version\Task combination.",])
+
+def table():
     connect()
     runs = (Run.select(Run, Task, Version, fn.Min(Run.score).alias("min"), fn.Avg(Run.score).alias("avg"), fn.Max(Run.score).alias("max"))
             .group_by(Run.task, Run.version)
@@ -25,22 +31,21 @@ def report():
     for run in runs:
         if run.version_id not in seenVersions:
             seenVersions.add(run.version_id)
-            rows.append([run.version.path] + [""] * (len(headers) - 1))
+            rows.append([run.version.reference] + [""] * (len(headers) - 1))
         rows[-1][headers.index(run.task.path)] = str(run.min) + "/" + str(run.avg) + "/" + str(run.max)
-
-    print("In each row, you can see one of your versions, in each column you see how it did on some task over multiple runs")
-    print("Format is")
-    print("\tMinimum Score / Average Score / Maximum Score")
-    print("over all runs of this Version\Task combination.")
-    print(tabulate(rows, headers, tablefmt="fancy_grid")) 
+    out = tabulate(rows, headers, tablefmt="fancy_grid")
     close()
+    return out
+
+def report():
+    return "\n".join([explanation(), table(),])
 
 def main():
     if len(argv) > 1:
         help()
         return
 
-    report()
+    print(report())
 
 if __name__ == "__main__":
     main()
