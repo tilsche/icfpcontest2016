@@ -49,7 +49,7 @@ def main():
         print(str(out))
     #execute
     print("executing " + path + "solver/build/solver")
-    out = execute.execute(path + "solver/build/solver", task.path, constraint.runtime_ms, constraint.cores)
+    out = execute.execute(path + "solver/build/solver", task.path, constraint.runtime_ms, constraint.cores, seed)
     print(out)
 
     submit_work(task, version, constraint, seed, out)
