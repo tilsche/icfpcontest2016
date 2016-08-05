@@ -1,6 +1,5 @@
 dist: trusty
 language: generic
-os: osx
 matrix:
   include:
     - os: linux
