@@ -17,7 +17,6 @@ using point = kernel::Point_2;
 
 inline point point_from_string(std::string s)
 {
-    std::string s(s_);
     for (int i = 0; i < s.size(); i += 1)
     {
         if (s[i] == ',')
