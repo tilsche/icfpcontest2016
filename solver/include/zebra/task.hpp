@@ -37,8 +37,10 @@ bool for_n_lines(std::ifstream& in, uint64_t number_of_lines,
         return false;
     }
 
-    for (std::string line; getline(in, line) && number_of_lines > 0; --number_of_lines)
+    for (std::string line; number_of_lines > 0; --number_of_lines)
     {
+        // TODO error check
+        getline(in, line);
         if (!cb(line))
         {
             break;
@@ -53,7 +55,8 @@ polygon read_polygon(std::ifstream& in)
     std::string line;
     getline(in, line);
     uint64_t num_vertices = std::stoull(line);
-    std::vector<point> points(num_vertices);
+    std::vector<point> points;
+    points.reserve(num_vertices);
 
     for_n_lines(in, num_vertices, [&](const std::string& line) {
         points.emplace_back(point_from_string(line));
@@ -80,7 +83,8 @@ std::vector<line_segment> read_line_segements(std::ifstream& in)
     std::string line;
     getline(in, line);
     uint64_t num_edges = std::stoull(line);
-    std::vector<line_segment> edges(num_edges);
+    std::vector<line_segment> edges;
+    edges.reserve(num_edges);
 
     for_n_lines(in, num_edges, [&](const std::string& line) {
         edges.emplace_back(line_segment_from_string(line));
