@@ -59,17 +59,25 @@ public:
          */
     }
 
-    std::vector<origami> move_to(line_segment seg) const
+    std::vector<origami> move_to(point p) const
     {
         std::vector<origami> results;
         results.reserve(poly.size() * 2);
         for (auto edge_it = poly.edges_begin(); edge_it != poly.edges_end(); edge_it++)
         {
             const auto& edge = *edge_it;
-            transofrmation move(CGAL::TRANSLATION, seg.source() - edge.source());
-            auto moved = *this;
-            moved.poly = CGAL::transform(move, moved.poly);
-            results.push_back(moved);
+            {
+                transofrmation move(CGAL::TRANSLATION, p - edge.source());
+                auto moved = *this;
+                moved.poly = CGAL::transform(move, moved.poly);
+                results.push_back(moved);
+            }
+            {
+                transofrmation move(CGAL::TRANSLATION, p - edge.target());
+                auto moved = *this;
+                moved.poly = CGAL::transform(move, moved.poly);
+                results.push_back(moved);
+            }
         }
         return results;
     }

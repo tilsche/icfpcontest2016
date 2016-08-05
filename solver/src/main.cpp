@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     zebra::logging::info() << "filename: " << filename;
     // do something useful
     auto t = zebra::read_task(filename);
-    std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::stupid>();
+    std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::simple>();
 
     zebra::logging::info() << "solving...";
     auto solu = (*solve)(t);
