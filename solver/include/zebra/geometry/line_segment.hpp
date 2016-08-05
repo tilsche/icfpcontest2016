@@ -4,11 +4,14 @@
 #include "kernel.hpp"
 #include <zebra/geometry.hpp>
 
-namespace zebra {
+namespace zebra
+{
 
-class line_segment : Kernel::Segment_2
+class line_segment : kernel::Segment_2
 {
 };
+
+}
 /*
 {
 public:
