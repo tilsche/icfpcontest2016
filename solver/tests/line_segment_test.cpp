@@ -49,5 +49,20 @@ void test_slope() {
 }
 
 void test_disjoint() {
+    line_segment l1 = line_segment::from_string("1,1 2,2");
+    line_segment l2 = line_segment::from_string("2,2 3,3");
+    line_segment l3 = line_segment::from_string("3,3 4,4");
+    line_segment l4 = line_segment::from_string("0,0 0,1");
+
+    line_segment l5 = line_segment::from_string("3/2,3/2 7/4,7/4");
+    line_segment l6 = line_segment::from_string("3/2,3/2 3,3");
+
+    assert(is_disjoint(l1, l2));
+    assert(is_disjoint(l2, l3));
+    assert(is_disjoint(l1, l3));
+    assert(is_disjoint(l1, l4));
+
+    assert(is_disjoint(l1, l5) == false);
+    assert(is_disjoint(l1, l6) == false);
 
 }
