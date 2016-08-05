@@ -7,9 +7,10 @@ import random
 import subprocess
 import xmlrpc.client
 import execute
+import sys
+import os
 
 from models import *
-from run import cpu_count
 
 #http://code.activestate.com/recipes/577376-simple-way-to-execute-multiple-process-in-parallel/
 def cpu_count():
@@ -72,7 +73,7 @@ def main():
         print(str(out))
     #execute
     print("executing " + path + "solver/build/solver")
-    out = execute.execute(path + "solver/build/solver", task.path, "--runtime", constraint.runtime_ms, "--cores", constraint.cores, "--seed", seed)
+    out = execute.execute(path + "solver/build/solver", task.path, constraint.runtime_ms, constraint.cores, seed)
     print(out)
 
     submit_work(task, version, constraint, seed, out)
