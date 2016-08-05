@@ -5,9 +5,13 @@ using namespace zebra;
 using namespace std;
 
 void test1();
+void test_slope();
+void test_disjoint();
 
 int main() {
     test1();
+    test_slope();
+    test_disjoint();
 }
 
 void test1() {
@@ -32,3 +36,18 @@ void test1() {
     assert(n == l);
 }
 
+void test_slope() {
+    line_segment l1 = line_segment::from_string("1,1 2,2");
+    line_segment l2 = line_segment::from_string("2,2 1,1");
+    line_segment l3 = line_segment::from_string("0,0 0,1");
+    line_segment l4 = line_segment::from_string("0,0 0,-1");
+
+    assert(l1.slope() == 1);
+    assert(l2.slope() == 1);
+    assert(l3.slopeInf() == true);
+    assert(l4.slopeInf() == true);
+}
+
+void test_disjoint() {
+
+}

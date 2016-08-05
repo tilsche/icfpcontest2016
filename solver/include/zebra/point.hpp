@@ -63,7 +63,7 @@ public:
                 comma = i;
             }
 
-            assert(s[i] == ',' || s[i] == '/' || (s[i] >= '0' && s[i] <= '9'));
+            assert(s[i] == ',' || s[i] == '/' || s[i] == '-' || (s[i] >= '0' && s[i] <= '9'));
         }
 
         assert(comma != -1);
@@ -78,8 +78,6 @@ public:
         return p;
     }
 };
-
-using vector = point;
 
 std::ostream& operator<<(std::ostream& o, const point& p)
 {
