@@ -7,9 +7,6 @@ find_path(GMPXX_INCLUDE_DIR NAMES gmpxx.h)
 find_library(GMP_LIBRARIES NAMES gmp)
 find_library(GMPXX_LIBRARY NAMES gmpxx)
 
-
-
-
 include (FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(GMP DEFAULT_MSG
   GMP_LIBRARIES GMPXX_LIBRARY GMPXX_INCLUDE_DIR
