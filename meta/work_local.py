@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import tempfile
 import pathlib
 import pickle
@@ -58,4 +60,7 @@ def serve():
     server.register_function(get_work_pickled, "get_work_pickled")
     server.register_function(submit_work_pickled, "submit_work_pickled")
     server.serve_forever()
+
+if __name__ == "__main__":
+    serve()
 
