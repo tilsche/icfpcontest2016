@@ -91,9 +91,7 @@ std::vector<line_segment> read_line_segements(std::ifstream& in)
 task read_task(const std::string& taskfile)
 {
     std::ifstream in {taskfile};
-    if (!in) {
-        return;
-    }
+    assert(in);
 
     std::string line;
     getline(in, line);

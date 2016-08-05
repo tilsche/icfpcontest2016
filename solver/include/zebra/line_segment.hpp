@@ -40,6 +40,25 @@ public:
         return *this;
     }
 
+    bool slopeInf() const {
+        return (a - b).x == 0;
+    }
+
+    mpq_class slope() const {
+        assert(slopeInf() == false);
+
+        point aa, bb;
+        if (a.x <= b.x) {
+            aa = a;
+            bb = b;
+        } else {
+            aa = b;
+            bb = a;
+        }
+
+        return (bb.y - aa.y) / (bb.x - aa.x);
+    }
+
     static line_segment from_string(const std::string& s)
     {
 
@@ -51,7 +70,7 @@ public:
                 space = i;
             }
 
-            assert(s[i] == ',' || s[i] == '/' || s[i] == ' ' || (s[i] >= '0' && s[i] <= '9'));
+            assert(s[i] == ',' || s[i] == '/' || s[i] == ' ' || s[i] == '-' || (s[i] >= '0' && s[i] <= '9'));
             assert(! (space != -1 && s[i] == ' ' && space != i));
         }
 
@@ -63,6 +82,10 @@ public:
         return line_segment(point::from_string(a), point::from_string(b));
     }
 };
+
+bool is_disjoint(const line_segment& l, const line_segment& m) {
+return false;
+}
 
 std::ostream& operator<<(std::ostream& o, const line_segment& s) {
     o << s.a << " " << s.b;
