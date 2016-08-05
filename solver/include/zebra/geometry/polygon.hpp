@@ -6,19 +6,8 @@
 
 #include <CGAL/Polygon_2.h>
 
-#include <vector>
-
 namespace zebra
 {
-
-class polygon : public CGAL::Polygon_2<kernel>
-{
-public:
-    template <class CONTAINER>
-    polygon(const CONTAINER& c) : CGAL::Polygon_2<kernel>(c.begin(), c.end())
-    {
-    }
-};
+using polygon = CGAL::Polygon_2<kernel>;
 }
-
 #endif // SOLVER_POLYGON_HPP

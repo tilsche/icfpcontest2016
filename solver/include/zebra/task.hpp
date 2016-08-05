@@ -48,7 +48,7 @@ polygon read_polygon(std::ifstream& in)
     std::vector<point> points(num_vertices);
 
     for_n_lines(in, num_vertices, [&](const std::string& line) {
-                      points.push_back(point::from_string(line));
+                      points.emplace_back(line);
                       return true;
                 });
 
@@ -76,7 +76,7 @@ std::vector<line_segment> read_line_segements(std::ifstream& in)
     std::vector<line_segment> edges(num_edges);
 
     for_n_lines(in, num_edges, [&](const std::string& line) {
-                edges.emplace_back(line_segment::from_string(line));
+                //edges.emplace_back(line_segment::from_string(line));
                 return true;
             });
 

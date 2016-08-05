@@ -7,9 +7,7 @@
 namespace zebra
 {
 
-class line_segment : kernel::Segment_2
-{
-};
+using line_segment = kernel::Segment_2;
 
 }
 /*

@@ -12,31 +12,23 @@
 namespace zebra
 {
 
-class point : public kernel::Point_2
+using point = kernel::Point_2;
+static point point_from_string(std::string s)
 {
-public:
-    point(const std::string& s) : kernel::Point_2(read_string(s))
+    for (int i = 0; i < s.size(); i += 1)
     {
-    }
-
-    static kernel::Point_2 read_string(std::string s)
-    {
-        for (int i = 0; i < s.size(); i += 1)
+        if (s[i] == ',')
         {
-            if (s[i] == ',')
-            {
-                s[i] = ' ';
-            }
+            s[i] = ' ';
         }
-        std::stringstream ss(s);
-        CGAL::Gmpq x, y;
-        ss >> x;
-        ss >> y;
-        return kernel::Point_2(x, y);
     }
-};
+    std::stringstream ss(s);
+    CGAL::Gmpq x, y;
+    ss >> x;
+    ss >> y;
+    return point(x, y);
 }
-
+}
 /*
 public:
     mpq_class x, y;
