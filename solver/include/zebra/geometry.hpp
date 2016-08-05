@@ -10,7 +10,7 @@
 
 namespace zebra
 {
-using transofrmation = typedef CGAL::Aff_transformation_2<kernel>;
+using transofrmation = CGAL::Aff_transformation_2<kernel>;
 }
 
 #endif // SOLVER_GEOMETRY_HPP
