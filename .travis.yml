@@ -12,6 +12,7 @@ matrix:
             - cmake-data
             - libgmp-dev
             - libboost1.55-all-dev
+            - libcgal-dev
           sources: &sources
             - llvm-toolchain-precise-3.8
             - ubuntu-toolchain-r-test
@@ -27,6 +28,7 @@ matrix:
             - cmake-data
             - libgmp-dev
             - libboost1.55-all-dev
+            - libcgal-dev
           sources: *sources
 before_script:
   - cd solver && cmake .
