@@ -12,6 +12,17 @@ class point {
     public:
         mpq_class x, y;
 
+        point() : x(-1), y(-1) {}
+        point(const point& p) : x(p.x), y(p.y) {}
+        point(const mpq_class& x_, const mpq_class& y_) : x(x_), y(y_) {}
+
+        point operator=(const point& rhs)        { x = rhs.x; y = rhs.y; return *this;}
+
+        point operator+(const point& rhs)  const { return point(x + rhs.x, y + rhs.y);}
+        point operator-(const point& rhs)  const { return point(x - rhs.x, y - rhs.y);}
+        point operator*(const mpq_class f) const { return point(x*f, y*f);            }
+        bool operator==(const point& rhs)  const { return x == rhs.x && y == rhs.y;   }
+        bool operator!=(const point& rhs)  const { return ! (*this == rhs);           }
 
         static point from_string(const std::string& s) {
 
@@ -35,13 +46,12 @@ class point {
 
             return p;
         }
-
-
 };
+
+using vector = point;
 
 std::ostream& operator<<(std::ostream& o, const point& p) {
     o << p.x << "," << p.y;
-
     return o;
 }
 
