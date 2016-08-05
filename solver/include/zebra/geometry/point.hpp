@@ -51,12 +51,6 @@ std::string point_to_string(const point& p) {
     return s.str();
 }
 
-double gmpq_to_double(const CGAL::Gmpq& q) {
-    double n = q.numerator().to_double();
-    double d = q.denominator().to_double();
-    return n / d;
-}
-
 };
 
 #endif // ZEBRA_POINT_HPP
