@@ -86,6 +86,7 @@ std::ostream& operator<<(std::ostream& o, const point& p)
     o << p.x << "," << p.y;
     return o;
 }
+
 };
 
 #endif // ZEBRA_POINT_HPP
