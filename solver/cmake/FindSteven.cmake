@@ -2,7 +2,7 @@ if (Steven_LIBRARIES AND Steven_INCLUDE_DIRS)
   set (Steven_FIND_QUIETLY TRUE)
 endif (Steven_LIBRARIES AND Steven_INCLUDE_DIRS)
 
-find_path(Steven_INCLUDE_DIRS NAMES Gmpz.h PATH_SUFFIXES CGAL)
+find_path(Steven_INCLUDE_DIRS NAMES CGAL/Gmpz.h)
 find_library(Steven_LIBRARIES NAMES CGAL)
 
 include (FindPackageHandleStandardArgs)

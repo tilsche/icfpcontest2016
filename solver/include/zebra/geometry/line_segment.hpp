@@ -1,11 +1,16 @@
 #ifndef ZEBRA_LINE_SEGMENT
 #define ZEBRA_LINE_SEGMENT
 
-#include <zebra/point.hpp>
+#include "kernel.hpp"
+#include <zebra/geometry.hpp>
 
 namespace zebra {
 
-class line_segment {
+class line_segment : Kernel::Segment_2
+{
+};
+/*
+{
 public:
     point a, b;
 
@@ -93,5 +98,5 @@ std::ostream& operator<<(std::ostream& o, const line_segment& s) {
 }
 
 };
-
+*/
 #endif // ZEBRA_LINE_SEGMENT
