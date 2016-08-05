@@ -4,10 +4,12 @@ from sys import argv
 from models import *
 
 def help():
-    print("Adds a task or a version to the database.")
+    print("Adds a task, a version or a constraint to the database.")
     print("subcommands:")
-    print("\ttask <path>...\t\tadds tasks")
-    print("\tversion <path>...\tadds version")
+    print("\ttask <path>...\t\t\tadds tasks")
+    print("\tversion <path>...\t\tadds version")
+    print("\tconstraint <name> <runtime_ms> <cores>\tadds constraint")
+    print("\twork <reference> <constraintName> <count> <priority> for all  lvls")
 
 def add_task(paths):
     connect()
@@ -18,7 +20,20 @@ def add_task(paths):
 def add_version(paths):
     connect()
     for p in paths:
-        Version.create(path=p)
+        Version.create(reference=p)
+    close()
+
+def add_constraint(name, runtime_ms, cores):
+    connect()
+    Constraint.create(runtime_ms=runtime_ms, cores=cores, name=name)
+    close()
+
+def add_work(reference, constraint, count, priority):
+    connect()
+    version=Version.get(reference=reference)
+    constraint=Constraint.get(name=constraint)
+    for task in Task.select():
+        a = Work.enque(task, version=version, constraint=constraint, priority=priority, count=count)
     close()
 
 def add(args):
@@ -26,6 +41,10 @@ def add(args):
         add_task(args[1:])
     elif args[0] == "version":
         add_version(args[1:])
+    elif args[0] == "constraint":
+        help() if len(args) < 4 else add_constraint(args[1], args[2], args[3])
+    elif args[0] == "work":
+        help() if len(args) < 5 else add_work(args[1], args[2], args[3], args[4])
     else:
         help()
 
