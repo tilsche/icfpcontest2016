@@ -27,7 +27,7 @@ inline polygon make_polygon_1()
 // not tested
 void polygons_to_png(const std::vector<polygon>& v, const std::string f) {
 
-    for (int i = 0; i < v.size(); i += 1) {
+    for (std::size_t i = 0; i < v.size(); i += 1) {
         const auto& polygon = v[i];
 
         std::stringstream s;
@@ -51,7 +51,7 @@ void polygons_to_png(const std::vector<polygon>& v, const std::string f) {
     o << "set output \"" << f << ".png\"" << std::endl;
     o << "plot ";
 
-    for (int i = 0; i < v.size(); i += 1) {
+    for (std::size_t i = 0; i < v.size(); i += 1) {
         o << " \"" << f << "_" << i << ".dat\" using 1:2:($3-$1):($4-$2) title \"Polygon_" << i << "\" with vectors nohead lw 3";
 
         if (i < v.size()-1) {
@@ -67,7 +67,7 @@ void polygons_to_png(const std::vector<polygon>& v, const std::string f) {
 
     unlink((f + ".plot").c_str());
 
-    for (int i = 0; i < v.size(); i += 1) {
+    for (std::size_t i = 0; i < v.size(); i += 1) {
         std::stringstream ss;
         ss << f << "_" << i << ".dat";
         unlink(ss.str().c_str());
