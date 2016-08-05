@@ -48,8 +48,8 @@ def submit_work(task, version, constraint, seed, solution):
     proxy.submit_work_pickled(*tuple(map(pickle.dumps, [task, version, constraint, seed, solution])))
 
 PATH_GIT_REMOTE = ".icfpc/git_remote/"
-REPO = "https://github.com/na-oma/test.git"
-#"https://github.com/tilsche/icfpcontest2016.git"
+#REPO = "https://github.com/na-oma/test.git"
+REPO = "git@github.com:tilsche/icfpcontest2016.git"
 
 def main():
     #pull work package
