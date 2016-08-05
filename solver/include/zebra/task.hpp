@@ -48,11 +48,11 @@ polygon read_polygon(std::ifstream& in)
     std::vector<point> points(num_vertices);
 
     for_n_lines(in, num_vertices, [&](const std::string& line) {
-                      points.emplace_back(line);
+                      points.emplace_back(point_from_string(line));
                       return true;
                 });
 
-    return polygon{points};
+    return polygon{points.begin(), points.end()};
 }
 
 
