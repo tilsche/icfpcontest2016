@@ -29,3 +29,10 @@ add_executable(solver ${SOURCE_FILES})
 target_link_libraries(solver ${GMP_LIBRARIES} ${BOOST_LIBRARIES})
 
 add_subdirectory(tests)
+
+
+# Convince clion to accept headers as part of the project by adding them to a dummy target
+# Should not interfer with normal opratation.
+FILE(GLOB_RECURSE clion_dummy_headers ${CMAKE_SOURCE_DIR}/*.hpp)
+FILE(GLOB_RECURSE clion_dummy_source ${CMAKE_SOURCE_DIR}/src/main.cpp)
+add_executable(clion_dummy_executable EXCLUDE_FROM_ALL ${clion_dummy_source} ${clion_dummy_headers})
