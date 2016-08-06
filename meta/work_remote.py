@@ -14,8 +14,7 @@ from models import *
 
 #http://code.activestate.com/recipes/577376-simple-way-to-execute-multiple-process-in-parallel/
 def cpu_count():
-    ''' Returns the number of CPUs in the system
-    '''
+    """Returns the number of CPUs in the system"""
     num = 1
     if sys.platform == 'win32':
         try:
@@ -75,12 +74,13 @@ def main():
             print(str(out))
         #execute
         print("executing " + path + "solver/build/solver")
-        print(constraint)
-        print(constraint.runtime_ms)
-        out = execute.execute(path + "solver/build/solver", "../tasks/" + task.path, constraint.runtime_ms, constraint.cores, seed)
-        print(str(out))
-
-        submit_work(task, version, constraint, seed, out)
+        print("Constraint: " + constraint.runtime_ms + ", " + constraint.cores)
+        try:
+            out = execute.execute(path + "solver/build/solver", "../tasks/" + task.path, constraint.runtime_ms, constraint.cores, seed)
+            print(str(out))
+            submit_work(task, version, constraint, seed, out)
+        except:
+            print("Exception occured, did not send result")
 
 if __name__ == "__main__":
     main()
