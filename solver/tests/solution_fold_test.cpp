@@ -9,6 +9,7 @@ void test4();
 void test1c();
 void test2c();
 void testedge();
+void testcross();
 
 int main()
 {
@@ -20,6 +21,7 @@ int main()
     test1c();
     test2c();
     testedge();
+    testcross();
     return 0;
 }
 
@@ -200,6 +202,50 @@ void test4()
     //   +---------+
 
     // TODO check
+}
+
+
+void testcross()
+{
+    // cerr << __func__ << endl;
+
+    //   +----+----+
+    //   |    |    |
+    //   +----+----+
+    //   |    |    |
+    // 0 +----+----+
+
+    solution s;
+    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
+    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+
+    auto fold1 = line_segment_from_string("1,1/2 0,1/2");
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold1;
+
+    s.fold(fold1);
+
+    s.to_png(string(__func__) + "_post1");
+    logging::info() << "Result:\n" << s;
+
+
+    //   +---------+
+    //   |         |
+    // 0 +---------+
+
+    auto fold2 = line_segment_from_string("1/2,1 1/2,0");
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold2;
+
+    s.fold(fold2);
+    s.to_png(string(__func__) + "_post2");
+    logging::info() << "Result:\n" << s;
+    //   +----+
+    //   |    |
+    // 0 +----+
+
+    assert(s.source_positions.size() == 9);
 }
 
 void test1c()
