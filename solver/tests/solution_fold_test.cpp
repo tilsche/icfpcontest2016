@@ -106,7 +106,7 @@ void test3()
     // +---------+
 
     solution s;
-    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { 0, 1 / 2 }, { 1, 1 / 2 } };
+    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { 1, CGAL::Gmpq(1,2) }, { 0, CGAL::Gmpq(1,2) } };
 
     s.facets = { facet{.vertex_ids = { 0, 1, 4, 5 } }, facet{.vertex_ids = { 5, 4, 2, 3 } } };
 
@@ -116,7 +116,7 @@ void test3()
     // |         |
     // +---------+
     s.destination_positions = {
-        { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 }, { 0, 1 / 2 }, { 1, 1 / 2 }
+        { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 }, { 1, CGAL::Gmpq(1,2) }, { 0, CGAL::Gmpq(1,2) }
     };
 
     s.to_png(string(__func__) + "_pre");
