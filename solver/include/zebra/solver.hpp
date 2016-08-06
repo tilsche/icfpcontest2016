@@ -15,7 +15,7 @@ public:
     {
     }
 
-    virtual solution operator()(task) = 0;
+    virtual solution operator()(const task&) = 0;
 };
 }
 #endif // SOLVER_SOLVER_HPP

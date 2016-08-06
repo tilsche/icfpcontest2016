@@ -12,7 +12,7 @@ namespace zebra
 class simple : public solver
 {
 public:
-    solution operator()(task t) override
+    solution operator()(const task& t) override
     {
         logging::info() << "Simple solver starting..";
 

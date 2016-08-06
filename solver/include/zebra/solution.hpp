@@ -358,6 +358,25 @@ struct solution
         return p;
     }
 
+    void fold(const line& fold_line)
+    {
+        size_t old_facet_size = facets.size();
+        for (auto facet_id = 0; facet_id < old_facet_size; facet_id++)
+        {
+            auto& facet = facets[facet_id];
+
+            facet_fold(facet, fold_line);
+        }
+        auto mirror = reflection(fold_line);
+        for (auto& destination_position : destination_positions)
+        {
+            if (fold_line.has_on_negative_side(destination_position))
+            {
+                destination_position = mirror(destination_position);
+            }
+        }
+    }
+
     void fold(const line_segment& fold_segment)
     {
 
@@ -427,23 +446,7 @@ struct solution
 
         // verify_fold(fold_segment);
 
-        line fold_line(fold_segment.source(), fold_segment.target());
-
-        size_t old_facet_size = facets.size();
-        for (auto facet_id = 0; facet_id < old_facet_size; facet_id++)
-        {
-            auto& facet = facets[facet_id];
-
-            facet_fold(facet, fold_line);
-        }
-        auto mirror = reflection(fold_line);
-        for (auto& destination_position : destination_positions)
-        {
-            if (fold_line.has_on_negative_side(destination_position))
-            {
-                destination_position = mirror(destination_position);
-            }
-        }
+        fold(line(fold_segment.source(), fold_segment.target()));
     }
 
     void transform(transformation t)
@@ -602,7 +605,8 @@ struct solution
         return ret;
     }
 
-    double resemblance(polygon target) const
+    template <class POLY>
+    double resemblance(POLY target) const
     {
         logging::trace() << "calculating resemblence with " << target;
         logging::trace() << "solution: " << *this;
