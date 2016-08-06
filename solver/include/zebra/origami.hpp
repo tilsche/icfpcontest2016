@@ -3,6 +3,7 @@
 #define SOLVER_ORIGAMI_HPP
 
 #include <zebra/geometry.hpp>
+#include <zebra/solution.hpp>
 
 #include <CGAL/Boolean_set_operations_2.h>
 
@@ -11,73 +12,18 @@ namespace zebra
 class origami
 {
 public:
-    void fold(line_segment seg)
-    {
-        /*
-        bool source_found = false, destination_found = false;
-        polygon s2d_poly, d2s_poly;
-        for (auto it = poly.edges_circulator();; it++)
-        {
-            const auto& edge = *it;
-            if (!source_found)
-            {
-                if (edge.has_on(seg.source()))
-                {
-                    source_found = true;
-                    s2d_poly.push_back(seg.source());
-                    if (seg.source() != edge.dest())
-                    {
-                        s2d_poly.push_back(edge.dest());
-                    }
-                }
-            }
-            else if (!destination_found)
-            {
-                if (edge.has_on(seg.destination()))
-                {
-                    destination_found = true;
-                    d2s_poly.push_back(seg.dest());
-                    if (seg.dest() != edge.dest())
-                    {
-                        d2s_poly.push_back(edge.dest());
-                    }
-                }
-                else
-                {
-                    s2d_poly.push_back(edge.dest());
-                }
-            }
-            else
-            {
-                d2s_poly.push_back(edge.dest());
-                if (edge.has_on(seg.source()))
-                {
-                    break;
-                }
-            }
-        }
-         */
-    }
+    solution sol = make_solution_1();
 
     std::vector<origami> move_to(point p) const
     {
         std::vector<origami> results;
-        results.reserve(poly.size() * 2);
-        for (auto edge_it = poly.edges_begin(); edge_it != poly.edges_end(); edge_it++)
+        results.reserve(sol.destination_positions.size() * 2);
+        for (auto dp : sol.destination_positions) {
         {
-            const auto& edge = *edge_it;
-            {
-                transformation move(CGAL::TRANSLATION, p - edge.source());
-                auto moved = *this;
-                moved.poly = CGAL::transform(move, moved.poly);
-                results.push_back(moved);
-            }
-            {
-                transformation move(CGAL::TRANSLATION, p - edge.target());
-                auto moved = *this;
-                moved.poly = CGAL::transform(move, moved.poly);
-                results.push_back(moved);
-            }
+            transformation move(CGAL::TRANSLATION, p - dp);
+            auto moved = *this;
+            moved.sol.transform(move);
+            results.push_back(moved);
         }
         return results;
     }
@@ -102,7 +48,6 @@ public:
         return poly.size();
     }
 
-    polygon poly = make_polygon_1();
 };
 }
 
