@@ -51,6 +51,15 @@ namespace zebra
                     }
                 }
             }
+            
+            for(const auto& poly : t.sil.polygons)
+            {
+                std::vector<point> polygon_i;
+                std::for_each(poly.vertices_begin(), poly.vertices_end(), [&](point p){
+                    polygon_i.push_back(p);
+                    });
+                m_polys.push_back(polygon_i);
+            }
         }
 
         std::set<point>& operator[](const point& p)
@@ -63,6 +72,7 @@ namespace zebra
             return m_graph.size();
         }
 
+        std::vector<std::vector<point>> m_polys;
         std::map<point, std::set<point>> m_graph;
     };
 
