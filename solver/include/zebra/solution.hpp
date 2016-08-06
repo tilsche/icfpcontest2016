@@ -414,14 +414,13 @@ struct solution
     }
 
     void to_png(const std::string& prefix) {
-        //std::vector<point> source_positions;
-        //std::vector<facet> facets;
-        //std::vector<point> destination_positions;
+        std::vector<std::string> unlink_files;
 
         // source points
 
         auto source_points_dat = prefix + "_source_points.dat";
         std::ofstream os(source_points_dat);
+        unlink_files.push_back(source_points_dat);
         for (const auto& p : source_positions) {
             os << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
         }
@@ -429,6 +428,7 @@ struct solution
 
         auto source_points_plot = prefix + "_source_points.plot";
         std::ofstream oss(source_points_plot);
+        unlink_files.push_back(source_points_plot);
         oss << "set terminal pngcairo size 800,800" << std::endl;
         oss << "set output \"" << prefix << "_source_points.png\"" << std::endl;
         oss << "plot \"" << source_points_dat << "\" ps 3 pt 3";
@@ -436,88 +436,71 @@ struct solution
 
         system(("gnuplot " + source_points_plot).c_str());
 
-        unlink(source_points_plot.c_str());
-        unlink(source_points_dat.c_str());
-
         // destination points
 
-        auto destination_points_dat = prefix + "_destination_points.dat";
+        auto destination_points_dat = prefix + "_target_points.dat";
         std::ofstream od(destination_points_dat);
+        unlink_files.push_back(destination_points_dat);
         for (const auto& p : destination_positions) {
             od << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
         }
         od.close();
 
-        auto destination_points_plot = prefix + "_destination_points.plot";
+        auto destination_points_plot = prefix + "_target_points.plot";
         std::ofstream odd(destination_points_plot);
+        unlink_files.push_back(destination_points_plot);
         odd << "set terminal pngcairo size 800,800" << std::endl;
-        odd << "set output \"" << prefix << "_destination_points.png\"" << std::endl;
+        odd << "set output \"" << prefix << "_target_points.png\"" << std::endl;
         odd << "plot \"" << destination_points_dat << "\" ps 3 pt 3";
         odd.close();
 
         system(("gnuplot " + destination_points_plot).c_str());
 
-        unlink(destination_points_plot.c_str());
-        unlink(destination_points_dat.c_str());
+        // facets
 
-        //for (std::size_t i = 0; i < v.size(); i += 1)
-        //{
-        //    o << " \"" << f << "_" << i << ".dat\" using 1:2:($3-$1):($4-$2) title \"Polygon_" << i
-        //      << "\" with vectors nohead lw 3";
-        //for (std::size_t i = 0; i < v.size(); i += 1)
-        //{
-        //    const auto& polygon = v[i];
+        auto facets_plot = prefix + "_facets.plot";
+        std::ofstream off(facets_plot);
+        unlink_files.push_back(facets_plot);
 
-        //    std::stringstream s;
-        //    s << f << "_" << i << ".dat";
+        off << "set terminal pngcairo size 800,800" << std::endl;
+        off << "set output \"" << prefix << "_facets.png\"" << std::endl;
+        off << "plot ";
 
-        //    std::ofstream of(s.str());
+        for (int i = 0; i < facets.size(); i += 1) {
 
-        //    for (auto v = polygon.edges_begin(); v != polygon.edges_end(); ++v)
-        //    {
-        //        point a = v->source();
-        //        point b = v->target();
+            auto facet = facets[i].vertex_ids;
+            facet.push_back(facet[0]);
 
-        //        of << gmpq_to_double(a.x()) << ' ' << gmpq_to_double(a.y()) << ' '
-        //           << gmpq_to_double(b.x()) << ' ' << gmpq_to_double(b.y()) << std::endl;
-        //    }
+            std::stringstream facet_dats;
+            facet_dats << prefix << "_facet_" << i << ".dat";
+            auto facet_dat = facet_dats.str();
 
-        //    of.close();
-        //}
+            unlink_files.push_back(facet_dat);
 
-        //std::ofstream o(f + ".plot");
 
-        //o << "set terminal pngcairo size 800,800" << std::endl;
-        //o << "set output \"" << f << ".png\"" << std::endl;
-        //o << "plot ";
+            std::ofstream of(facet_dat);
+            for (int j = 0; j < facet.size(); j += 1) {
+                auto p = destination_positions[facet[j]];
+                of << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
+            }
+            of.close();
 
-        //for (std::size_t i = 0; i < v.size(); i += 1)
-        //{
-        //    o << " \"" << f << "_" << i << ".dat\" using 1:2:($3-$1):($4-$2) title \"Polygon_" << i
-        //      << "\" with vectors nohead lw 3";
+            off << "\"" << facet_dat << "\" with lines lw 3";
 
-        //    if (i < v.size() - 1)
-        //    {
-        //        o << ", \\" << std::endl;
-        //    }
-        //    else
-        //    {
-        //        o << std::endl;
-        //    }
-        //}
+            if (i < facets.size()-1) {
+                off << ", \\" << std::endl;
+            } else {
+                off << std::endl;
+            }
+        }
 
-        //o.close();
+        off.close();
 
-        //system(("gnuplot " + f + ".plot").c_str());
+        system(("gnuplot " + facets_plot).c_str());
 
-        //unlink((f + ".plot").c_str());
-
-        //for (std::size_t i = 0; i < v.size(); i += 1)
-        //{
-        //    std::stringstream ss;
-        //    ss << f << "_" << i << ".dat";
-        //    unlink(ss.str().c_str());
-        //}
+        for (const auto& f : unlink_files) {
+            unlink(f.c_str());
+        }
     }
 };
 
