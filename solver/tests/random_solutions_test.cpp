@@ -9,14 +9,14 @@ int rand(int off, int size_) {
 }
 
 CGAL::Gmpq rand(CGAL::Gmpq off, CGAL::Gmpq size_) {
-    return off + size_ / rand(0, 10);
+    return off + size_ / rand(1, 10);
 }
 
 point rand(point a, point b) {
 
     CGAL::Vector_2<kernel> v(a, b);
 
-    v = v/rand(0, 10);
+    v = v/rand(1, 10);
 
     return a + v;
 }
@@ -81,17 +81,21 @@ int main(int argc, char** args) {
 
     s.to_png(name);
 
-    for (int i = 0; i < repeat; i += 1) {
-
+    for (int i = 1; i <= repeat; i += 1) {
         stringstream name_;
         name_ << "seed_" << seed << "_" << i;
         auto name = name_.str();
 
-        s.to_png(name);
-
         line_segment f = random_fold(s);
 
         s.fold(f);
+
+        s.to_png(name);
+
+        std::cerr << name << ", solution:" << endl;
+        std::cerr << s;
+        std::cerr << endl;
+
     }
 
     return 0;
