@@ -33,6 +33,24 @@ namespace zebra
                     m_graph[edge.target()].insert(edge.source());
                 }
             }
+            
+            for(const auto& edge : t.skel.edges)
+            {
+                for(const auto& map_entry : m_graph)
+                {
+                    if(edge.has_on(map_entry.first)
+                    && edge.source() != map_entry.first
+                    && edge.target() != map_entry.first)
+                    {
+                        m_graph[map_entry.first].insert(edge.source());
+                        m_graph[map_entry.first].insert(edge.target());
+                        m_graph[edge.source()].insert(map_entry.first);
+                        m_graph[edge.target()].insert(map_entry.first);
+                        m_graph[edge.source()].erase(edge.target());
+                        m_graph[edge.target()].erase(edge.source());
+                    }
+                }
+            }
         }
 
         std::set<point>& operator[](const point& p)
