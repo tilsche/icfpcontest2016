@@ -21,14 +21,14 @@ find_package(Steven REQUIRED)
 
 find_package(Boost 1.54 REQUIRED COMPONENTS program_options system filesystem)
 
-include_directories(include)
+include_directories("include" ${GMP_INCLUDE_DIRS} ${BOOST_INCLUDE_DIRS} ${Steven_INCLUDE_DIRS})
 
-include_directories(${GMP_INCLUDE_DIRS} ${BOOST_INCLUDE_DIRS} ${Steven_INCLUDE_DIRS})
+file(GLOB BACKWARD src/solver/*.cpp)
+add_library(backward_solver SHARED ${BACKWARD})
 
 file(GLOB SOURCE_FILES src/*.cpp)
 add_executable(solver ${SOURCE_FILES})
-
-target_link_libraries(solver ${GMP_LIBRARIES} ${Boost_LIBRARIES} ${Steven_LIBRARIES})
+target_link_libraries(solver backward_solver ${GMP_LIBRARIES} ${Boost_LIBRARIES} ${Steven_LIBRARIES})
 
 add_subdirectory(tests)
 

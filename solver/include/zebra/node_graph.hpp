@@ -8,11 +8,10 @@
 #include "geometry.hpp"
 #include "task.hpp"
 
-namespace zebra {
-
-
-    struct node_graph {
-
+namespace zebra
+{
+    struct node_graph
+    {
         node_graph(task& t)
         {
             for (const auto& edge : t.skel.edges)
@@ -48,8 +47,6 @@ namespace zebra {
             std::cout << "\n\n";
         }
     }
-
-
 } /* closing namespace zebra */
 
 #endif /* __ZEBRA_NODE_GRAPH_HPP__ */

@@ -3,10 +3,9 @@
 #include <zebra/log.hpp>
 #include <zebra/task.hpp>
 
-#include <zebra/solvers/solve_backward.hpp>
-
 #include <boost/program_options.hpp>
 #include <zebra/solver.hpp>
+#include <zebra/solvers/solve_backward.hpp>
 #include <zebra/solvers/simple.hpp>
 #include <zebra/solvers/stupid.hpp>
 
