@@ -36,11 +36,23 @@ int main(int argc, char** argv)
 
     po::variables_map vm;
 
-    po::store(
-        po::command_line_parser(argc, argv).options(options).positional(positional_options).run(),
-        vm);
+    try
+    {
+        po::store(po::command_line_parser(argc, argv)
+                      .options(options)
+                      .positional(positional_options)
+                      .run(),
+                  vm);
 
-    po::notify(vm);
+        po::notify(vm);
+    }
+    catch (std::exception& e)
+    {
+        // something went wrong, so lets print out the message and a usage
+        std::cerr << argv[0] << ": " << e.what() << std::endl << std::endl;
+        help(options);
+        return 1;
+    }
 
     zebra::log::set_min_severity_level(vm["verbosity"].as<std::string>());
 
@@ -48,6 +60,12 @@ int main(int argc, char** argv)
     {
         help(options);
         return EXIT_SUCCESS;
+    }
+
+    if (vm.count("task-file") == 0)
+    {
+        help(options);
+        return -1;
     }
 
     auto filename = vm["task-file"].as<std::string>();
