@@ -148,6 +148,9 @@ struct solution
 
     void facet_mirror(facet& facet, line fold_line)
     {
+        // DOES NOT YET MIRROR THE POINTS
+        auto mirror = reflection(fold_line);
+        facet.transform = facet.transform * mirror;
     }
 
     void facet_fold(facet& facet, line fold_line)
@@ -285,16 +288,16 @@ struct solution
 
                 if (o->which() == 0)
                 {
-                    intersections += 1;
+                    intersections++;
                     assert(!(s.has_on(fold.source()) && s.has_on(fold.target())));
                     if (s.has_on(fold.source()) || s.has_on(fold.target()))
                     {
-                        is_ons += 1;
+                        is_ons++;
                     }
                 }
                 else
                 {
-                    on_segments += 1;
+                    on_segments++;
                 }
             }
 
@@ -331,6 +334,11 @@ struct solution
             auto& facet = facets[facet_id];
 
             facet_fold(facet, fold_line);
+        }
+        auto mirror = reflection(fold_line);
+        for (auto& destination_position : destination_positions)
+        {
+            destination_position = mirror(destination_position);
         }
 
         // // cut
@@ -415,7 +423,6 @@ struct solution
 
     void to_png(const std::string& prefix) {
         std::vector<std::string> unlink_files;
-
         // source points
 
         auto source_points_dat = prefix + "_source_points.dat";
