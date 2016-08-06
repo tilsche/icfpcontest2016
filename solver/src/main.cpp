@@ -36,19 +36,19 @@ int main(int argc, char** argv)
 
     po::variables_map vm;
 
-    zebra::log::set_min_severity_level(vm["verbosity"].as<std::string>());
-
     po::store(
         po::command_line_parser(argc, argv).options(options).positional(positional_options).run(),
         vm);
+
+    po::notify(vm);
+
+    zebra::log::set_min_severity_level(vm["verbosity"].as<std::string>());
 
     if (vm.count("help"))
     {
         help(options);
         return EXIT_SUCCESS;
     }
-
-    po::notify(vm);
 
     auto filename = vm["task-file"].as<std::string>();
     zebra::logging::info() << "filename: " << filename;
