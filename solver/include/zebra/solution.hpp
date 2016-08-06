@@ -524,6 +524,38 @@ struct solution
         return ret;
     }
 
+    polygon hull() const {
+
+        polygon_with_holes ret;
+
+        bool first = true;
+        for (const facet& f : facets) {
+            polygon p;
+            for (int i : f.vertex_ids) {
+                p.push_back(destination_positions[i]);
+            }
+
+            if (first == true) {
+                CGAL::join(p, p, ret);
+                first = false;
+            }
+
+            polygon_with_holes tmp;
+
+            CGAL::join(p, ret, tmp);
+
+            ret = tmp;
+
+            //std::cerr << "facet: ";
+            //for (int i = 0; i < f.vertex_ids.size(); i += 1) {
+            //    std::cerr << f.vertex_ids[i] << ", ";
+            //}
+            //std::cerr << std::endl;
+        }
+
+        return ret.outer_boundary();
+    }
+
 
     // double resemblance(const silhouette& them__) const
     // {
