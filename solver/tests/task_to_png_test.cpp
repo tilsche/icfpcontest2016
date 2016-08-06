@@ -58,7 +58,7 @@ int main(int argc, const char** args)
           << i << "\" with vectors nohead lw 3, \\" << endl;
     }
 
-    o << " \"skel.dat\" using 1:2:($3-$1):($4-$2) title \"Skeleton\" with vectors nohead lw 3"
+    o << " \"skel.dat\" using 1:2:($3-$1):($4-$2) title \"Skeleton\" with vectors nohead lw 1"
       << endl;
 
     o.close();
