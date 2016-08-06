@@ -5,7 +5,7 @@ namespace zebra
 void check_silhouette(const std::string& taskname)
 {
     auto t = read_task(taskname);
-    std::cout << "Polygons: " << t.sil.polygons().size() << std::endl;
+    // std::cout << "Polygons: " << t.sil.polygons().size() << std::endl;
     int cw = 0;
     int ccw = 0;
     for (const auto& p : t.sil.polygons())
@@ -20,14 +20,16 @@ void check_silhouette(const std::string& taskname)
             cw++;
         }
     }
-    std::cout << "CCW: " << ccw << std::endl;
-    std::cout << "CW: " << cw << std::endl;
-    int holes = 0;
-    for (auto it = t.sil.shape().holes_begin(); it != t.sil.shape().holes_end(); it++)
+    // std::cout << "CCW: " << ccw << std::endl;
+    // std::cout << "CW: " << cw << std::endl;
+    int holes = t.sil.shape().number_of_holes();
+    // std::cout << "Holes: " << holes << std::endl;
+
+    if ( // t.sil.polygons().size() != 1 || ccw != 1 || cw != 0 ||
+        holes != 0)
     {
-        holes++;
+        std::cout << taskname << std::endl;
     }
-    std::cout << "Holes: " << holes << std::endl;
 }
 }
 
