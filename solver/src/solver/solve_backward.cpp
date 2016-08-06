@@ -1,3 +1,5 @@
+#include <CGAL/squared_distance_2.h>
+#include <cmath>
 #include <set>
 #include <vector>
 
@@ -12,30 +14,62 @@ namespace zebra
         logging::info() << "backward solver starting..";
         solution s; //TODO
         ngraph = node_graph(t);
-        
-        std::vector<point> stack;
-        hull_list ret;
-
-        logging::info() << "backward before";
-        transitive_hull(point_from_string("0,0"), point_from_string("1/2,2/3"), stack, ret);
-
 
         point ps(0, 0);
         point pe(1, 1);
         std::cout << BackwardConstraints::valid_length(ps, pe) << '\n';
         std::cout << BackwardConstraints::is_standard_square(ngraph) << '\n';
         
-        for(const auto& elem : ret)
-        {
-            logging::info() << "hull";
-            for(const auto& i : elem)
-            {
-                logging::info() << "\t" << point_to_string(i);
-            }
-        }
-        
         return s;
     }
+
+    //std::set<node_graph> backward::unfold_segment(node_graph ng)
+    void backward::unfold_segment(point begin, point end)
+    {
+        //for
+        // Get hulls
+        std::vector<point> stack;
+        hull_list h_list;
+
+        transitive_hull(begin, end, stack, h_list);
+
+        // Get normal
+        line_segment seg( begin, end );
+        auto dir = seg.direction();
+        kernel::Vector_2 normal(-dir.dy(), dir.dx());
+
+        for(const auto& hull : h_list)
+        {
+            for(const auto& p : hull)
+            {
+                // Calc transformation parameters
+                point beg2point(p.x() - begin.x(), p.y() - begin.y());
+                auto dist = CGAL::to_double(beg2point.x() * normal.x() + beg2point.y() * normal.y()) / sqrt(CGAL::to_double(normal.squared_length()));
+                
+                // Build tranlation matrix
+                vector translate_vec = (-2 * dist) * normal;
+                CGAL::Gmpq zero(0,0);
+                transformation translate(zero, zero, translate_vec.hx(), zero, zero, translate_vec.hy(), translate_vec.hw());
+                
+                // Move point
+                auto p_new = translate(p);
+                
+                // Change point in new node_graph
+                auto new_graph = ngraph;
+                new_graph[p_new] = ngraph[p];
+                for(const auto& point : new_graph[p_new])
+                {
+                    new_graph[point].erase(p);
+                    new_graph[point].insert(p_new);
+                }
+            }
+        }
+    }
+
+    //void backward::make_node_connections_unique(node_graph& ng)
+    //{
+        //for(auto& 
+    //}
 
     void backward::transitive_hull(point begin,
                                    point end,

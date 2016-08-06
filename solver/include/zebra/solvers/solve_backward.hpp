@@ -17,12 +17,12 @@ namespace zebra
     {
     public:
         solution operator()(task t) override;
-
-        void transitive_hull(point begin, point end, std::vector<point>& stack, hull_list& ret);
+        void unfold_segment(point begin, point end);
 
     private:
         node_graph ngraph;
 
+        void transitive_hull(point begin, point end, std::vector<point>& stack, hull_list& ret);
         void transitive_hull_in(point begin, point end, std::vector<point>& stack, hull_list& ret);
     };
 
