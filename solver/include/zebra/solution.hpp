@@ -324,7 +324,7 @@ struct solution
             }
         };
 
-        verify_fold(fold_segment);
+        //verify_fold(fold_segment);
 
         line fold_line(fold_segment.source(), fold_segment.target());
 
@@ -338,7 +338,10 @@ struct solution
         auto mirror = reflection(fold_line);
         for (auto& destination_position : destination_positions)
         {
-            destination_position = mirror(destination_position);
+            if (fold_line.has_on_negative_side(destination_position))
+            {
+                destination_position = mirror(destination_position);
+            }
         }
 
         // // cut
