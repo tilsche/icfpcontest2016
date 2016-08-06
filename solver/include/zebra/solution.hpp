@@ -516,6 +516,14 @@ struct solution
         }
     }
 
+    static solution unit_square() {
+        solution ret;
+        ret.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+        ret.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
+        ret.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+        return ret;
+    }
+
 
     // double resemblance(const silhouette& them__) const
     // {
