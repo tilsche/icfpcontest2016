@@ -10,6 +10,9 @@
 
 #include <zebra/geometry.hpp>
 #include <zebra/log.hpp>
+#include <zebra/silhouette.hpp>
+
+#include <CGAL/Boolean_set_operations_2.h>
 
 namespace zebra
 {
@@ -512,6 +515,86 @@ struct solution
             unlink(f.c_str());
         }
     }
+
+
+    // double resemblance(const silhouette& them__) const
+    // {
+
+    //      auto to_silhoutte = [this]() -> vector<polygon> const {
+    //         vector<polygon> ret;
+
+    //         for (const facet& f, this->facets) {
+
+    //             polygon p;
+    //             for (int i : f.vertex_ids) {
+    //                 p.push_back(destination_positions[i]);
+    //             }
+    //             ret.push_back(p);
+    //         }
+    //         return ret;
+    //     }
+
+    //     auto to_polygon = [](const std::vector<polygon>& polygons) {
+
+    //         polygon_with_holes polygon;
+    //         polygon_with_holes tmp;
+
+    //         int j = 0;
+    //         while (polygons[j].is_counterclockwise_oriented() == false()) {
+    //             j += 1;
+    //         }
+
+    //         if (j == polygons.size()) {
+    //             std::cerr << "no positive size polygons";
+    //             assert(j == polygons.size());
+    //         }
+
+    //         polygon = polygons[j];
+
+    //         for (int i = 0; i < polygons.size(); i += 1) {
+
+    //             if (i == j) { continue; }
+
+    //             if (p.is_counterclockwise_oriented()) {
+    //                 CGAL::join(target, p, tmp);
+    //             } else {
+    //                 std::vector<polygon_with_holes> v;
+    //                 CGAL::intersection(target, p, begin(v));
+
+    //             }
+    //             target = tmp;
+    //         }
+
+    //         return polygon;
+
+    //     }
+
+    //     const auto& them_ = them__.polygons;
+    //     const auto& us_ = to_silhoutte();
+
+    //     polygon_with_holes them = to_polygon(them_);
+    //     polygon_with_holes us   = to_polygon(us_);
+
+    //     polygon_with_holes both;
+    //     CGAL::join(target)
+
+
+
+    // //double resemblance(polygon target) const
+    // //{
+    // //    polygon_with_holes p_or;
+    // //    std::vector<polygon_with_holes> p_ands;
+    // //    CGAL::join(poly, target, p_or);
+    // //    CGAL::intersection(poly, target, std::back_inserter(p_ands));
+    // //    CGAL::Gmpq and_area = 0;
+    // //    for (const auto& holy : p_ands)
+    // //    {
+    // //        and_area += holy.outer_boundary().area();
+    // //    }
+    // //    auto or_area = p_or.outer_boundary().area();
+    // //    return gmpq_to_double(and_area / or_area);
+    // //}
+
 };
 
 inline std::ostream& operator<<(std::ostream& os, const solution& s)
