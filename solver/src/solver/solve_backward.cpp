@@ -14,7 +14,7 @@ namespace zebra
         ngraph = node_graph(t);
         
         std::vector<point> stack;
-        std::vector<std::set<point>> ret;
+        hull_list ret;
 
         logging::info() << "backward before";
         transitive_hull(point_from_string("0,0"), point_from_string("1/2,2/3"), stack, ret);
@@ -39,7 +39,7 @@ namespace zebra
     void backward::transitive_hull(point begin,
                                    point end,
                                    std::vector<point>& stack,
-                                   std::vector<std::set<point>>& ret)
+                                   hull_list& ret)
     {
         stack.push_back(begin);
         transitive_hull_in(begin, end, stack, ret);
@@ -57,7 +57,7 @@ namespace zebra
     void backward::transitive_hull_in(point begin,
                                       point end,
                                       std::vector<point>& stack,
-                                      std::vector<std::set<point>>& ret)
+                                      hull_list& ret)
     {
         if(stack.size() <= ngraph.size())
         {
