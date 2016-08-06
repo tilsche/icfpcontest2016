@@ -13,16 +13,19 @@ from models import *
 import sys
 
 def submit_all():
-    for run in Run.select().where(Run.score == None):
-        print(run.task.path)
-        id = run.task.path[4:-4]
-        print(id)
-        print(run.path)
-        result = submit(id, run.path)
-        if result is not None:
-            Run.score = result
-            Run.save
-        time.sleep(2)
+    connect()
+    while True:
+        for run in Run.select().where(Run.score == None):
+            id = run.task.path[4:-4]
+            print("id:", id)
+            print("sol", run.path)
+            result = submit(id, run.path)
+            if result is not None:
+                run.score = result
+                run.save()
+            print()
+            time.sleep(2)
+    close()
     print("Done submitting all Runs with score NULL")
 
 def submit(problemId, solutionPath):
