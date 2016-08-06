@@ -16,8 +16,7 @@ public:
     {
         logging::info() << "Simple solver starting..";
 
-        assert(t.sil.polygons.size() == 1);
-        polygon target = t.sil.polygons[0];
+        polygon target = t.sil.shape().outer_boundary();
         assert(target.is_counterclockwise_oriented());
 
         origami ori;

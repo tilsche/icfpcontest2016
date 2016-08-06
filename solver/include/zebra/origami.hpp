@@ -30,7 +30,7 @@ public:
             results.push_back(moved);
         }
         return results;
-    }o
+    }
 };
 }
 
