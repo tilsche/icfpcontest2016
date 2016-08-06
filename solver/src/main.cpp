@@ -19,8 +19,6 @@ void help(po::options_description& desc)
 
 int main(int argc, char** argv)
 {
-    zebra::logging::info() << "Hello, World!";
-
     po::positional_options_description positional_options;
     positional_options.add("task-file", -1);
 
@@ -29,7 +27,8 @@ int main(int argc, char** argv)
     options.add_options()("help", "show help message")
             ("task-file", po::value<std::string>(), "File containing the task.")
             ("runtime", po::value<long>(), "runtime")
-            ("verbosity,v", po::value<std::string>()->default_value("warn"),
+            ("visualize", po::value<std::string>(), "visualize")
+            ("verbosity,v", po::value<std::string>()->default_value("info"),
                             "set the verbosity level")
             ("cores", po::value<int>(), "core count");
     // clang-format on
@@ -77,6 +76,11 @@ int main(int argc, char** argv)
     zebra::logging::info() << "solving...";
     auto solu = (*solve)(t);
     zebra::logging::info() << "solution found...";
+
+    if (vm.count("visualize") > 0)
+    {
+        solu.to_png(filename + ".png");
+    }
 
     // std::ofstream ofs(filename_out);
     // ofs << solu;
