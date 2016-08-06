@@ -155,9 +155,9 @@ void test4()
     solution s;
     s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
     s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
-    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 } };
+    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
-    auto fold1 = line_segment_from_string("0,3/4 1,3/4");
+    auto fold1 = line_segment_from_string("1,3/4 0,3/4");
     logging::info() << "Testing to fold:\n" << s;
     logging::info() << "with line segment " << fold1;
 
@@ -173,12 +173,12 @@ void test4()
     //   |         |
     // 0 +---------+
 
-    auto fold2 = line_segment_from_string("0,1/4 1/1/4");
+    auto fold2 = line_segment_from_string("1,1/4 0,1/4");
     logging::info() << "Testing to fold:\n" << s;
     logging::info() << "with line segment " << fold2;
 
     s.fold(fold2);
-    s.to_png(string(__func__) + "_pos2");
+    s.to_png(string(__func__) + "_post2");
     logging::info() << "Result:\n" << s;
     //   +---------+
     //   |         |
