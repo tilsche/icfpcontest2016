@@ -51,6 +51,8 @@ int main(int argc, char** argv)
     zebra::logging::info() << "filename: " << filename;
     // do something useful
     auto t = zebra::read_task(filename);
+    zebra::node_graph ng(t);
+    zebra::print_node_graph(ng);
     zebra::backward b;
     b( t );
     //std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::simple>();
