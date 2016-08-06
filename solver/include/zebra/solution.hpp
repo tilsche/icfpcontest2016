@@ -21,8 +21,19 @@ namespace zebra
 class facet
 {
 public:
+    facet()
+    {
+    }
+
     facet(transformation t) : transform_(t)
     {
+    }
+
+    static facet unit_facet()
+    {
+        facet f;
+        f.vertex_ids = { 0, 1, 2, 3 };
+        return f;
     }
 
     size_t size() const
@@ -44,7 +55,7 @@ public:
 
     void transform(transformation t)
     {
-        transform_ = transform * t;
+        transform_ = transform_ * t;
     }
 
 private:
@@ -273,9 +284,9 @@ struct solution
                     else
                     {
                         // need new vertex
-                        auto new_vertex_id = add_positions(
-                            old_facet.transform().inverse()(intersection_point),
-                            intersection_point);
+                        auto new_vertex_id =
+                            add_positions(old_facet.transform().inverse()(intersection_point),
+                                          intersection_point);
                         logging::debug() << "new vertex " << new_vertex_id << "@"
                                          << intersection_point;
                         facet_positive.vertex_ids.push_back(new_vertex_id);
@@ -299,7 +310,7 @@ struct solution
     void fold(const line_segment& fold_segment)
     {
 
-        //auto verify_fold = [this](const line_segment& fold) {
+        // auto verify_fold = [this](const line_segment& fold) {
         //    int intersections = 0;
         //    int is_ons = 0;
         //    int on_segments = 0;
@@ -493,26 +504,50 @@ struct solution
         }
     }
 
-    static solution unit_square() {
+    static solution unit_square()
+    {
         solution ret;
         ret.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-        ret.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
+        ret.facets = { facet::unit_facet() };
         ret.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
         return ret;
     }
 
-    polygon hull() const {
+    double resemblance(polygon target) const
+    {
+        logging::trace() << "calculating resemblence with " << target;
+        logging::trace() << "solution: " << *this;
+        polygon_with_holes p_or;
+        polygon_with_holes solution_poly = poly();
+        logging::trace() << "solution_poly: " << solution_poly;
+        std::vector<polygon_with_holes> p_ands;
+        CGAL::join(solution_poly, target, p_or);
+        CGAL::intersection(solution_poly, target, std::back_inserter(p_ands));
+        CGAL::Gmpq and_area = 0;
+        for (const auto& holy : p_ands)
+        {
+            and_area += holy.outer_boundary().area();
+        }
+        auto or_area = p_or.outer_boundary().area();
+        return gmpq_to_double(and_area / or_area);
+    }
+
+    polygon_with_holes poly() const
+    {
 
         polygon_with_holes ret;
 
         bool first = true;
-        for (const facet& f : facets) {
+        for (const facet& f : facets)
+        {
             polygon p;
-            for (int i : f.vertex_ids) {
+            for (int i : f.vertex_ids)
+            {
                 p.push_back(destination_positions[i]);
             }
 
-            if (first == true) {
+            if (first == true)
+            {
                 CGAL::join(p, p, ret);
                 first = false;
             }
@@ -523,16 +558,20 @@ struct solution
 
             ret = tmp;
 
-            //std::cerr << "facet: ";
-            //for (int i = 0; i < f.vertex_ids.size(); i += 1) {
+            // std::cerr << "facet: ";
+            // for (int i = 0; i < f.vertex_ids.size(); i += 1) {
             //    std::cerr << f.vertex_ids[i] << ", ";
             //}
-            //std::cerr << std::endl;
+            // std::cerr << std::endl;
         }
 
-        return ret.outer_boundary();
+        return ret;
     }
 
+    polygon hull() const
+    {
+        return poly().outer_boundary();
+    }
 
     // double resemblance(const silhouette& them__) const
     // {
@@ -595,8 +634,6 @@ struct solution
     //     polygon_with_holes both;
     //     CGAL::join(target)
 
-
-
     // //double resemblance(polygon target) const
     // //{
     // //    polygon_with_holes p_or;
@@ -611,17 +648,7 @@ struct solution
     // //    auto or_area = p_or.outer_boundary().area();
     // //    return gmpq_to_double(and_area / or_area);
     // //}
-
 };
-
-inline solution make_solution_1()
-{
-    solution s;
-    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
-    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-    return s;
-}
 
 inline std::ostream& operator<<(std::ostream& os, const solution& s)
 {
