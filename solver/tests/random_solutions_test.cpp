@@ -78,6 +78,9 @@ int main(int argc, char** args) {
 
     s.to_png(name);
 
+
+    string previous_solution = "";
+
     for (int i = 1; i <= repeat; i += 1) {
         stringstream name_;
         name_ << "seed_" << seed << "_" << i;
@@ -89,9 +92,25 @@ int main(int argc, char** args) {
 
         s.to_png(name);
 
-        std::cerr << name << ", solution:" << endl;
-        std::cerr << s;
-        std::cerr << endl;
+        stringstream ss;
+        ss << s;
+
+        if (ss.str().size() > 5000) {
+            logging::error() << "repetition: " << i << ", solution size > 5000";
+
+            std::cout << endl << endl;
+            std::cout << "== size: " << previous_solution.size() << " ==" << endl;
+            std::cout << previous_solution;
+            std::cout << endl;
+            return 0;
+        }
+
+        previous_solution = ss.str();
+
+        std::cout << name << ", solution (" << ss.str().size() << "):" << endl;
+
+        std::cout << ss.str();
+        std::cout << endl;
 
     }
 
