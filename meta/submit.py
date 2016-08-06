@@ -18,7 +18,10 @@ def submit_all():
         id = run.task.path[4:-4]
         print(id)
         print(run.path)
-        submit(id, run.path)
+        result = submit(id, run.path)
+        if result not None:
+            Run.score = result
+            Run.save
         time.sleep(2)
     print("Done submitting all Runs with score NULL")
 
