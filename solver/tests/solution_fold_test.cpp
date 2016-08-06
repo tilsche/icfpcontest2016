@@ -369,3 +369,12 @@ void testedge()
 
     // assert(s.facets.size() == 2);
 }
+
+void test_broken() {
+    solution s = solution::unit_square();
+
+    s.fold(line_segment_from_string("0,0 1,0"));
+    s.to_png(string(__func__) + "_post");
+    logging::info() << "Result:\n" << s;
+
+}
