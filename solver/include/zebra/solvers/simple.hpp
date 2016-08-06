@@ -15,15 +15,13 @@ public:
     solution operator()(task t) override
     {
         logging::info() << "Simple solver starting..";
-        solution s;
-        s.source_positions = make_positions_1();
-        s.facets.push_back(facet{.vertex_ids = { 0, 1, 2, 3 } });
 
         assert(t.sil.polygons.size() == 1);
         polygon target = t.sil.polygons[0];
         assert(target.is_counterclockwise_oriented());
 
         origami ori;
+
         double best_r = 0;
         origami best_ori;
         for (auto vx_it = target.vertices_begin(); vx_it != target.vertices_end(); vx_it++)

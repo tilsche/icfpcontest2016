@@ -18,8 +18,13 @@
 namespace zebra
 {
 
-struct facet
+class facet
 {
+public:
+    facet(transformation t) : transform_(t)
+    {
+    }
+
     size_t size() const
     {
         return vertex_ids.size();
@@ -31,7 +36,19 @@ struct facet
     }
 
     std::vector<size_t> vertex_ids;
-    transformation transform;
+
+    transformation transform() const
+    {
+        return transform_;
+    }
+
+    void transform(transformation t)
+    {
+        transform_ = transform * t;
+    }
+
+private:
+    transformation transform_;
 };
 
 struct solution
@@ -175,7 +192,7 @@ struct solution
     {
         // DOES NOT YET MIRROR THE POINTS
         auto mirror = reflection(fold_line);
-        facet.transform = facet.transform * mirror;
+        facet.transform(mirror);
     }
 
     void facet_fold(facet& facet, line fold_line)
@@ -211,9 +228,7 @@ struct solution
 
     facet& facet_split(facet& old_facet, line fold_line)
     {
-        facet facet_positive, facet_negative;
-        facet_positive.transform = old_facet.transform;
-        facet_negative.transform = old_facet.transform;
+        facet facet_positive(old_facet.transform()), facet_negative(old_facet.transform());
         for (size_t segment_id = 0; segment_id < old_facet.size(); segment_id++)
         {
             auto vertex_id = old_facet[segment_id];
@@ -259,7 +274,8 @@ struct solution
                     {
                         // need new vertex
                         auto new_vertex_id = add_positions(
-                            old_facet.transform.inverse()(intersection_point), intersection_point);
+                            old_facet.transform().inverse()(intersection_point),
+                            intersection_point);
                         logging::debug() << "new vertex " << new_vertex_id << "@"
                                          << intersection_point;
                         facet_positive.vertex_ids.push_back(new_vertex_id);
@@ -366,85 +382,18 @@ struct solution
                 destination_position = mirror(destination_position);
             }
         }
+    }
 
-        // // cut
-
-        // std::vector<line_segment> t;
-
-        // for (std::size_t i = 0; i < s.edges.size(); i += 1) {
-        //     bool found = false;
-        //     point q;
-        //     for (const auto& p : intersection_points) {
-        //         if (p.second == &s.edges[i]) {
-        //             q = p.first;
-        //             found = true;
-        //             break;
-        //         }
-        //     }
-
-        //     if (found == false) {
-        //         t.push_back(s.edges[i]);
-        //     } else {
-        //         t.push_back({s.edges[i].source(), q});
-        //         t.push_back({q,                   s.edges[i].target()});
-        //     }
-        // }
-
-        // t.push_back(fold);
-
-        // std::cerr << "split segments: " << std::endl;
-        // for (const auto& l : t) {
-        //     std::cerr << "  " << line_segment_to_string(l) << std::endl;
-        // }
-
-        // // determine which half to fold
-
-        // std::vector<line_segment> v1;
-        // std::vector<line_segment> v2;
-
-        // auto left_side = [](const line_segment& fold, const line_segment& l) -> bool {
-
-        //     auto distance = [](const line_segment& fold, const point& p) -> CGAL::Gmpq {
-        //         auto x1 = fold.source().x();
-        //         auto y1 = fold.source().y();
-        //         auto x2 = fold.target().x();
-        //         auto y2 = fold.target().y();
-        //         auto x  = p.x();
-        //         auto y  = p.y();
-
-        //         return (x - x1)*(y2 - y1) - (y - y1)*(x2 - x1);
-        //     };
-
-        //     if (distance(fold, l.source()) <= 0 && distance(fold, l.target()) <= 0) {
-        //         return true;
-        //     } else {
-        //         return false;
-        //     }
-        // };
-
-        // for (const auto& l : t) {
-        //     if (left_side(fold, l)) {
-        //         v1.push_back(l);
-        //     } else {
-        //         v2.push_back(l);
-        //     }
-        // }
-
-        // std::cerr << "left segments: " << std::endl;
-        // for (const auto& l : v1) {
-        //     std::cerr << "  " << line_segment_to_string(l) << std::endl;
-        // }
-
-        // std::cerr << "right segments: " << std::endl;
-        // for (const auto& l : v2) {
-        //     std::cerr << "  " << line_segment_to_string(l) << std::endl;
-        // }
-
-        // // TODO mirror left side
-
-        // // TODO unify mirrored left side and right side
-
-        // // TODO deduplicate segments
+    void transform(transformation t)
+    {
+        for (auto& f : facets)
+        {
+            f.transform(t);
+        }
+        for (auto& dp : destination_positions)
+        {
+            dp = t(dp);
+        }
     }
 
     void to_png(const std::string& prefix)
@@ -664,6 +613,15 @@ struct solution
     // //}
 
 };
+
+inline solution make_solution_1()
+{
+    solution s;
+    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
+    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    return s;
+}
 
 inline std::ostream& operator<<(std::ostream& os, const solution& s)
 {
