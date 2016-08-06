@@ -3,7 +3,7 @@
 #include <zebra/log.hpp>
 #include <zebra/task.hpp>
 
-#include <zebra/backward_solve.hpp>
+#include <zebra/solvers/solve_backward.hpp>
 
 #include <boost/program_options.hpp>
 #include <zebra/solver.hpp>
