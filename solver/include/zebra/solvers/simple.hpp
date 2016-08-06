@@ -17,7 +17,7 @@ public:
         logging::info() << "Simple solver starting..";
         solution s;
         s.source_positions = make_positions_1();
-        s.facets.push_back({ 0, 1, 2, 3 });
+        s.facets.push_back(facet{.vertex_ids = { 0, 1, 2, 3 } });
 
         assert(t.sil.polygons.size() == 1);
         polygon target = t.sil.polygons[0];
@@ -43,7 +43,7 @@ public:
                         << " vector: " << gmpq_to_string(vector.hx()) << ", "
                         << gmpq_to_string(vector.hy());
 
-        transofrmation move(CGAL::TRANSLATION, vector);
+        transformation move(CGAL::TRANSLATION, vector);
         s.destination_positions = make_positions_1();
         for (auto& destination_position : s.destination_positions)
         {
