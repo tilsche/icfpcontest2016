@@ -2,9 +2,6 @@
 #ifndef SOLVER_SOLUTION_HPP
 #define SOLVER_SOLUTION_HPP
 
-#include "geometry.hpp"
-
-#include <zebra/log.hpp>
 
 #include <cassert>
 #include <fstream>
@@ -12,13 +9,32 @@
 #include <set>
 #include <vector>
 
+#include <zebra/geometry.hpp>
+#include <zebra/log.hpp>
+
 namespace zebra
 {
+
+struct facet
+{
+    size_t size() const
+    {
+        return vertex_ids.size();
+    }
+
+    size_t operator[](size_t index) const
+    {
+        return vertex_ids[index % size()];
+    }
+
+    std::vector<size_t> vertex_ids;
+    transformation transform;
+};
 
 struct solution
 {
     std::vector<point> source_positions;
-    std::vector<std::vector<int>> facets;
+    std::vector<facet> facets;
     std::vector<point> destination_positions;
 
     std::vector<polygon> source_facets() const
@@ -108,8 +124,120 @@ struct solution
         }
     }
 
+    line_segment destination_segment(const facet& facet, size_t segment_id) const
+    {
+        assert(segment_id < facet.size());
+        return line_segment(destination_positions[facet[segment_id]],
+                            destination_positions[facet[segment_id + 1]]);
+    }
 
-    void fold(const line_segment& fold) {
+    line_segment source_segment(const facet& facet, size_t segment_id) const
+    {
+        assert(segment_id < facet.size());
+        return line_segment(source_positions[facet[segment_id]],
+                            source_positions[facet[segment_id + 1]]);
+    }
+
+    void facet_mirror(facet& facet, line fold_line)
+    {
+    }
+
+    void facet_fold(facet& facet, line fold_line)
+    {
+        size_t positive_points = 0;
+        size_t negative_points = 0;
+        for (auto vertex_id : facet.vertex_ids)
+        {
+            const auto& vertex = destination_positions[vertex_id];
+            switch (fold_line.oriented_side(vertex))
+            {
+            case CGAL::ON_POSITIVE_SIDE:
+                positive_points++;
+                break;
+            case CGAL::ON_NEGATIVE_SIDE:
+                negative_points++;
+                break;
+            case CGAL::ON_ORIENTED_BOUNDARY:
+                break;
+            }
+        }
+        // we really need to split
+        if (positive_points > 0 && negative_points > 0)
+        {
+            auto& new_facet = facet_split(facet, fold_line);
+            facet_mirror(new_facet, fold_line);
+        }
+        else if (positive_points > 0)
+        {
+            facet_mirror(facet, fold_line);
+        }
+    }
+
+    facet& facet_split(facet& old_facet, line fold_line)
+    {
+        facet facet_positive, facet_negative;
+        facet_positive.transform = old_facet.transform;
+        facet_negative.transform = old_facet.transform;
+        for (size_t segment_id = 0; segment_id < old_facet.size(); segment_id++)
+        {
+            auto vertex_id = old_facet[segment_id];
+            auto segment = destination_segment(old_facet, segment_id);
+            auto vertex = segment.source();
+
+            // Not so important check
+            assert(vertex == destination_positions[vertex_id]);
+
+            switch (fold_line.oriented_side(vertex))
+            {
+            case CGAL::ON_POSITIVE_SIDE:
+                facet_positive.vertex_ids.push_back(vertex_id);
+                break;
+            case CGAL::ON_NEGATIVE_SIDE:
+                facet_negative.vertex_ids.push_back(vertex_id);
+                break;
+            case CGAL::ON_ORIENTED_BOUNDARY:
+                facet_positive.vertex_ids.push_back(vertex_id);
+                facet_negative.vertex_ids.push_back(vertex_id);
+                break;
+            }
+            boost::optional<boost::variant<point, line_segment>> o =
+                CGAL::intersection(segment, fold_line);
+
+            if (o != boost::none)
+            {
+                if (o->which() == 0)
+                {
+                    // intersection_point is a point
+                    auto intersection_point = boost::get<point>(*o);
+                    if (intersection_point == segment.target())
+                    {
+                        // No need for new vertex - vertex id will be added in next iteration.
+                    }
+                    else
+                    {
+                        // need new vertex
+                        size_t new_vertex_id = destination_positions.size();
+                        facet_positive.vertex_ids.push_back(new_vertex_id);
+                        facet_negative.vertex_ids.push_back(new_vertex_id);
+
+                        destination_positions.push_back(intersection_point);
+                        source_positions.push_back(old_facet.transform(intersection_point));
+                    }
+                }
+                else
+                {
+                    // intersection is a line
+                    assert(false);
+                }
+            }
+        }
+        old_facet = facet_negative;
+        facets.push_back(facet_positive);
+        return facets.back();
+    }
+
+    void fold(const line_segment& fold_segment)
+    {
 
         auto verify_fold = [this](const line_segment& fold) {
             int intersections = 0;
@@ -157,57 +285,16 @@ struct solution
             }
         };
 
-        verify_fold(fold);
+        verify_fold(fold_segment);
 
+        line fold_line(fold_segment.source(), fold_segment.target());
 
-        // intersection points
+        size_t old_facet_size = facets.size();
+        for (auto facet_id = 0; facet_id < old_facet_size; facet_id++)
+        {
+            auto& facet = facets[facet_id];
 
-        for (const auto& facet : facets) {
-            std::vector<line_segment> segments;
-            for (int i = 1; i < facet.size(); i += 1) {
-                segments.push_back(line_segment(destination_positions[i-1], destination_positions[i]));
-            }
-            segments.push_back(line_segment(destination_positions[destination_positions.size()-1], destination_positions[0]));
-
-            std::vector<std::pair<point, const line_segment*>> intersection_points;
-
-            for (const auto& l : segments) {
-                boost::optional<boost::variant<point, line_segment>> o = CGAL::intersection(l, fold);
-
-                if (o == boost::none) { continue; }
-
-                if (o->which() == 0) {
-                    intersection_points.push_back(std::make_pair(boost::get<point>(*o), &l));
-                } else {
-                    std::cerr << "folding on a line segment, fold:" << line_segment_to_string(fold) << ", segment:" << line_segment_to_string(l) << std::endl;
-                }
-            }
-
-            std::cerr << "intersection points: " << std::endl;
-            for (const auto& p : intersection_points) {
-                std::cerr << "  p:" << point_to_string(p.first) << ", segment:" << line_segment_to_string(*p.second) << std::endl;
-            }
-
-            facets.resize(0);
-            if (intersection_points.size() > 2) {
-                std::cerr << "Unexpected: intersection point number > 2" << std::endl;
-            } else if (intersection_points.size() == 1) {
-                std::cerr << "Unexpected: intersection point number == 1" << std::endl;
-            } else if (intersection_points.size() == 0) {
-                facets.push_back(facet);
-                continue;
-            }
-
-            auto i1 = source_positions.size();
-            auto i2 = source_positions.size() + 1;
-
-            source_positions.push_back(intersection_points[0].first);
-            source_positions.push_back(intersection_points[1].first);
-            destination_positions.push_back(intersection_points[0].first);
-            destination_positions.push_back(intersection_points[1].first);
-
-            facets.push_back(std::vector<int>{facet[0]});
-            facets.push_back(std::vector<int>{});
+            facet_fold(facet, fold_line);
         }
 
         // // cut
@@ -304,7 +391,7 @@ inline std::ostream& operator<<(std::ostream& os, const solution& s)
     for (const auto& facet : s.facets)
     {
         os << facet.size() << " ";
-        for (auto vertex_id : facet)
+        for (auto vertex_id : facet.vertex_ids)
         {
             os << vertex_id << " ";
         }
@@ -317,8 +404,6 @@ inline std::ostream& operator<<(std::ostream& os, const solution& s)
     }
     return os;
 }
-
-
 }
 
 #endif // SOLVER_SOLUTION_HPP

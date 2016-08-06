@@ -14,7 +14,7 @@ public:
         solution s;
         s.source_positions = make_positions_1();
         s.destination_positions = make_positions_1();
-        s.facets.push_back({ 0, 1, 2, 3 });
+        s.facets.push_back(facet{.vertex_ids = { 0, 1, 2, 3 } });
         return s;
     }
 };

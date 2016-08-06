@@ -67,13 +67,13 @@ public:
         {
             const auto& edge = *edge_it;
             {
-                transofrmation move(CGAL::TRANSLATION, p - edge.source());
+                transformation move(CGAL::TRANSLATION, p - edge.source());
                 auto moved = *this;
                 moved.poly = CGAL::transform(move, moved.poly);
                 results.push_back(moved);
             }
             {
-                transofrmation move(CGAL::TRANSLATION, p - edge.target());
+                transformation move(CGAL::TRANSLATION, p - edge.target());
                 auto moved = *this;
                 moved.poly = CGAL::transform(move, moved.poly);
                 results.push_back(moved);
