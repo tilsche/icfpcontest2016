@@ -76,7 +76,7 @@ int main(int argc, char** argv)
     // std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::simple>();
     std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::brutesolver>();
 
-    auto ng = zebra::node_graph(t);
+    zebra::node_graph ng(t);
     zebra::print_node_graph(ng);
     zebra::backward b;
     b( t );

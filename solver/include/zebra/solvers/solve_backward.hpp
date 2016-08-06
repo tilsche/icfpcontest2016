@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include <vector>
 
 #include <zebra/geometry.hpp>
 #include <zebra/node_graph.hpp>
@@ -14,7 +15,7 @@ namespace zebra
     public:
         solution operator()(task t) override;
 
-        std::set<point> transitive_hull(point begin, point end);
+        void transitive_hull(point begin, point end, std::vector<point>& stack, std::vector<std::set<point>>& ret);
 
     private:
         node_graph ngraph;
