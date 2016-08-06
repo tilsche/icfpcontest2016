@@ -10,6 +10,7 @@ void test1c();
 void test2c();
 void testedge();
 void testcross();
+void test_broken();
 void test1c2();
 
 int main()
@@ -24,6 +25,7 @@ int main()
     // testedge();
     // testcross();
     test1c2();
+    test_broken();
     return 0;
 }
 
