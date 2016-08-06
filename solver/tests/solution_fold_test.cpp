@@ -38,6 +38,8 @@ void test1()
     s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
     s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
+    s.to_png(string(__func__) + "_pre");
+
     line_segment fold = line_segment_from_string("1/2,0 1/2,1");
 
     logging::info() << "Testing to fold:\n" << s;
@@ -72,6 +74,8 @@ void test2()
     s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
     s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
     s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+
+    s.to_png(string(__func__) + "_pre");
 
     auto fold = line_segment_from_string("0,1/2 1,3/4");
 
@@ -115,6 +119,8 @@ void test3()
         { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 }, { 0, 1 / 2 }, { 1, 1 / 2 }
     };
 
+    s.to_png(string(__func__) + "_pre");
+
     auto fold = line_segment_from_string("1/2,0 1/2,1");
     logging::info() << "Testing to fold:\n" << s;
     logging::info() << "with line segment " << fold;
@@ -150,6 +156,8 @@ void test4()
     s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
     s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
     s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 } };
+
+    s.to_png(string(__func__) + "_pre");
 
     auto fold1 = line_segment_from_string("0,3/4 1/3/4");
     logging::info() << "Testing to fold:\n" << s;
