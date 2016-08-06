@@ -6,14 +6,20 @@ void test1();
 void test2();
 void test3();
 void test4();
+void test1c();
+void test2c();
+void testedge();
 
 int main()
 {
     test1();
     test2();
     test3();
-    test4();
+    // test4();
 
+    test1c();
+    test2c();
+    testedge();
     return 0;
 }
 
@@ -34,7 +40,12 @@ void test1()
 
     line_segment fold = line_segment_from_string("1/2,0 1/2,1");
 
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold;
+
     s.fold(fold);
+
+    logging::info() << "Result:\n" << s;
 
     //   +-+
     //   | |
@@ -62,7 +73,14 @@ void test2()
     s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
     s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
-    s.fold(line_segment_from_string("0,1/2 1,3/4"));
+    auto fold = line_segment_from_string("0,1/2 1,3/4");
+
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold;
+
+    s.fold(fold);
+
+    logging::info() << "Result:\n" << s;
     //
     //
     // +---+
@@ -97,7 +115,13 @@ void test3()
         { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 }, { 0, 1 / 2 }, { 1, 1 / 2 }
     };
 
-    s.fold(line_segment_from_string("1/2,0 1/2,1"));
+    auto fold = line_segment_from_string("1/2,0 1/2,1");
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold;
+
+    s.fold(fold);
+
+    logging::info() << "Result:\n" << s;
     //
     //
     //    +--+
@@ -127,7 +151,13 @@ void test4()
     s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
     s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 } };
 
-    s.fold(line_segment_from_string("0,3/4 1/3/4"));
+    auto fold1 = line_segment_from_string("0,3/4 1/3/4");
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold1;
+
+    s.fold(fold1);
+
+    logging::info() << "Result:\n" << s;
     //   +---------+
     //   |         |
     //   +---------+
@@ -136,7 +166,13 @@ void test4()
     //   |         |
     // 0 +---------+
 
-    s.fold(line_segment_from_string("0,1/4 1/1/4"));
+    auto fold2 = line_segment_from_string("0,1/4 1/1/4");
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold2;
+
+    s.fold(fold2);
+
+    logging::info() << "Result:\n" << s;
     //   +---------+
     //   |         |
     // 0 +---------+
@@ -145,10 +181,115 @@ void test4()
 
     // on 0 there is now a line on which we want to fold
 
-    s.fold(line_segment_from_string("0,0 1,0"));
+    auto fold3 = line_segment_from_string("0,0 1,0");
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold3;
+
+    s.fold(fold3);
+
+    logging::info() << "Result:\n" << s;
     // 0 +---------+
     //   |         |
     //   +---------+
 
     // TODO check
+}
+
+void test1c()
+{
+    // cerr << __func__ << endl;
+
+    // +---+
+    // |   |
+    // |   |
+    // |   |
+    // +---+
+    logging::info() << " TEST ONE CORNER !!!!!!!!!! ";
+    solution s;
+    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
+    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+
+    line_segment fold = line_segment_from_string("1/2,0 1,1");
+
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold;
+
+    s.fold(fold);
+
+    logging::info() << "Result:\n" << s;
+
+    // TODO check
+
+    // assert(s.facets.size() == 2);
+}
+
+void test2c()
+{
+    // cerr << __func__ << endl;
+
+    // +---+
+    // |   |
+    // |   |
+    // |   |
+    // +---+
+
+    solution s;
+    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
+    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+
+    line_segment fold = line_segment_from_string("0,0 1,1");
+
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold;
+
+    s.fold(fold);
+
+    logging::info() << "Result:\n" << s;
+
+    //   +-+
+    //   | |
+    //   | |
+    //   | |
+    //   +-+
+
+    // TODO check
+
+    // assert(s.facets.size() == 2);
+}
+
+void testedge()
+{
+    // cerr << __func__ << endl;
+
+    // +---+
+    // |   |
+    // |   |
+    // |   |
+    // +---+
+
+    solution s;
+    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
+    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+
+    line_segment fold = line_segment_from_string("0,0 1,0");
+
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold;
+
+    s.fold(fold);
+
+    logging::info() << "Result:\n" << s;
+
+    //   +-+
+    //   | |
+    //   | |
+    //   | |
+    //   +-+
+
+    // TODO check
+
+    // assert(s.facets.size() == 2);
 }

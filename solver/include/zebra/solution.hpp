@@ -125,15 +125,25 @@ struct solution
     line_segment destination_segment(const facet& facet, size_t segment_id) const
     {
         assert(segment_id < facet.size());
-        return line_segment(destination_positions[facet[segment_id]],
-                            destination_positions[facet[segment_id + 1]]);
+        auto s = line_segment(destination_positions[facet[segment_id]],
+                              destination_positions[facet[segment_id + 1]]);
+        if (s.source() == s.target())
+        {
+            logging::error() << "Invalid destination segment: " << s;
+        }
+        return s;
     }
 
     line_segment source_segment(const facet& facet, size_t segment_id) const
     {
         assert(segment_id < facet.size());
-        return line_segment(source_positions[facet[segment_id]],
-                            source_positions[facet[segment_id + 1]]);
+        auto s = line_segment(source_positions[facet[segment_id]],
+                              source_positions[facet[segment_id + 1]]);
+        if (s.source() == s.target())
+        {
+            logging::error() << "Invalid destination segment: " << s;
+        }
+        return s;
     }
 
     void facet_mirror(facet& facet, line fold_line)
@@ -185,15 +195,19 @@ struct solution
             // Not so important check
             assert(vertex == destination_positions[vertex_id]);
 
+            logging::debug() << "vertex " << vertex_id << "@" << vertex << ", segment " << segment;
             switch (fold_line.oriented_side(vertex))
             {
             case CGAL::ON_POSITIVE_SIDE:
+                logging::debug() << " POSITIVE";
                 facet_positive.vertex_ids.push_back(vertex_id);
                 break;
             case CGAL::ON_NEGATIVE_SIDE:
+                logging::debug() << "NEGATVE";
                 facet_negative.vertex_ids.push_back(vertex_id);
                 break;
             case CGAL::ON_ORIENTED_BOUNDARY:
+                logging::debug() << "BOUNDARY";
                 facet_positive.vertex_ids.push_back(vertex_id);
                 facet_negative.vertex_ids.push_back(vertex_id);
                 break;
@@ -207,14 +221,18 @@ struct solution
                 {
                     // intersection_point is a point
                     auto intersection_point = boost::get<point>(*o);
-                    if (intersection_point == segment.target())
+                    if (intersection_point == segment.target() ||
+                        intersection_point == segment.source())
                     {
+                        logging::debug() << "Intersecting at line ";
                         // No need for new vertex - vertex id will be added in next iteration.
                     }
                     else
                     {
                         // need new vertex
                         size_t new_vertex_id = destination_positions.size();
+                        logging::debug() << "new vertex " << new_vertex_id << "@"
+                                         << intersection_point;
                         facet_positive.vertex_ids.push_back(new_vertex_id);
                         facet_negative.vertex_ids.push_back(new_vertex_id);
 
@@ -225,6 +243,8 @@ struct solution
                 else
                 {
                     // intersection is a line
+                    logging::error() << "Intersection of segment " << segment << " on fold "
+                                     << fold_line << " is a  line.";
                     assert(false);
                 }
             }
