@@ -16,7 +16,7 @@ def submit_all():
     connect()
     while True:
         for run in Run.select().where(Run.score == None):
-            id = run.task.path[4:-4]
+            id = run.task.path[:-4]
             print("id:", id)
             print("sol", run.path)
             result = submit(id, run.path)
