@@ -11,11 +11,8 @@ class stupid : public solver
 public:
     solution operator()(task t) override
     {
-        solution s;
-        s.source_positions = make_positions_1();
-        s.destination_positions = make_positions_1();
-        s.facets.push_back(facet{.vertex_ids = { 0, 1, 2, 3 } });
-        return s;
+        origami o;
+        return o.sol;
     }
 };
 }

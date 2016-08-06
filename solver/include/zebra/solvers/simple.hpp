@@ -28,7 +28,7 @@ public:
         {
             for (auto o2 : ori.move_to(*vx_it))
             {
-                auto new_r = o2.resemblance(target);
+                auto new_r = o2.sol.resemblance(target);
                 if (new_r > best_r)
                 {
                     best_r = new_r;
@@ -36,18 +36,9 @@ public:
                 }
             }
         }
-        auto vector = best_ori.poly.vertex(0) - ori.poly.vertex(0);
-        logging::info() << "Simple found best resemblence " << best_r
-                        << " vector: " << gmpq_to_string(vector.hx()) << ", "
-                        << gmpq_to_string(vector.hy());
+        logging::info() << "Simple found best resemblence " << best_r;
 
-        transformation move(CGAL::TRANSLATION, vector);
-        s.destination_positions = make_positions_1();
-        for (auto& destination_position : s.destination_positions)
-        {
-            destination_position = move(destination_position);
-        }
-        return s;
+        return best_ori.sol;
     }
 };
 }
