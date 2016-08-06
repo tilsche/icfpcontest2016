@@ -2,7 +2,6 @@
 #ifndef SOLVER_SOLUTION_HPP
 #define SOLVER_SOLUTION_HPP
 
-
 #include <cassert>
 #include <fstream>
 #include <iostream>
@@ -119,9 +118,8 @@ struct solution
                     return false;
                 }
             }
-
-            return true;
         }
+        return true;
     }
 
     line_segment destination_segment(const facet& facet, size_t segment_id) const
@@ -241,46 +239,64 @@ struct solution
 
         auto verify_fold = [this](const line_segment& fold) {
             int intersections = 0;
-            int is_ons        = 0;
-            int on_segments   = 0;
+            int is_ons = 0;
+            int on_segments = 0;
             std::vector<line_segment> segments;
-            for (auto facet : facets) {
-                for (int i = 1; i < facet.size(); i += 1) {
-                    segments.push_back(line_segment(destination_positions[i-1], destination_positions[i]));
+            for (auto facet : facets)
+            {
+                for (int i = 1; i < facet.size(); i += 1)
+                {
+                    segments.push_back(
+                        line_segment(destination_positions[i - 1], destination_positions[i]));
                 }
-                segments.push_back(line_segment(destination_positions[facet.size()-1], destination_positions[0]));
+                segments.push_back(line_segment(destination_positions[facet.size() - 1],
+                                                destination_positions[0]));
             }
 
-            for (const auto& s : segments) {
-                boost::optional<boost::variant<point, line_segment>> o = CGAL::intersection(s, fold);
+            for (const auto& s : segments)
+            {
+                boost::optional<boost::variant<point, line_segment>> o =
+                    CGAL::intersection(s, fold);
 
-                if (o == boost::none) { continue; }
+                if (o == boost::none)
+                {
+                    continue;
+                }
 
-                if (o->which() == 0) {
+                if (o->which() == 0)
+                {
                     intersections += 1;
-                    assert(! (s.has_on(fold.source()) && s.has_on(fold.target())));
-                    if (s.has_on(fold.source()) || s.has_on(fold.target())) {
+                    assert(!(s.has_on(fold.source()) && s.has_on(fold.target())));
+                    if (s.has_on(fold.source()) || s.has_on(fold.target()))
+                    {
                         is_ons += 1;
                     }
-                } else {
+                }
+                else
+                {
                     on_segments += 1;
                 }
             }
 
-            if (is_ons == 0) {
+            if (is_ons == 0)
+            {
                 logging::error() << "Fold does not start and end on any line segment";
                 assert(is_ons > 0);
             }
 
-            if (intersections % 2 != 0) {
-                logging::warn() << "Fold intersects with an odd number of segments: " << intersections;
+            if (intersections % 2 != 0)
+            {
+                logging::warn() << "Fold intersects with an odd number of segments: "
+                                << intersections;
             }
 
-            if (on_segments > 0) {
+            if (on_segments > 0)
+            {
                 logging::info() << "Fold overlaps with segments: " << on_segments;
             }
 
-            if (is_ons % 2 != 0) {
+            if (is_ons % 2 != 0)
+            {
                 logging::warn() << "Fold ends/starts on an odd number of segments: " << is_ons;
             }
         };

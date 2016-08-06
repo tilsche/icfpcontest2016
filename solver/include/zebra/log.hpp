@@ -101,6 +101,8 @@ using log::logging;
 
 } // namespace zebra
 
+namespace std
+{
 template <typename T>
 std::ostream& operator<<(std::ostream& o, const std::vector<T>& v)
 {
@@ -113,4 +115,5 @@ std::ostream& operator<<(std::ostream& o, const std::vector<T>& v)
         }
     }
     return o;
+}
 }

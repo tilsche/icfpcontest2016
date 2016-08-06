@@ -4,7 +4,7 @@
 
 int main()
 {
-    std::vector v;
+    std::vector<int> v;
 
     zebra::logging::info() << "Hello, World!";
 
