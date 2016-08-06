@@ -65,7 +65,8 @@ public:
     void transform(transformation t)
     {
         logging::trace() << "Adding transformation: " << t << " to " << transform_;
-        transform_ = transform_ * t;
+        //transform_ = transform_ * t;
+        transform_ = t * transform_;
         logging::trace() << "= " << transform_;
     }
 
