@@ -5,6 +5,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <set>
 #include <vector>
 
@@ -38,6 +39,27 @@ struct solution
     std::vector<point> source_positions;
     std::vector<facet> facets;
     std::vector<point> destination_positions;
+    std::map<point, size_t> source_positions_by_point;
+
+    size_t add_positions(point source_point, point destination_point)
+    {
+        assert(source_positions.size() == destination_positions.size());
+        auto new_idx = source_positions.size();
+
+        auto try_insert = source_positions_by_point.emplace(std::make_pair(source_point, new_idx));
+        if (try_insert.second)
+        {
+            destination_positions.push_back(destination_point);
+            source_positions.push_back(source_point);
+            return new_idx;
+        }
+        else
+        {
+            auto old_id = try_insert.first->second;
+            assert(destination_positions[old_id] == destination_point);
+            return old_id;
+        }
+    }
 
     std::vector<polygon> source_facets() const
     {
@@ -236,14 +258,12 @@ struct solution
                     else
                     {
                         // need new vertex
-                        size_t new_vertex_id = destination_positions.size();
+                        auto new_vertex_id = add_positions(
+                            old_facet.transform.inverse()(intersection_point), intersection_point);
                         logging::debug() << "new vertex " << new_vertex_id << "@"
                                          << intersection_point;
                         facet_positive.vertex_ids.push_back(new_vertex_id);
                         facet_negative.vertex_ids.push_back(new_vertex_id);
-
-                        destination_positions.push_back(intersection_point);
-                        source_positions.push_back(old_facet.transform(intersection_point));
                     }
                 }
                 else
@@ -327,7 +347,7 @@ struct solution
         //    }
         //};
 
-        //verify_fold(fold_segment);
+        // verify_fold(fold_segment);
 
         line fold_line(fold_segment.source(), fold_segment.target());
 
@@ -427,14 +447,16 @@ struct solution
         // // TODO deduplicate segments
     }
 
-    void to_png(const std::string& prefix) {
+    void to_png(const std::string& prefix)
+    {
         std::vector<std::string> unlink_files;
         // source points
 
         auto source_points_dat = prefix + "_source_points.dat";
         std::ofstream os(source_points_dat);
         unlink_files.push_back(source_points_dat);
-        for (const auto& p : source_positions) {
+        for (const auto& p : source_positions)
+        {
             os << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
         }
         os.close();
@@ -454,7 +476,8 @@ struct solution
         auto destination_points_dat = prefix + "_target_points.dat";
         std::ofstream od(destination_points_dat);
         unlink_files.push_back(destination_points_dat);
-        for (const auto& p : destination_positions) {
+        for (const auto& p : destination_positions)
+        {
             od << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
         }
         od.close();
@@ -479,7 +502,8 @@ struct solution
         off << "set output \"" << prefix << "_facets.png\"" << std::endl;
         off << "plot [-2:2][-2:2] ";
 
-        for (int i = 0; i < facets.size(); i += 1) {
+        for (int i = 0; i < facets.size(); i += 1)
+        {
 
             auto facet = facets[i].vertex_ids;
             facet.push_back(facet[0]);
@@ -490,9 +514,9 @@ struct solution
 
             unlink_files.push_back(facet_dat);
 
-
             std::ofstream of(facet_dat);
-            for (int j = 0; j < facet.size(); j += 1) {
+            for (int j = 0; j < facet.size(); j += 1)
+            {
                 auto p = destination_positions[facet[j]];
                 of << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
             }
@@ -500,9 +524,12 @@ struct solution
 
             off << "\"" << facet_dat << "\" with lines lw 3";
 
-            if (i < facets.size()-1) {
+            if (i < facets.size() - 1)
+            {
                 off << ", \\" << std::endl;
-            } else {
+            }
+            else
+            {
                 off << std::endl;
             }
         }
@@ -511,7 +538,8 @@ struct solution
 
         system(("gnuplot " + facets_plot).c_str());
 
-        for (const auto& f : unlink_files) {
+        for (const auto& f : unlink_files)
+        {
             unlink(f.c_str());
         }
     }
