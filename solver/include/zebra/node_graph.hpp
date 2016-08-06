@@ -40,6 +40,11 @@ namespace zebra
             return m_graph[p];
         }
 
+        size_t size()
+        {
+            return m_graph.size();
+        }
+
         std::map<point, std::set<point>> m_graph;
     };
 
