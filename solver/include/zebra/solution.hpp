@@ -458,7 +458,8 @@ struct solution
         unlink_files.push_back(source_plot);
         oss << "set terminal pngcairo size 800,800" << std::endl;
         oss << "set output \"" << prefix << "_source.png\"" << std::endl;
-        oss << "plot [-2:2][-2:2] \"" << source_points_dat << "\" ps 3 pt 3, \\" << std::endl;
+        oss << "set size square" << std::endl;
+        oss << "plot \"" << source_points_dat << "\" ps 3 pt 3, \\" << std::endl;
 
         // source facets
 
@@ -513,7 +514,8 @@ struct solution
         unlink_files.push_back(destination_plot);
         odd << "set terminal pngcairo size 800,800" << std::endl;
         odd << "set output \"" << prefix << "_target.png\"" << std::endl;
-        odd << "plot [-2:2][-2:2] \"" << destination_points_dat << "\" ps 3 pt 3, \\" << std::endl;
+        oss << "set size square" << std::endl;
+        odd << "plot \"" << destination_points_dat << "\" ps 3 pt 3, \\" << std::endl;
 
         // destination facets
 
