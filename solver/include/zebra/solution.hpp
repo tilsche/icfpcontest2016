@@ -15,17 +15,17 @@ namespace zebra
 
 struct solution
 {
-    polygon source_positions;
+    std::vector<point> source_positions;
     std::vector<std::vector<int>> facets;
-    polygon destination_positions;
+    std::vector<point> destination_positions;
 
     std::vector<polygon> source_facets() const
     {
         std::vector<polygon> sf(facets.size());
-        int i = 0;
+        size_t i = 0;
         for (const auto& facet : facets)
         {
-            for (int vid = 0; vid < facet.size(); vid++)
+            for (size_t vid = 0; vid < facet.size(); vid++)
             {
                 sf[i].push_back(source_positions[vid]);
             }
@@ -37,10 +37,10 @@ struct solution
     std::vector<polygon> destination_facets() const
     {
         std::vector<polygon> sf(facets.size());
-        int i = 0;
+        size_t i = 0;
         for (const auto& facet : facets)
         {
-            for (int vid = 0; vid < facet.size(); vid++)
+            for (size_t vid = 0; vid < facet.size(); vid++)
             {
                 sf[i].push_back(destination_positions[vid]);
             }
@@ -54,10 +54,8 @@ struct solution
         // All source vertices in 0,0 1,1
         // No duplicate source vertex
         std::set<point> source_set;
-        for (auto vit = source_positions.vertices_begin(); vit != source_positions.vertices_end();
-             vit++)
+        for (const auto& v : source_positions)
         {
-            auto v = *vit;
             if (v.x() > 1 || v.x() < 0 || v.y() > 1 || v.y() < 0)
             {
                 return false;
@@ -77,7 +75,7 @@ struct solution
 
         assert(dfs.size() == sfs.size());
 
-        for (int i = 0; i < dfs.size(); i++)
+        for (size_t i = 0; i < dfs.size(); i++)
         {
             auto& sf = sfs[i];
             auto& df = dfs[i];
@@ -88,7 +86,7 @@ struct solution
                 return false;
             }
 
-            for (int ei = 0; ei < sf.size(); ei++)
+            for (size_t ei = 0; ei < sf.size(); ei++)
             {
                 // TODO Check possible transformation!!!!
                 auto source_edge = sf.edge(ei);
@@ -104,15 +102,6 @@ struct solution
                 }
             }
 
-            for (auto eit = source_positions.edges_begin(); eit != source_positions.edges_end();
-                 eit++)
-            {
-                auto edge = *eit;
-                if (edge.source() == edge.target())
-                {
-                    return false;
-                }
-            }
             return true;
         }
     }
@@ -122,10 +111,8 @@ inline std::ostream& operator<<(std::ostream& os, const solution& s)
 {
     assert(s.source_positions.size() == s.destination_positions.size());
     os << s.source_positions.size() << "\n";
-    for (auto it = s.source_positions.vertices_begin(); it != s.source_positions.vertices_end();
-         it++)
+    for (const auto& vertex : s.source_positions)
     {
-        const auto& vertex = *it;
         os << point_to_string(vertex) << "\n";
     }
 
@@ -140,10 +127,8 @@ inline std::ostream& operator<<(std::ostream& os, const solution& s)
         os << "\n";
     }
 
-    for (auto it = s.destination_positions.vertices_begin();
-         it != s.destination_positions.vertices_end(); it++)
+    for (const auto& vertex : s.destination_positions)
     {
-        const auto& vertex = *it;
         os << point_to_string(vertex) << "\n";
     }
     return os;

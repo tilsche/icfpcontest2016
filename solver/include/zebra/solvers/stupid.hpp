@@ -12,13 +12,8 @@ public:
     solution operator()(task t) override
     {
         solution s;
-        polygon one;
-        one.push_back({ 0, 0 });
-        one.push_back({ 1, 0 });
-        one.push_back({ 1, 1 });
-        one.push_back({ 0, 1 });
-        s.source_positions = one;
-        s.destination_positions = one;
+        s.source_positions = make_positions_1();
+        s.destination_positions = make_positions_1();
         s.facets.push_back({ 0, 1, 2, 3 });
         return s;
     }
