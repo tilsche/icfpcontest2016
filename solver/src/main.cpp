@@ -78,6 +78,8 @@ int main(int argc, char** argv)
 
     auto ng = zebra::node_graph(t);
     zebra::print_node_graph(ng);
+    zebra::backward b;
+    b( t );
     //std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::simple>();
 
     //zebra::logging::info() << "solving...";
