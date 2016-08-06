@@ -13,12 +13,9 @@ CGAL::Gmpq rand(CGAL::Gmpq off, CGAL::Gmpq size_) {
 }
 
 point rand(point a, point b) {
-
     CGAL::Vector_2<kernel> v(a, b);
-
-    v = v/rand(1, 10);
-
-    return a + v;
+    v = v / 10;
+    return a + v + v*rand(0, 9);
 }
 
 line_segment random_fold(const solution& s) {
@@ -39,8 +36,8 @@ line_segment random_fold(const solution& s) {
         e2 = rand(0, edge_count);
     }
 
-    std::cerr << "edge 1: " << e1 << endl;
-    std::cerr << "edge 2: " << e2 << endl;
+    //std::cerr << "edge 1: " << e1 << endl;
+    //std::cerr << "edge 2: " << e2 << endl;
 
     line_segment s1 = hull.edge(e1);
     line_segment s2 = hull.edge(e2);
