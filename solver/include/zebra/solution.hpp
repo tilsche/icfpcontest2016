@@ -65,7 +65,7 @@ public:
     void transform(transformation t)
     {
         logging::trace() << "Adding transformation: " << t << " to " << transform_;
-        //transform_ = transform_ * t;
+        // transform_ = transform_ * t;
         transform_ = t * transform_;
         logging::trace() << "= " << transform_;
     }
@@ -319,6 +319,17 @@ struct solution
         return facets.back();
     }
 
+    std::vector<polygon> facet_polygons() const
+    {
+        std::vector<polygon> r;
+        r.reserve(facets.size());
+        for (const facet& f : facets)
+        {
+            r.push_back(facet_poly(f));
+        }
+        return r;
+    }
+
     polygon facet_poly(const facet& f) const
     {
         polygon p;
@@ -326,17 +337,17 @@ struct solution
         {
             p.push_back(destination_positions[i]);
         }
-        if (p.is_counterclockwise_oriented())
+        if (!p.is_counterclockwise_oriented())
         {
-            return p;
+            p = polygon();
+            for (auto it = f.vertex_ids.rbegin(); it != f.vertex_ids.rend(); it++)
+            {
+                auto id = *it;
+                p.push_back(destination_positions[id]);
+            }
+            assert(p.is_counterclockwise_oriented());
         }
-        p = polygon();
-        for (auto it = f.vertex_ids.rbegin(); it != f.vertex_ids.rend(); it++)
-        {
-            auto id = *it;
-            p.push_back(destination_positions[id]);
-        }
-        assert(p.is_counterclockwise_oriented());
+        logging::trace() << "FACET_POLY = " << p;
         return p;
     }
 
@@ -440,7 +451,7 @@ struct solution
         }
     }
 
-    void to_png(const std::string& prefix)
+    void to_png(const std::string& prefix) const
     {
         std::vector<std::string> unlink_files;
         // source points
@@ -591,34 +602,14 @@ struct solution
 
     polygon_with_holes poly() const
     {
-
+        logging::trace() << "Generating polygon for SOLUTION[[[[\n" << *this << "SOLUTION]]]]\n";
         polygon_with_holes ret;
 
-        bool first = true;
-        for (const facet& f : facets)
-        {
-            auto p = facet_poly(f);
-
-            if (first == true)
-            {
-                CGAL::join(p, p, ret);
-                first = false;
-            }
-
-            polygon_with_holes tmp;
-
-            CGAL::join(p, ret, tmp);
-
-            ret = tmp;
-
-            // std::cerr << "facet: ";
-            // for (int i = 0; i < f.vertex_ids.size(); i += 1) {
-            //    std::cerr << f.vertex_ids[i] << ", ";
-            //}
-            // std::cerr << std::endl;
-        }
-
-        return ret;
+        auto fpolys = facet_polygons();
+        std::vector<polygon_with_holes> union_polys;
+        CGAL::join(fpolys.begin(), fpolys.end(), std::back_inserter(union_polys));
+        assert(union_polys.size() == 1);
+        return union_polys[0];
     }
 
     polygon hull() const
