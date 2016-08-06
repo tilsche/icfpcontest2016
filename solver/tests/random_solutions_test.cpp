@@ -12,10 +12,10 @@ CGAL::Gmpq rand(CGAL::Gmpq off, CGAL::Gmpq size_) {
     return off + size_ / rand(1, 10);
 }
 
-point rand(point a, point b) {
+point rand(point a, point b, int parts) {
     CGAL::Vector_2<kernel> v(a, b);
-    v = v / 10;
-    return a + v + v*rand(0, 9);
+    v = v / parts;
+    return a + v + v*rand(0, parts-1);
 }
 
 line_segment random_fold(const solution& s) {
@@ -42,8 +42,8 @@ line_segment random_fold(const solution& s) {
     line_segment s1 = hull.edge(e1);
     line_segment s2 = hull.edge(e2);
 
-    point p1 = rand(s1.source(), s1.target());
-    point p2 = rand(s2.source(), s2.target());
+    point p1 = rand(s1.source(), s1.target(), 10);
+    point p2 = rand(s2.source(), s2.target(), 10);
 
     std::cerr << "point 1: " << point_to_string(p1) << endl;
     std::cerr << "point 2: " << point_to_string(p2) << endl;
@@ -79,6 +79,7 @@ int main(int argc, char** args) {
     s.to_png(name);
 
 
+    string previous_name = "";
     string previous_solution = "";
 
     for (int i = 1; i <= repeat; i += 1) {
@@ -99,17 +100,18 @@ int main(int argc, char** args) {
             logging::error() << "repetition: " << i << ", solution size > 5000";
 
             std::cout << endl << endl;
-            std::cout << "== size: " << previous_solution.size() << " ==" << endl;
+            std::cout << "== " << previous_name << " == size: " << previous_solution.size() << " ==" << endl;
             std::cout << previous_solution;
             std::cout << endl;
             return 0;
         }
 
+        previous_name = name;
         previous_solution = ss.str();
 
-        std::cout << name << ", solution (" << ss.str().size() << "):" << endl;
-
-        std::cout << ss.str();
+        std::cout << endl << endl;
+        std::cout << "== " << previous_name << " == size: " << previous_solution.size() << " ==" << endl;
+        std::cout << previous_solution;
         std::cout << endl;
 
     }
