@@ -4,6 +4,7 @@ from flask import Flask
 from models import *
 import report
 import playhouse.shortcuts
+import json
 
 app = Flask(__name__)
 
@@ -13,8 +14,15 @@ def dashboard():
 
 @app.route("/best/")
 def best():
-    r = Run.select(Run, Task.path, fn.MAX(Run.score).alias("max")).join(Task).group_by(Run.task).get()
-    return str(playhouse.shortcuts.model_to_dict(r))
+    #runs = Run.select()
+    runs = (Run.select(Run, Task, fn.Max(Run.score).alias("score"))
+    #        .where(Run.score != None)
+            .group_by(Run.task)
+            .join(Task))
+    result = []
+    for r in runs:
+        result.append(playhouse.shortcuts.model_to_dict(r, fields_from_query=runs))
+    return json.dumps(result)
 
 if __name__ == "__main__":
     app.run()

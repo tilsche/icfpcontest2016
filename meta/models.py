@@ -1,8 +1,12 @@
 from peewee import *
+from playhouse.shortcuts import RetryOperationalError
+
+class MyRetryDB(RetryOperationalError, SqliteDatabase):
+    pass
 
 DATABASE = '.icfpc/db.db'
 
-database = SqliteDatabase(DATABASE)
+database = MyRetryDB(DATABASE)
 
 class BaseModel(Model):
     class Meta:
