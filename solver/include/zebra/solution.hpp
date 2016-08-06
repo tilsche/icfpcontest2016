@@ -421,19 +421,53 @@ struct solution
         }
         os.close();
 
-        auto source_points_plot = prefix + "_source_points.plot";
-        std::ofstream oss(source_points_plot);
-        unlink_files.push_back(source_points_plot);
+        auto source_plot = prefix + "_source.plot";
+        std::ofstream oss(source_plot);
+        unlink_files.push_back(source_plot);
         oss << "set terminal pngcairo size 800,800" << std::endl;
-        oss << "set output \"" << prefix << "_source_points.png\"" << std::endl;
-        oss << "plot [-2:2][-2:2] \"" << source_points_dat << "\" ps 3 pt 3";
+        oss << "set output \"" << prefix << "_source.png\"" << std::endl;
+        oss << "plot [-2:2][-2:2] \"" << source_points_dat << "\" ps 3 pt 3, \\" << std::endl;
+
+        // source facets
+
+        for (int i = 0; i < facets.size(); i += 1)
+        {
+            auto facet = facets[i].vertex_ids;
+            facet.push_back(facet[0]);
+
+            std::stringstream facet_dats;
+            facet_dats << prefix << "_source_facet_" << i << ".dat";
+            auto facet_dat = facet_dats.str();
+
+            unlink_files.push_back(facet_dat);
+
+            std::ofstream of(facet_dat);
+            for (int j = 0; j < facet.size(); j += 1)
+            {
+                auto p = source_positions[facet[j]];
+                of << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
+            }
+            of.close();
+
+            oss << "\"" << facet_dat << "\" with lines lw 3";
+
+            if (i < facets.size() - 1)
+            {
+                oss << ", \\" << std::endl;
+            }
+            else
+            {
+                oss << std::endl;
+            }
+        }
+
         oss.close();
 
-        system(("gnuplot " + source_points_plot).c_str());
+        system(("gnuplot " + source_plot).c_str());
 
-        // destination points
+        // destination plot
 
-        auto destination_points_dat = prefix + "_target_points.dat";
+        auto destination_points_dat = prefix + "_target.dat";
         std::ofstream od(destination_points_dat);
         unlink_files.push_back(destination_points_dat);
         for (const auto& p : destination_positions)
@@ -442,34 +476,22 @@ struct solution
         }
         od.close();
 
-        auto destination_points_plot = prefix + "_target_points.plot";
-        std::ofstream odd(destination_points_plot);
-        unlink_files.push_back(destination_points_plot);
+        auto destination_plot = prefix + "_target.plot";
+        std::ofstream odd(destination_plot);
+        unlink_files.push_back(destination_plot);
         odd << "set terminal pngcairo size 800,800" << std::endl;
-        odd << "set output \"" << prefix << "_target_points.png\"" << std::endl;
-        odd << "plot [-2:2][-2:2] \"" << destination_points_dat << "\" ps 3 pt 3";
-        odd.close();
+        odd << "set output \"" << prefix << "_target.png\"" << std::endl;
+        odd << "plot [-2:2][-2:2] \"" << destination_points_dat << "\" ps 3 pt 3, \\" << std::endl;
 
-        system(("gnuplot " + destination_points_plot).c_str());
-
-        // facets
-
-        auto facets_plot = prefix + "_facets.plot";
-        std::ofstream off(facets_plot);
-        unlink_files.push_back(facets_plot);
-
-        off << "set terminal pngcairo size 800,800" << std::endl;
-        off << "set output \"" << prefix << "_facets.png\"" << std::endl;
-        off << "plot [-2:2][-2:2] ";
+        // destination facets
 
         for (int i = 0; i < facets.size(); i += 1)
         {
-
             auto facet = facets[i].vertex_ids;
             facet.push_back(facet[0]);
 
             std::stringstream facet_dats;
-            facet_dats << prefix << "_facet_" << i << ".dat";
+            facet_dats << prefix << "_destination_facet_" << i << ".dat";
             auto facet_dat = facet_dats.str();
 
             unlink_files.push_back(facet_dat);
@@ -482,21 +504,21 @@ struct solution
             }
             of.close();
 
-            off << "\"" << facet_dat << "\" with lines lw 3";
+            odd << "\"" << facet_dat << "\" with lines lw 3";
 
             if (i < facets.size() - 1)
             {
-                off << ", \\" << std::endl;
+                odd << ", \\" << std::endl;
             }
             else
             {
-                off << std::endl;
+                odd << std::endl;
             }
         }
 
-        off.close();
+        odd.close();
 
-        system(("gnuplot " + facets_plot).c_str());
+        system(("gnuplot " + destination_plot).c_str());
 
         for (const auto& f : unlink_files)
         {
