@@ -10,7 +10,6 @@ void test1c();
 void test2c();
 void testedge();
 void testcross();
-void test_broken();
 void test1c2();
 
 int main()
@@ -25,7 +24,6 @@ int main()
     // testedge();
     // testcross();
     test1c2();
-    test_broken();
     return 0;
 }
 
@@ -370,13 +368,4 @@ void testedge()
     // TODO check
 
     // assert(s.facets.size() == 2);
-}
-
-void test_broken() {
-    solution s = solution::unit_square();
-
-    s.fold(line_segment_from_string("0,0 1,0"));
-    s.to_png(string(__func__) + "_post");
-    logging::info() << "Result:\n" << s;
-
 }
