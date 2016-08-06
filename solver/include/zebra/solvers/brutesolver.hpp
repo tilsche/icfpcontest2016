@@ -14,22 +14,22 @@ class brutesolver : public solver
     class state
     {
     public:
-        state(const task& tt) : t(tt)
+        state(const task& tt, int md = 5) : t(tt), max_depth(5);
         {
         }
 
-        void fold_recurse(const origami& o)
+        void fold_recurse(const origami& o, int depth = 0)
         {
         }
 
-        void move_recurse(const origami& o)
+        void move_recurse(const origami& o, int depth = 0)
         {
-            auto bound = s.t.sil.shape().outer_boundary();
+            auto bound = t.sil.shape().outer_boundary();
             for (auto vx_it = bound.vertices_begin(); vx_it = bound.vertices_end(); vx_it++)
             {
                 for (auto o2 : o.move_to(*vx_it))
                 {
-                    fold_recurse(o2, s);
+                    fold_recurse(o2, depth + 1);
                     /*                auto new_r = o2.resemblance(target);
                                     if (new_r > best_r)
                                     {
@@ -42,6 +42,7 @@ class brutesolver : public solver
         }
 
         const task& t;
+        int max_depth;
     };
 
 public:

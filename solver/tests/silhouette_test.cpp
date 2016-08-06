@@ -20,15 +20,15 @@ void check_silhouette(const std::string& taskname)
             cw++;
         }
     }
-    // std::cout << "CCW: " << ccw << std::endl;
-    // std::cout << "CW: " << cw << std::endl;
     int holes = t.sil.shape().number_of_holes();
-    // std::cout << "Holes: " << holes << std::endl;
 
     if ( // t.sil.polygons().size() != 1 || ccw != 1 || cw != 0 ||
         holes != 0)
     {
         std::cout << taskname << std::endl;
+        std::cout << "CCW: " << ccw << std::endl;
+        std::cout << "CW: " << cw << std::endl;
+        std::cout << "Holes: " << holes << std::endl;
     }
 }
 }
