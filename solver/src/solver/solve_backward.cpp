@@ -19,6 +19,7 @@ namespace zebra
         logging::info() << "backward before";
         transitive_hull(point_from_string("0,0"), point_from_string("1/2,2/3"), stack, ret);
 
+
         point ps(0, 0);
         point pe(1, 1);
         std::cout << BackwardConstraints::valid_length(ps, pe) << '\n';
