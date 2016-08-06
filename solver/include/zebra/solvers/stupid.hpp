@@ -9,7 +9,7 @@ namespace zebra
 class stupid : public solver
 {
 public:
-    solution operator()(task t) override
+    solution operator()(const task&) override
     {
         origami o;
         return o.sol;

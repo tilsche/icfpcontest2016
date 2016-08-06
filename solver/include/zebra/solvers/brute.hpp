@@ -14,18 +14,48 @@ class brutesolver : public solver
     class state
     {
     public:
-        state(const task& tt, int md = 5) : t(tt), max_depth(5);
+        state(const task& tt, int md = 1) : t(tt), max_depth(5)
         {
+        }
+
+        // returns true if you should break;
+        bool check(const origami& o, int depth)
+        {
+            int new_r = o.sol.resemblance(t.sil.shape());
+            if (new_r > best_resemblance)
+            {
+                best_resemblance = new_r;
+                best_solution = o.sol;
+                if (new_r == 1.0)
+                {
+                    return true;
+                }
+            }
+            if (depth > max_depth)
+            {
+                return true;
+            }
+            return false;
         }
 
         void fold_recurse(const origami& o, int depth = 0)
         {
+            if (check(o, depth))
+            {
+                return;
+            }
+            for (auto line : t.skel.lines())
+            {
+                auto o2 = o;
+                o2.sol.fold(line);
+                fold_recurse(o2, depth + 1);
+            }
         }
 
         void move_recurse(const origami& o, int depth = 0)
         {
             auto bound = t.sil.shape().outer_boundary();
-            for (auto vx_it = bound.vertices_begin(); vx_it = bound.vertices_end(); vx_it++)
+            for (auto vx_it = bound.vertices_begin(); vx_it != bound.vertices_end(); vx_it++)
             {
                 for (auto o2 : o.move_to(*vx_it))
                 {
@@ -42,6 +72,8 @@ class brutesolver : public solver
         }
 
         const task& t;
+        solution best_solution;
+        double best_resemblance = 0;
         int max_depth;
     };
 
