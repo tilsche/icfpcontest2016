@@ -15,7 +15,7 @@ int main()
     test1();
     test2();
     test3();
-    // test4();
+    test4();
 
     test1c();
     test2c();
@@ -38,7 +38,6 @@ void test1()
     s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
     s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
-    s.to_png(string(__func__) + "_pre");
 
     line_segment fold = line_segment_from_string("1/2,0 1/2,1");
 
@@ -46,6 +45,8 @@ void test1()
     logging::info() << "with line segment " << fold;
 
     s.fold(fold);
+
+    s.to_png(string(__func__) + "_post");
 
     logging::info() << "Result:\n" << s;
 
@@ -75,7 +76,6 @@ void test2()
     s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
     s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
 
-    s.to_png(string(__func__) + "_pre");
 
     auto fold = line_segment_from_string("0,1/2 1,3/4");
 
@@ -84,6 +84,7 @@ void test2()
 
     s.fold(fold);
 
+    s.to_png(string(__func__) + "_post");
     logging::info() << "Result:\n" << s;
     //
     //
@@ -119,14 +120,13 @@ void test3()
         { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 }, { 1, CGAL::Gmpq(1,2) }, { 0, CGAL::Gmpq(1,2) }
     };
 
-    s.to_png(string(__func__) + "_pre");
-
     auto fold = line_segment_from_string("1/2,0 1/2,1");
     logging::info() << "Testing to fold:\n" << s;
     logging::info() << "with line segment " << fold;
 
     s.fold(fold);
 
+    s.to_png(string(__func__) + "_post");
     logging::info() << "Result:\n" << s;
     //
     //
@@ -157,14 +157,13 @@ void test4()
     s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
     s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 } };
 
-    s.to_png(string(__func__) + "_pre");
-
-    auto fold1 = line_segment_from_string("0,3/4 1/3/4");
+    auto fold1 = line_segment_from_string("0,3/4 1,3/4");
     logging::info() << "Testing to fold:\n" << s;
     logging::info() << "with line segment " << fold1;
 
     s.fold(fold1);
 
+    s.to_png(string(__func__) + "_post1");
     logging::info() << "Result:\n" << s;
     //   +---------+
     //   |         |
@@ -179,7 +178,7 @@ void test4()
     logging::info() << "with line segment " << fold2;
 
     s.fold(fold2);
-
+    s.to_png(string(__func__) + "_pos2");
     logging::info() << "Result:\n" << s;
     //   +---------+
     //   |         |
@@ -194,7 +193,7 @@ void test4()
     logging::info() << "with line segment " << fold3;
 
     s.fold(fold3);
-
+    s.to_png(string(__func__) + "_post3");
     logging::info() << "Result:\n" << s;
     // 0 +---------+
     //   |         |
@@ -224,7 +223,7 @@ void test1c()
     logging::info() << "with line segment " << fold;
 
     s.fold(fold);
-
+    s.to_png(string(__func__) + "_post");
     logging::info() << "Result:\n" << s;
 
     // TODO check
@@ -253,7 +252,7 @@ void test2c()
     logging::info() << "with line segment " << fold;
 
     s.fold(fold);
-
+    s.to_png(string(__func__) + "_post");
     logging::info() << "Result:\n" << s;
 
     //   +-+
@@ -288,7 +287,7 @@ void testedge()
     logging::info() << "with line segment " << fold;
 
     s.fold(fold);
-
+    s.to_png(string(__func__) + "_post");
     logging::info() << "Result:\n" << s;
 
     //   +-+
