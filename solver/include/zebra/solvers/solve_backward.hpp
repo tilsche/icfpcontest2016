@@ -18,7 +18,6 @@ namespace zebra
 
     private:
         node_graph ngraph;
-
     };
 
 }

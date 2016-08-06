@@ -12,6 +12,9 @@ namespace zebra
 {
     struct node_graph
     {
+        node_graph()
+        {}
+
         node_graph(task& t)
         {
             for (const auto& edge : t.skel.edges)
@@ -30,6 +33,11 @@ namespace zebra
                     m_graph[edge.target()].insert(edge.source());
                 }
             }
+        }
+
+        std::set<point>& operator[](const point& p)
+        {
+            return m_graph[p];
         }
 
         std::map<point, std::set<point>> m_graph;
