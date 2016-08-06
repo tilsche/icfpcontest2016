@@ -74,7 +74,7 @@ def main():
             print(str(out))
         #execute
         print("executing " + path + "solver/build/solver")
-        print("Constraint: " + constraint.runtime_ms + ", " + constraint.cores)
+        print("Constraint: " + str(constraint.runtime_ms) + ", " + str(constraint.cores))
         try:
             out = execute.execute(path + "solver/build/solver", "../tasks/" + task.path, constraint.runtime_ms, constraint.cores, seed)
             print(str(out))
