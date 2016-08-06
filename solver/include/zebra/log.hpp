@@ -98,3 +98,15 @@ namespace log
 using log::logging;
 
 } // namespace zebra
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o, const std::vector<T>& v) {
+    for (int i = 0; i < v.size(); i += 1) {
+        o << v[i];
+        if (i < v.size()-1) {
+            o << ",";
+        }
+    }
+    return o;
+}
+
