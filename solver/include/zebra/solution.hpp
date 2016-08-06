@@ -53,9 +53,20 @@ public:
         return transform_;
     }
 
+    transformation inverse() const
+    {
+        transformation i = transform_.inverse();
+        logging::trace() << "INVERTING: " << transform_;
+        logging::trace() << " = : " << i;
+        logging::trace() << "ID: " << transform_ * i;
+        return i;
+    }
+
     void transform(transformation t)
     {
+        logging::trace() << "Adding transformation: " << t << " to " << transform_;
         transform_ = transform_ * t;
+        logging::trace() << "= " << transform_;
     }
 
 private:
@@ -239,7 +250,8 @@ struct solution
 
     facet& facet_split(facet& old_facet, line fold_line)
     {
-        facet facet_positive(old_facet.transform()), facet_negative(old_facet.transform());
+        facet facet_positive(old_facet.transform());
+        facet facet_negative(old_facet.transform());
         for (size_t segment_id = 0; segment_id < old_facet.size(); segment_id++)
         {
             auto vertex_id = old_facet[segment_id];
@@ -284,9 +296,8 @@ struct solution
                     else
                     {
                         // need new vertex
-                        auto new_vertex_id =
-                            add_positions(old_facet.transform().inverse()(intersection_point),
-                                          intersection_point);
+                        auto source_point = old_facet.inverse()(intersection_point);
+                        auto new_vertex_id = add_positions(source_point, intersection_point);
                         logging::debug() << "new vertex " << new_vertex_id << "@"
                                          << intersection_point;
                         facet_positive.vertex_ids.push_back(new_vertex_id);
@@ -305,6 +316,27 @@ struct solution
         old_facet = facet_negative;
         facets.push_back(facet_positive);
         return facets.back();
+    }
+
+    polygon facet_poly(const facet& f) const
+    {
+        polygon p;
+        for (auto i : f.vertex_ids)
+        {
+            p.push_back(destination_positions[i]);
+        }
+        if (p.is_counterclockwise_oriented())
+        {
+            return p;
+        }
+        p = polygon();
+        for (auto it = f.vertex_ids.rbegin(); it != f.vertex_ids.rend(); it++)
+        {
+            auto id = *it;
+            p.push_back(destination_positions[id]);
+        }
+        assert(p.is_counterclockwise_oriented());
+        return p;
     }
 
     void fold(const line_segment& fold_segment)
@@ -562,11 +594,7 @@ struct solution
         bool first = true;
         for (const facet& f : facets)
         {
-            polygon p;
-            for (int i : f.vertex_ids)
-            {
-                p.push_back(destination_positions[i]);
-            }
+            auto p = facet_poly(f);
 
             if (first == true)
             {

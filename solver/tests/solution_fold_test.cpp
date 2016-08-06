@@ -5,7 +5,7 @@ using namespace zebra;
 void test1();
 void test2();
 void test3();
-void test4();
+void testmulti();
 void test1c();
 void test2c();
 void testedge();
@@ -13,15 +13,15 @@ void testcross();
 
 int main()
 {
-    test1();
-    test2();
-    test3();
-    test4();
+    //test1();
+    //test2();
+    //test3();
+    testmulti();
 
-    test1c();
-    test2c();
-    testedge();
-    testcross();
+    //test1c();
+    //test2c();
+    //testedge();
+    //testcross();
     return 0;
 }
 
@@ -35,11 +35,7 @@ void test1()
     // |   |
     // +---+
 
-    solution s;
-    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
-    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-
+    solution s = solution::unit_square();
 
     line_segment fold = line_segment_from_string("1/2,0 1/2,1");
 
@@ -73,11 +69,7 @@ void test2()
     // |   |
     // +---+
 
-    solution s;
-    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
-    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-
+    solution s = solution::unit_square();
 
     auto fold = line_segment_from_string("0,1/2 1,3/4");
 
@@ -140,7 +132,7 @@ void test3()
     // assert(s.facets.size() == 4);
 }
 
-void test4()
+void testmulti()
 {
     // cerr << __func__ << endl;
 
@@ -154,10 +146,7 @@ void test4()
     //   |         |
     // 0 +---------+
 
-    solution s;
-    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
-    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    solution s = solution::unit_square();
 
     auto fold1 = line_segment_from_string("1,3/4 0,3/4");
     logging::info() << "Testing to fold:\n" << s;
@@ -215,10 +204,7 @@ void testcross()
     //   |    |    |
     // 0 +----+----+
 
-    solution s;
-    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
-    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    solution s = solution::unit_square();
 
     auto fold1 = line_segment_from_string("1,1/2 0,1/2");
     logging::info() << "Testing to fold:\n" << s;
@@ -258,10 +244,7 @@ void test1c()
     // |   |
     // +---+
     logging::info() << " TEST ONE CORNER !!!!!!!!!! ";
-    solution s;
-    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
-    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    solution s = solution::unit_square();
 
     line_segment fold = line_segment_from_string("1/2,0 1,1");
 
@@ -287,10 +270,7 @@ void test2c()
     // |   |
     // +---+
 
-    solution s;
-    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
-    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    solution s = solution::unit_square();
 
     line_segment fold = line_segment_from_string("0,0 1,1");
 
@@ -322,10 +302,7 @@ void testedge()
     // |   |
     // +---+
 
-    solution s;
-    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-    s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
-    s.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+    solution s = solution::unit_square();
 
     line_segment fold = line_segment_from_string("0,0 1,0");
 
