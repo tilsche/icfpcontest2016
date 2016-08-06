@@ -41,14 +41,30 @@ namespace zebra
                                    std::vector<point>& stack,
                                    std::vector<std::set<point>>& ret)
     {
+        stack.push_back(begin);
+        transitive_hull_in(begin, end, stack, ret);
+        for(auto& elem : ret)
+        {
+            elem.erase(begin);
+            if(elem.size() == 0)
+            {
+                auto it = std::find(ret.begin(), ret.end(), elem);
+                ret.erase(it);
+            }
+        }
+    }
+
+    void backward::transitive_hull_in(point begin,
+                                      point end,
+                                      std::vector<point>& stack,
+                                      std::vector<std::set<point>>& ret)
+    {
         if(stack.size() <= ngraph.size())
         {
             for(const auto& elem : ngraph[begin])
             {
-                stack.push_back(elem);
                 if(elem == end)
                 {
-                    stack.pop_back();
                     std::set<point> set;
                     for(const auto stack_elem : stack)
                     {
@@ -56,13 +72,14 @@ namespace zebra
                     }
                     ret.push_back(set);
                 }
-                else if(std::find(stack.begin(), stack.end(), begin) != stack.end())
+                else if(std::find(stack.begin(), stack.end(), elem) != stack.end())
                 {
-                    stack.pop_back();
+                    continue;
                 }
                 else
                 {
-                    transitive_hull(elem, end, stack, ret);
+                    stack.push_back(elem);
+                    transitive_hull_in(elem, end, stack, ret);
                     stack.pop_back();
                 }
             }

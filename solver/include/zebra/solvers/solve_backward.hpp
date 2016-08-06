@@ -16,6 +16,7 @@ namespace zebra
         solution operator()(task t) override;
 
         void transitive_hull(point begin, point end, std::vector<point>& stack, std::vector<std::set<point>>& ret);
+        void transitive_hull_in(point begin, point end, std::vector<point>& stack, std::vector<std::set<point>>& ret);
 
     private:
         node_graph ngraph;
