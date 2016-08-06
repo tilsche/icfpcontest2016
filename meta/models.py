@@ -47,7 +47,7 @@ class Run(BaseModel):
     version = ForeignKeyField(Version, related_name='runs')
     constraint = ForeignKeyField(Constraint, related_name='runs')
     path = TextField(unique=True)
-    score = FloatField()
+    score = FloatField(null=True)
 
 class Tag(BaseModel):
     name = TextField(unique=True)
