@@ -242,7 +242,7 @@ struct solution
             auto& new_facet = facet_split(facet, fold_line);
             facet_mirror(new_facet, fold_line);
         }
-        else if (positive_points > 0)
+        else if (negative_points > 0)
         {
             facet_mirror(facet, fold_line);
         }
@@ -313,8 +313,8 @@ struct solution
                 }
             }
         }
-        old_facet = facet_negative;
-        facets.push_back(facet_positive);
+        old_facet = facet_positive;
+        facets.push_back(facet_negative);
         return facets.back();
     }
 
