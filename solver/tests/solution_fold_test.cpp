@@ -10,18 +10,20 @@ void test1c();
 void test2c();
 void testedge();
 void testcross();
+void test1c2();
 
 int main()
 {
-    //test1();
-    //test2();
-    //test3();
-    testmulti();
+    // test1();
+    // test2();
+    // test3();
+    // testmulti();
 
-    //test1c();
-    //test2c();
-    //testedge();
-    //testcross();
+    // test1c();
+    // test2c();
+    // testedge();
+    // testcross();
+    test1c2();
     return 0;
 }
 
@@ -101,7 +103,9 @@ void test3()
     // +---------+
 
     solution s;
-    s.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { 1, CGAL::Gmpq(1,2) }, { 0, CGAL::Gmpq(1,2) } };
+    s.source_positions = {
+        { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { 1, CGAL::Gmpq(1, 2) }, { 0, CGAL::Gmpq(1, 2) }
+    };
 
     s.facets = { facet{.vertex_ids = { 0, 1, 4, 5 } }, facet{.vertex_ids = { 5, 4, 2, 3 } } };
 
@@ -111,7 +115,7 @@ void test3()
     // |         |
     // +---------+
     s.destination_positions = {
-        { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 }, { 1, CGAL::Gmpq(1,2) }, { 0, CGAL::Gmpq(1,2) }
+        { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 }, { 1, CGAL::Gmpq(1, 2) }, { 0, CGAL::Gmpq(1, 2) }
     };
 
     auto fold = line_segment_from_string("1/2,0 1/2,1");
@@ -193,7 +197,6 @@ void testmulti()
     // TODO check
 }
 
-
 void testcross()
 {
     // cerr << __func__ << endl;
@@ -215,12 +218,11 @@ void testcross()
     s.to_png(string(__func__) + "_post1");
     logging::info() << "Result:\n" << s;
 
-
     //   +---------+
     //   |         |
     // 0 +---------+
 
-    auto fold2 = line_segment_from_string("1/2,1 1/2,0");
+    auto fold2 = line_segment_from_string("1/2,0 1/2,1");
     logging::info() << "Testing to fold:\n" << s;
     logging::info() << "with line segment " << fold2;
 
@@ -232,6 +234,22 @@ void testcross()
     // 0 +----+
 
     assert(s.source_positions.size() == 9);
+
+    auto fold3 = line_segment_from_string("1,2 0,0");
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold3;
+
+    s.fold(fold3);
+    s.to_png(string(__func__) + "_post3");
+    logging::info() << "Result:\n" << s;
+
+    auto fold4 = line_segment_from_string("1,1 0,0");
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold4;
+
+    s.fold(fold4);
+    s.to_png(string(__func__) + "_post4");
+    logging::info() << "Result:\n" << s;
 }
 
 void test1c()
@@ -253,6 +271,34 @@ void test1c()
 
     s.fold(fold);
     s.to_png(string(__func__) + "_post");
+    logging::info() << "Result:\n" << s;
+
+    // TODO check
+
+    // assert(s.facets.size() == 2);
+}
+
+void test1c2()
+{
+    logging::info() << " TEST ONE CORNER !!!!!!!!!! ";
+    solution s = solution::unit_square();
+
+    line_segment fold = line_segment_from_string("1/2,0 1,1");
+
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold;
+
+    s.fold(fold);
+    s.to_png(string(__func__) + "_post_1");
+    logging::info() << "Result:\n" << s;
+
+    line_segment fold2 = line_segment_from_string("1,1/2 0,1/2");
+
+    logging::info() << "Testing to fold:\n" << s;
+    logging::info() << "with line segment " << fold2;
+
+    s.fold(fold2);
+    s.to_png(string(__func__) + "_post_2");
     logging::info() << "Result:\n" << s;
 
     // TODO check
