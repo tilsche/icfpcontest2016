@@ -107,7 +107,7 @@ struct solution
     }
 
 
-    void fold(const solution& s, const line_segment& fold) {
+    void fold(const line_segment& fold) {
 
         // TODO test that fold is a correct line .. has_on()
 
@@ -149,8 +149,8 @@ struct solution
                 continue;
             }
 
-            int i1 = source_positions.size();
-            int i2 = source_positions.size() + 1;
+            auto i1 = source_positions.size();
+            auto i2 = source_positions.size() + 1;
 
             source_positions.push_back(intersection_points[0].first);
             source_positions.push_back(intersection_points[1].first);
