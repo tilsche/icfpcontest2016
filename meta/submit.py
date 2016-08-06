@@ -19,7 +19,7 @@ def submit_all():
         print(id)
         print(run.path)
         result = submit(id, run.path)
-        if result not None:
+        if result is not None:
             Run.score = result
             Run.save
         time.sleep(2)
