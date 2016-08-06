@@ -2,18 +2,21 @@
 #ifndef SOLVER_SOLUTION_HPP
 #define SOLVER_SOLUTION_HPP
 
-#include <cassert>
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <set>
-#include <vector>
-
 #include <zebra/geometry.hpp>
 #include <zebra/log.hpp>
 #include <zebra/silhouette.hpp>
 
 #include <CGAL/Boolean_set_operations_2.h>
+
+#include <boost/algorithm/string/erase.hpp>
+
+#include <cassert>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <vector>
 
 namespace zebra
 {
@@ -73,6 +76,10 @@ public:
 private:
     transformation transform_;
 };
+
+struct solution;
+
+inline std::ostream& operator<<(std::ostream& os, const solution& s);
 
 struct solution
 {
@@ -449,6 +456,20 @@ struct solution
         {
             dp = t(dp);
         }
+    }
+
+    std::size_t file_size() const
+    {
+        std::stringstream s;
+
+        s << *this;
+
+        auto txt = s.str();
+
+        boost::erase_all(txt, " ");
+        boost::erase_all(txt, "\n");
+
+        return txt.size();
     }
 
     void to_png(const std::string& prefix) const
