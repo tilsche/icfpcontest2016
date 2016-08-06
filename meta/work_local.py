@@ -36,14 +36,15 @@ def submit_work(task, version, constraint, seed, solution):
         f.write(bytes(solution, "utf-8"))
     solutionPath = pathlib.Path(f.name).relative_to(pathlib.Path().resolve())
 
-    score = subprocess.check_output(["./evaluate.py", "../tasks/" + task.path, str(solutionPath)], universal_newlines=True)
+    #score = subprocess.check_output(["./evaluate.py", "../tasks/" + task.path, str(solutionPath)], universal_newlines=True)
 
     print("version:\t" + version.reference)
     print("task:\t" + task.path)
-    print("score:\t" + score)
+    #print("score:\t" + score)
+    print("score will be NULL, we evaluate later")
 
     connect()
-    Run.create(task=task, version=version, constraint=constraint, seed=seed, path=solutionPath, score=score)
+    Run.create(task=task, version=version, constraint=constraint, seed=seed, path=solutionPath, score=None)
     close()
 
 def serve():
