@@ -614,7 +614,12 @@ struct solution
         polygon_with_holes solution_poly = poly();
         logging::trace() << "solution_poly: " << solution_poly;
         std::vector<polygon_with_holes> p_ands;
-        CGAL::join(solution_poly, target, p_or);
+        bool overlap = CGAL::join(solution_poly, target, p_or);
+        if (!overlap)
+        {
+            logging::trace() << "NO overlap";
+            return 0.0;
+        }
         CGAL::intersection(solution_poly, target, std::back_inserter(p_ands));
         CGAL::Gmpq and_area = 0;
         for (const auto& holy : p_ands)
@@ -622,7 +627,10 @@ struct solution
             and_area += holy.outer_boundary().area();
         }
         auto or_area = p_or.outer_boundary().area();
-        return gmpq_to_double(and_area / or_area);
+        auto gmpr = and_area / or_area;
+        double r = gmpq_to_double(gmpr);
+        logging::trace() << "rsemblance " << r << " = " << gmpr;
+        return r;
     }
 
     polygon_with_holes poly() const

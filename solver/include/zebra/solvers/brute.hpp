@@ -7,28 +7,36 @@
 #include <zebra/log.hpp>
 #include <zebra/origami.hpp>
 
+#include <exception>
+
 namespace zebra
 {
 class brutesolver : public solver
 {
+    class solution_found : public std::exception
+    {
+    };
+
     class state
     {
     public:
-        state(const task& tt, int md = 1) : t(tt), max_depth(5)
+        state(const task& tt, int md = 2) : t(tt), max_depth(md)
         {
         }
 
         // returns true if you should break;
         bool check(const origami& o, int depth)
         {
-            int new_r = o.sol.resemblance(t.sil.shape());
+            auto new_r = o.sol.resemblance(t.sil.shape());
+            logging::debug() << "[[[CHECKING at depth " << depth << " r " << new_r;
+            logging::debug() << o.sol << "\n]]]";
             if (new_r > best_resemblance)
             {
                 best_resemblance = new_r;
                 best_solution = o.sol;
                 if (new_r == 1.0)
                 {
-                    return true;
+                    throw solution_found();
                 }
             }
             if (depth > max_depth)
@@ -54,19 +62,16 @@ class brutesolver : public solver
 
         void move_recurse(const origami& o, int depth = 0)
         {
+            if (check(o, depth))
+            {
+                return;
+            }
             auto bound = t.sil.shape().outer_boundary();
             for (auto vx_it = bound.vertices_begin(); vx_it != bound.vertices_end(); vx_it++)
             {
                 for (auto o2 : o.move_to(*vx_it))
                 {
                     fold_recurse(o2, depth + 1);
-                    /*                auto new_r = o2.resemblance(target);
-                                    if (new_r > best_r)
-                                    {
-                                        best_r = new_r;
-                                        best_ori = o2;
-                                    }
-                                    */
                 }
             }
         }
@@ -85,35 +90,16 @@ public:
         origami ori;
 
         state st(t);
-        st.move_recurse(ori);
-        /*
-        move double best_r = 0;
-        origami best_ori;
-        for (auto vx_it = target.vertices_begin(); vx_it != target.vertices_end(); vx_it++)
+        try
         {
-            for (auto o2 : ori.move_to(*vx_it))
-            {
-                auto new_r = o2.resemblance(target);
-                if (new_r > best_r)
-                {
-                    best_r = new_r;
-                    best_ori = o2;
-                }
-            }
+            st.move_recurse(ori);
         }
-        auto vector = best_ori.poly.vertex(0) - ori.poly.vertex(0);
-        logging::info() << "Simple found best resemblence " << best_r
-                        << " vector: " << gmpq_to_string(vector.hx()) << ", "
-                        << gmpq_to_string(vector.hy());
-
-        transformation move(CGAL::TRANSLATION, vector);
-        s.destination_positions = make_positions_1();
-        for (auto& destination_position : s.destination_positions)
+        catch (solution_found&)
         {
-            destination_position = move(destination_position);
+            logging::info() << "PERFECT SOLUTION FOUND";
         }
-        return s;*/
-        return ori.sol;
+        logging::info() << "Best solution: " << st.best_resemblance;
+        return st.best_solution;
     }
 };
 }
