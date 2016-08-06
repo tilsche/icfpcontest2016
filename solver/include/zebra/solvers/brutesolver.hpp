@@ -13,7 +13,27 @@ class brutesolver : public solver
 {
 public:
 
-    st::vector<solution>
+    fold_recurse(const origami& o, const task& t)
+    {
+        o.
+    }
+
+    move_recurse(const origami& o, const task& t)
+    {
+        for (auto vx_it = target.vertices_begin(); vx_it != target.vertices_end(); vx_it++)
+        {
+            for (auto o2 : ori.move_to(*vx_it))
+            {
+                auto new_r = o2.resemblance(target);
+                if (new_r > best_r)
+                {
+                    best_r = new_r;
+                    best_ori = o2;
+                }
+            }
+        }
+
+    }
 
     solution operator()(task t) override
     {

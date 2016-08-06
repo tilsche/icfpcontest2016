@@ -18,9 +18,6 @@ namespace zebra
 
 struct task
 {
-    task()
-    {
-    }
     task(std::vector<polygon> polys, std::vector<line_segment> edgs) : sil{ polys }, skel{ edgs }
     {
     }
