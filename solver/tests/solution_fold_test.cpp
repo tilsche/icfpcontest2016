@@ -21,7 +21,7 @@ void test1() {
 
     line_segment fold = line_segment_from_string("0,1/2 1,3/4");
 
-    auto o = solution_fold(s, fold);
+    auto o = s.fold(fold);
     // TODO
 }
 
@@ -44,6 +44,6 @@ void test2() {
 
     line_segment fold = line_segment_from_string("1/2,0 1/2,1");
 
-    auto o = solution_fold(s, fold);
+    auto o = s.fold(fold);
     // TODO
 }
