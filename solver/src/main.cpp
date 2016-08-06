@@ -29,10 +29,14 @@ int main(int argc, char** argv)
     options.add_options()("help", "show help message")
             ("task-file", po::value<std::string>(), "File containing the task.")
             ("runtime", po::value<long>(), "runtime")
+            ("verbosity,v", po::value<std::string>()->default_value("warn"),
+                            "set the verbosity level")
             ("cores", po::value<int>(), "core count");
     // clang-format on
 
     po::variables_map vm;
+
+    zebra::log::set_min_severity_level(vm["verbosity"].as<std::string>());
 
     po::store(
         po::command_line_parser(argc, argv).options(options).positional(positional_options).run(),
