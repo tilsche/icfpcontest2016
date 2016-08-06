@@ -13,6 +13,8 @@
 
 #include <zebra/exception.hpp>
 
+#include <vector>
+
 namespace zebra
 {
 namespace log
@@ -99,14 +101,16 @@ using log::logging;
 
 } // namespace zebra
 
-template<typename T>
-std::ostream& operator<<(std::ostream& o, const std::vector<T>& v) {
-    for (int i = 0; i < v.size(); i += 1) {
+template <typename T>
+std::ostream& operator<<(std::ostream& o, const std::vector<T>& v)
+{
+    for (std::size_t i = 0; i < v.size(); ++i)
+    {
         o << v[i];
-        if (i < v.size()-1) {
+        if (i < v.size() - 1)
+        {
             o << ",";
         }
     }
     return o;
 }
-
