@@ -26,8 +26,6 @@ def submit_with_evaluate():
 
             run = Run.select().where(Run.submitted == False).order_by(Run.score.desc()).limit(1).get()
 
-            if run.score < 1.0:
-                return
             id = task.path[:-4]
             print("id:", id)
             print("sol", run.path)
@@ -45,7 +43,7 @@ def submit_with_evaluate():
                     run.save()
             print()
             time.sleep(1.1)
-            
+
 
 def submit_all():
     #connect()
