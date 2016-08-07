@@ -55,6 +55,7 @@ namespace zebra
             for(const auto& hull : h_list)
             {
                 auto new_graph = ngraph;
+                std::vector<upoint> poly_points;
                 for(const auto& p : hull)
                 {
                     // Calc transformation parameters
@@ -70,6 +71,7 @@ namespace zebra
 
                     // Move point
                     auto p_new = translate(p);
+                    poly_points.push_back(p_new);
 
                     // Change point in new node_graph
                     new_graph[p_new] = ngraph[p];
@@ -79,6 +81,9 @@ namespace zebra
                         new_graph[p].insert(p_new);
                     }
                 }
+                poly_points.push_back(begin);
+                poly_points.push_back(end);
+                new_graph.m_polys.emplace_back(poly_points.begin(), poly_points.end());
                 if (std::find(result.begin(), result.end(), new_graph) == result.end()
                  && BackwardConstraints::test(new_graph))
                 {
@@ -139,4 +144,5 @@ namespace zebra
             }
         }
     }
+
 }
