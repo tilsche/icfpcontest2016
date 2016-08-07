@@ -58,11 +58,13 @@ public:
 
     transformation inverse() const
     {
+        /*
         transformation i = transform_.inverse();
         logging::trace() << "INVERTING: " << transform_;
         logging::trace() << " = : " << i;
         logging::trace() << "ID: " << transform_ * i;
-        return i;
+        return i; */
+        return transform_inverse_;
     }
 
     void transform(transformation t)
@@ -71,12 +73,14 @@ public:
         // transform_ = transform_ * t;
         transform_ = t * transform_;
         logging::trace() << "= " << transform_;
+        transform_inverse_ = transform_.inverse();
     }
 
     std::vector<vertex_id> vertex_ids_;
 
 private:
     transformation transform_;
+    transformation transform_inverse_;
 };
 }
 #endif // SOLVER_FACET_HPP
