@@ -5,9 +5,10 @@
 #include "geometry/line_segment.hpp"
 #include "geometry/point.hpp"
 #include "geometry/polygon.hpp"
+#include <zebgra/log.hpp>
 
-#include <CGAL/Polygon_set_2.h>
 #include <CGAL/Aff_transformation_2.h>
+#include <CGAL/Polygon_set_2.h>
 //#include <CGAL/Homogeneous/Aff_transformationH2.h>
 
 namespace zebra
