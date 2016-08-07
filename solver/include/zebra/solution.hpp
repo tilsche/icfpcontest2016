@@ -473,6 +473,7 @@ public:
                 destination_position = mirror(destination_position);
             }
         }
+        invalidate();
     }
 
     void fold(const line_segment& fold_segment)
@@ -546,6 +547,7 @@ public:
                 destination_positions_[vid] = mirror(destination_position(vid));
             }
         }
+        invalidate();
         return facets_and_vertices;
     }
 
@@ -559,6 +561,7 @@ public:
         {
             dp = t(dp);
         }
+        invalidate();
     }
 
     void rotate(const point& p, const line_segment& segment)
@@ -745,8 +748,21 @@ public:
         return r;
     }
 
+private:
+    mutable polygon_with_holes poly_cache_;
+    mutable bool poly_cache_valid_ = false;
+    void invalidate()
+    {
+        poly_cache_valid_ = false;
+    }
+
+public:
     polygon_with_holes poly() const
     {
+        if (poly_cache_valid_)
+        {
+            return poly_cache_;
+        }
         logging::trace() << "Generating polygon for SOLUTION[[[[\n" << *this << "SOLUTION]]]]\n";
         polygon_set ps;
         for (const facet& f : facets_)
@@ -757,6 +773,8 @@ public:
         std::vector<polygon_with_holes> union_polys;
         ps.polygons_with_holes(std::back_inserter(union_polys));
         assert(union_polys.size() == 1);
+        poly_cache_ = union_polys[0];
+        poly_cache_valid_ = true;
         return union_polys[0];
     }
 
