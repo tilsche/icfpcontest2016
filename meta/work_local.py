@@ -6,6 +6,8 @@ import pickle
 import random
 import subprocess
 import xmlrpc.server
+import submit
+import time
 
 from models import *
 
@@ -46,6 +48,9 @@ def submit_work(task, version, constraint, seed, solution):
     connect()
     Run.create(task=task, version=version, constraint=constraint, seed=seed, path=solutionPath, score=None)
     close()
+
+    submit.submit(task.path[:-4], str(solutionPath))
+    time.sleep(1)
 
 def serve():
     """Starts a server listening for Slaves requesting or submitting work"""
