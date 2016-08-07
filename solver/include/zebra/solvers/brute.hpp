@@ -29,6 +29,7 @@ class brutesolver : public solver
     public:
         state(const task& tt, int md, clock::time_point dl) : t(tt), max_depth(md), deadline(dl)
         {
+            target_area = tt.sil.shape().outer_boundary().area().to_double();
         }
 
         ~state()
@@ -40,18 +41,30 @@ class brutesolver : public solver
         bool check(const origami& o, int depth)
         {
             check_count++;
-            if (depth <= max_depth)
+            if (depth == max_depth)
             {
-                auto new_r = o.sol.resemblance(t.sil.shape());
-                logging::debug() << "[[[CHECKING at depth " << depth << " r " << new_r;
-                logging::debug() << o.sol << "\n]]]";
-                if (new_r > best_resemblance)
+                const auto& p = o.sol.poly();
+                if (t.sil.shape() == p)
                 {
-                    best_resemblance = new_r;
+                    best_resemblance = 1.0;
                     best_solution = o.sol;
-                    if (new_r == 1.0)
+                    throw solution_found();
+                }
+
+                auto p_area = p.outer_boundary().area().to_double();
+                auto area_error = fabs(p_area - target_area);
+                if (area_error < best_area_error)
+                {
+                    best_area_error = area_error;
+                    auto new_r = o.sol.resemblance(t.sil.shape());
+                    if (new_r > best_resemblance)
                     {
-                        throw solution_found();
+                        best_resemblance = new_r;
+                        best_solution = o.sol;
+                        if (new_r == 1.0)
+                        {
+                            throw solution_found();
+                        }
                     }
                 }
             }
@@ -103,6 +116,8 @@ class brutesolver : public solver
         }
         const task& t;
         solution best_solution;
+        double target_area;
+        double best_area_error = 999999.0;
         double best_resemblance = 0;
         int max_depth;
         clock::time_point deadline;
