@@ -736,12 +736,12 @@ public:
         CGAL::Gmpq and_area = 0;
         for (const auto& holy : p_ands)
         {
-            and_area += holy.outer_boundary().area();
+            and_area += holy_area(holy);
         }
-        auto or_area = p_or.outer_boundary().area();
+        auto or_area = holy_area(p_or);
         auto gmpr = and_area / or_area;
         double r = gmpq_to_double(gmpr);
-        logging::trace() << "rsemblance " << r << " = " << gmpr;
+        logging::trace() << "resmblance " << r << " = " << gmpr;
         return r;
     }
 
