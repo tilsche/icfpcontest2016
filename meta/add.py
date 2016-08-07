@@ -12,7 +12,8 @@ def help():
     print("\ttask_dir <path>\t\t add all files in <path> as task")
     print("\tversion <path>...\t\tadds version")
     print("\tconstraint <name> <runtime_ms> <cores>\tadds constraint")
-    print("\twork <reference> <constraintName> <count> <priority> for all  lvls")
+    print("\twork all <reference> <constraintName> <count> <priority> for all lvls")
+    print("\twork imperfect <reference> <constraintName> <count> <priority> for all imperfect lvls")
 
 def add_task(paths):
     connect()
@@ -43,12 +44,30 @@ def add_constraint(name, runtime_ms, cores):
     Constraint.create(runtime_ms=runtime_ms, cores=cores, name=name)
     close()
 
-def add_work(reference, constraint, count, priority):
+def add_work(args):
+    if args[0] == "not_perfect":
+        help() if len(args) < 5 else add_work_imperfect(args[1], args[2], args[3], args[4])
+    elif args[0] == "all":
+        help() if len(args) < 5 else add_work_all(args[1], args[2], args[3], args[4])
+    else:
+        help()
+
+def add_work_imperfect(reference, constraint, count, priority):
     connect()
     version=Version.get(reference=reference)
     constraint=Constraint.get(name=constraint)
-    for task in Task.select():
-        a = Work.enque(task, version=version, constraint=constraint, priority=priority, count=count)
+    #we use list() to make faster?
+    for task in list(Task.select().where(Run.score != 1.0).group_by(Task).join(Run)):
+        Work.enque(task, version=version, constraint=constraint, priority=priority, count=count)
+    close()
+
+def add_work_all(reference, constraint, count, priority):
+    connect()
+    version=Version.get(reference=reference)
+    constraint=Constraint.get(name=constraint)
+    #we use list() to make faster?
+    for task in list(Task.select()):
+        Work.enque(task, version=version, constraint=constraint, priority=priority, count=count)
     close()
 
 def add(args):
@@ -61,7 +80,7 @@ def add(args):
     elif args[0] == "constraint":
         help() if len(args) < 4 else add_constraint(args[1], args[2], args[3])
     elif args[0] == "work":
-        help() if len(args) < 5 else add_work(args[1], args[2], args[3], args[4])
+        add_work(args[1:])
     else:
         help()
 

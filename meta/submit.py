@@ -40,6 +40,7 @@ def submit(problemId, solutionPath):
         out_str = str(out)
         print(out_str)
         if "Error" in out_str:
+            time.sleep(10)
             continue
         j = json.loads(str(out, "utf-8"))
         if j["ok"] == True:
