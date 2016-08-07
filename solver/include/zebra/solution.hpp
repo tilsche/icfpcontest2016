@@ -84,7 +84,6 @@ public:
         return facets_[id];
     }
 
-protected:
     facet& get_facet(facet_id id)
     {
         return facets_[id];
