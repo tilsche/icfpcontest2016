@@ -6,9 +6,6 @@
 #include <zebra/geometry/kernel.hpp>
 #include <zebra/geometry/point.hpp>
 
-#include <zebra/geometry.hpp>
-
-
 namespace zebra
 {
 
