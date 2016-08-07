@@ -47,8 +47,13 @@ class Work(BaseModel):
         work_dict = []
 
         for task in tasks:
-            run = Run.select().where(Run.task == task).order_by(Run.score.desc()).limit(1).get()
-            if run.score < 1.0:
+            try:
+                run = Run.select().where(Run.task == task).order_by(Run.score.desc()).limit(1).get()
+                score = run.score
+            except:
+                score = 0
+                
+            if score < 1.0:
                 work_dict.append({"task": task, "version": version, "constraint": constraint, "priority": priority, "count": count})
 
         with database.atomic():
