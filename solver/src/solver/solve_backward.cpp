@@ -19,16 +19,16 @@ namespace zebra
         point pe(1, 1);
         std::cout << BackwardConstraints::valid_length(ps, pe) << '\n';
         std::cout << BackwardConstraints::is_standard_square(ngraph) << '\n';
-        
+
         return s;
     }
 
     //std::set<node_graph> backward::unfold_segment(node_graph ng)
-    void backward::unfold_segment(point begin, point end)
+    void backward::unfold_segment(upoint begin, upoint end)
     {
         //for
         // Get hulls
-        std::vector<point> stack;
+        std::vector<upoint> stack;
         hull_list h_list;
 
         transitive_hull(begin, end, stack, h_list);
@@ -43,24 +43,24 @@ namespace zebra
             for(const auto& p : hull)
             {
                 // Calc transformation parameters
-                point beg2point(p.x() - begin.x(), p.y() - begin.y());
+                upoint beg2point(p.x() - begin.x(), p.y() - begin.y());
                 auto dist = CGAL::to_double(beg2point.x() * normal.x() + beg2point.y() * normal.y()) / sqrt(CGAL::to_double(normal.squared_length()));
-                
+
                 // Build tranlation matrix
                 vector translate_vec = (-2 * dist) * normal;
                 CGAL::Gmpq zero(0,0);
                 transformation translate(zero, zero, translate_vec.hx(), zero, zero, translate_vec.hy(), translate_vec.hw());
-                
+
                 // Move point
                 auto p_new = translate(p);
-                
+
                 // Change point in new node_graph
                 auto new_graph = ngraph;
                 new_graph[p_new] = ngraph[p];
-                for(const auto& point : new_graph[p_new])
+                for(const auto& p : new_graph[p_new])
                 {
-                    new_graph[point].erase(p);
-                    new_graph[point].insert(p_new);
+                    new_graph[p].erase(p);
+                    new_graph[p].insert(p_new);
                 }
             }
         }
@@ -68,12 +68,12 @@ namespace zebra
 
     //void backward::make_node_connections_unique(node_graph& ng)
     //{
-        //for(auto& 
+        //for(auto&
     //}
 
-    void backward::transitive_hull(point begin,
-                                   point end,
-                                   std::vector<point>& stack,
+    void backward::transitive_hull(upoint begin,
+                                   upoint end,
+                                   std::vector<upoint>& stack,
                                    hull_list& ret)
     {
         stack.push_back(begin);
@@ -89,9 +89,9 @@ namespace zebra
         }
     }
 
-    void backward::transitive_hull_in(point begin,
-                                      point end,
-                                      std::vector<point>& stack,
+    void backward::transitive_hull_in(upoint begin,
+                                      upoint end,
+                                      std::vector<upoint>& stack,
                                       hull_list& ret)
     {
         if(stack.size() <= ngraph.size())
@@ -100,7 +100,7 @@ namespace zebra
             {
                 if(elem == end)
                 {
-                    std::set<point> set;
+                    std::set<upoint> set;
                     for(const auto stack_elem : stack)
                     {
                         set.insert(stack_elem);

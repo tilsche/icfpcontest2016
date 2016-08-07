@@ -12,29 +12,29 @@ namespace zebra
 {
     struct node_graph
     {
-        using iterator = std::map<point, std::set<point>>::iterator;
+        using iterator = std::map<upoint, std::set<upoint>>::iterator;
 
         node_graph()
         {}
 
-        node_graph(const task& t)
-        : m_polys(t.sil.polygons())
+        node_graph(const task& t) : m_polys(t.sil.polygons())
         {
+            std::map<point, upoint> pup;
+
             for (const auto& edge : t.skel.edges)
             {
-                if (m_graph.count(edge.source()) == 0) {
-                    m_graph[edge.source()] = std::set<point>{edge.target()};
+                if (pup.count(edge.source()) == 0) {
+                    pup[edge.source()] = upoint(edge.source());
                 }
-                else {
-                    m_graph[edge.source()].insert(edge.target());
+                if (pup.count(edge.target()) == 0) {
+                    pup[edge.target()] = upoint(edge.target());
                 }
+            }
 
-                if (m_graph.count(edge.target()) == 0) {
-                    m_graph[edge.target()] = std::set<point>{edge.source()};
-                }
-                else {
-                    m_graph[edge.target()].insert(edge.source());
-                }
+            for (const auto& edge : t.skel.edges)
+            {
+                m_graph[pup[edge.source()]].insert(pup[edge.target()]);
+                m_graph[pup[edge.target()]].insert(pup[edge.source()]);
             }
 
             for(const auto& edge : t.skel.edges)
@@ -45,12 +45,12 @@ namespace zebra
                     && edge.source() != map_entry.first
                     && edge.target() != map_entry.first)
                     {
-                        m_graph[map_entry.first].insert(edge.source());
-                        m_graph[map_entry.first].insert(edge.target());
-                        m_graph[edge.source()].insert(map_entry.first);
-                        m_graph[edge.target()].insert(map_entry.first);
-                        m_graph[edge.source()].erase(edge.target());
-                        m_graph[edge.target()].erase(edge.source());
+                        m_graph[map_entry.first].insert(pup[edge.source()]);
+                        m_graph[map_entry.first].insert(pup[edge.target()]);
+                        m_graph[pup[edge.source()]].insert(map_entry.first);
+                        m_graph[pup[edge.target()]].insert(map_entry.first);
+                        m_graph[pup[edge.source()]].erase(pup[edge.target()]);
+                        m_graph[pup[edge.target()]].erase(pup[edge.source()]);
                     }
                 }
             }
@@ -66,7 +66,7 @@ namespace zebra
             return m_graph.end();
         }
 
-        std::set<point>& operator[](const point& p)
+        std::set<upoint>& operator[](const upoint& p)
         {
             return m_graph[p];
         }
@@ -77,60 +77,7 @@ namespace zebra
         }
 
         std::vector<polygon> m_polys;
-        std::map<point, std::set<point>> m_graph;
-    };
-
-    struct s2dmap
-    {
-        using map_iterator = std::map<point, std::set<point>>::iterator;
-
-        // maps destination points to source points
-        s2dmap()
-        {
-        }
-
-        s2dmap(const node_graph& ng)
-        {
-            for (const auto& kvp : ng.m_graph)
-            {
-                m_map[kvp.first] = std::set<point>{kvp.first};
-            }
-
-        }
-
-        std::vector<point> destination_points() const
-        {
-            std::vector<point> ret;
-            for (const auto& kvp : m_map)
-            {
-                ret.push_back(kvp.first);
-            }
-            return ret;
-        }
-
-        std::set<point>& sources_points_of_destination(const point& dest)
-        {
-            return m_map[dest];
-        }
-
-        std::set<point>& operator[](const point& p)
-        {
-            return sources_points_of_destination(p);
-        }
-
-        map_iterator begin()
-        {
-            return m_map.begin();
-
-        }
-
-        map_iterator end()
-        {
-            return m_map.end();
-        }
-
-        private:
-        std::map<point, std::set<point>> m_map;
+        std::map<upoint, std::set<upoint>> m_graph;
     };
 
 

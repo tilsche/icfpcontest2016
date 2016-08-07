@@ -10,6 +10,10 @@ namespace zebra {
     {
     }
 
+    upoint::upoint(CGAL::Gmpq a, CGAL::Gmpq b) : point(a,b), m_src(a,b), m_id(id_init++)
+    {
+    }
+
     unsigned int upoint::id() const
     {
         return m_id;

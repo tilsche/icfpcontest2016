@@ -9,6 +9,7 @@ namespace zebra
     {
         upoint();
         upoint(point p);
+        upoint(CGAL::Gmpq, CGAL::Gmpq);
         unsigned int id() const;
         bool operator==(const upoint&) const;
         bool operator!=(const upoint&) const;
