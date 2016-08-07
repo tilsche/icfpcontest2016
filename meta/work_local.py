@@ -49,7 +49,7 @@ def submit_work(task, version, constraint, seed, solution):
     Run.create(task=task, version=version, constraint=constraint, seed=seed, path=solutionPath, score=None)
     close()
 
-    submit.submit(task.path[:-4], str(solutionPath))
+    submit.submit(task.path.strip("0")[:-4], str(solutionPath))
     time.sleep(1)
 
 def serve():
