@@ -19,8 +19,8 @@ public:
     {
         logging::debug() << "MOVE_TO (" << p << ")[[[[\n" << sol << "\n]]]]] MOVE_TO";
         std::vector<origami> results;
-        results.reserve(sol.destination_positions.size() * 2);
-        for (auto dp : sol.destination_positions)
+        results.reserve(sol.destination_positions().size() * 2);
+        for (auto dp : sol.destination_positions())
         {
             transformation move(CGAL::TRANSLATION, p - dp);
             auto moved = *this;
