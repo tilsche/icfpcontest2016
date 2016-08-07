@@ -516,6 +516,25 @@ public:
         }
     }
 
+    // move to
+    void rotate(const line_segment& line)
+    {
+        auto& source = line.source();
+        auto& target = line.target();
+
+        auto cos_rho = target.x() - source.x();
+        auto sin_rho = target.y() - source.y();
+
+        auto cos_rho2 = cos_rho * cos_rho;
+        auto sin_rho2 = sin_rho * sin_rho;
+
+        auto hw2 = line.squared_length();
+
+        auto rotate = transformation(CGAL::ROTATION, sin_rho2, cos_rho2, hw2);
+
+        transform(rotate);
+    }
+
     std::size_t file_size() const
     {
         std::stringstream s;
