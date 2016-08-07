@@ -44,10 +44,23 @@ class Work(BaseModel):
         except Work.DoesNotExist:
             return None
     def enque(tasks, version, constraint, priority, count):
-        work_dict = [{"task": task, "version": version, "constraint": constraint, "priority": priority, "count": count} for task in tasks]
+        work_dict = []
+
+        for task in tasks:
+            score = Run.select().where(Run.task == task).order_by(Run.score.desc()).limit(1)
+            if score < 1.0:
+                work_dict.append({"task": task, "version": version, "constraint": constraint, "priority": priority, "count": count})
+
+            print("###############")
+            print(score)
+            print(task)
+
+
+
         with database.atomic():
             for idx in range(0, len(work_dict), 100):
-                Work.insert_many(work_dict[idx:idx+100]).execute()
+                pass
+                # Work.insert_many(work_dict[idx:idx+100]).execute()
         #return Work.create(task=task, version=version, constraint=constraint, priority=priority, count=count)
 
 class Run(BaseModel):
@@ -69,4 +82,3 @@ def close():
 
 def create_tables():
     database.create_tables([Task, Version, Constraint, Run, Work, Tag, ])
-
