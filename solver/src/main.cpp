@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     // clang-format off
     options.add_options()("help", "show help message")
             ("task-file", po::value<std::string>(), "File containing the task.")
-            ("runtime", po::value<long>(), "runtime")
+            ("runtime", po::value<long>()->default_value(60), "runtime")
             ("visualize,z", po::value<std::string>(), "visualize")
             ("verbosity,v", po::value<std::string>()->default_value("info"),
                             "set the verbosity level")
@@ -62,11 +62,7 @@ int main(int argc, char** argv)
         help(options);
         return EXIT_SUCCESS;
     }
-    std::chrono::seconds runtime(10);
-    if (vm.count("runtime"))
-    {
-        runtime = std::chrono::seconds(vm["runtime"].as<long>());
-    }
+    auto runtime = std::chrono::seconds(vm["runtime"].as<long>());
 
     if (vm.count("task-file") == 0)
     {
