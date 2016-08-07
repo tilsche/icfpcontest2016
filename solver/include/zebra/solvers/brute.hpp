@@ -52,11 +52,12 @@ class brutesolver : public solver
             {
                 return;
             }
-            for (auto line : t.skel.lines())
+            for (auto l : t.skel.lines())
             {
-                auto o2 = o;
-                o2.sol.fold(line);
-                fold_recurse(o2, depth + 1);
+                for (auto o2 : o.folds(l))
+                {
+                    fold_recurse(o2, depth + 1);
+                }
             }
         }
 
