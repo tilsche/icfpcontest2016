@@ -51,6 +51,21 @@ std::string point_to_string(const point& p) {
     return s.str();
 }
 
-};
+}
+
+std::ostream& operator<<(std::ostream& o, std::set<zebra::point> s) {
+    for (const auto& e : s) {
+        o << zebra::point_to_string(e) << ",";
+    }
+    return o;
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o, std::set<T> s) {
+    for (const auto& e : s) {
+        o << e << ",";
+    }
+    return o;
+}
 
 #endif // ZEBRA_POINT_HPP

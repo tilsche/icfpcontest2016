@@ -33,6 +33,7 @@ inline std::vector<point> make_positions_1()
     p.push_back({ 0, 1 });
     return p;
 }
+
 // not tested
 void polygons_to_png(const std::vector<polygon>& v, const std::string f)
 {
