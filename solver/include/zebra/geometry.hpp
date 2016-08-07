@@ -5,6 +5,7 @@
 #include "geometry/line_segment.hpp"
 #include "geometry/point.hpp"
 #include "geometry/polygon.hpp"
+#include "geometry/upoint.hpp"
 
 #include <CGAL/Aff_transformation_2.h>
 //#include <CGAL/Homogeneous/Aff_transformationH2.h>

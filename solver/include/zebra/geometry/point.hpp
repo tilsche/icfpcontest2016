@@ -31,7 +31,7 @@ inline point point_from_string(std::string s)
     return point(x, y);
 }
 
-std::string gmpq_to_string(const CGAL::Gmpq& q) {
+inline std::string gmpq_to_string(const CGAL::Gmpq& q) {
     std::stringstream ss;
     ss << q;
     std::string s = ss.str();
@@ -45,7 +45,7 @@ std::string gmpq_to_string(const CGAL::Gmpq& q) {
     }
 }
 
-std::string point_to_string(const point& p) {
+inline std::string point_to_string(const point& p) {
     std::stringstream s;
     s << gmpq_to_string(p.x()) << "," << gmpq_to_string(p.y());
     return s.str();

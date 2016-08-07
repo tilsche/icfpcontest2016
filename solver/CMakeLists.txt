@@ -48,7 +48,7 @@ find_package(Boost 1.54 REQUIRED COMPONENTS program_options system filesystem)
 
 include_directories("include" ${GMP_INCLUDE_DIRS} ${BOOST_INCLUDE_DIRS} ${Steven_INCLUDE_DIRS})
 
-file(GLOB BACKWARD src/solver/*.cpp)
+file(GLOB BACKWARD src/solver/*.cpp src/geometry/*.cpp)
 add_library(backward_solver SHARED ${BACKWARD})
 
 file(GLOB SOURCE_FILES src/*.cpp)
