@@ -429,29 +429,32 @@ public:
         fold(line(fold_segment.source(), fold_segment.target()));
     }
 
+    using facet_id_set = std::vector<bool>;
+    using vertex_id_set = std::vector<bool>;
+
 protected:
     template <typename T1, typename T2>
     void facet_connected(facet_id fid, const line& fold_line, T1& facets, T2& vertices)
     {
         // I will take care of this facet if not in already
-        auto ins_f = facets.insert(fid);
-        if (!ins_f.second)
+        if (facets[fid])
         {
             // allready in;
             return;
         }
+        facets[fid] = true;
         // added to facets, so this will not be checked again
         for (auto vid : this->get_facet(fid).vertex_ids())
         {
             if (fold_line.has_on_negative_side(destination_position(vid)))
             {
                 // i will take care of this vertex if not done already
-                auto ins_v = vertices.insert(vid);
-                if (!ins_v.second)
+                if (vertices[vid])
                 {
                     // allready in
                     continue;
                 }
+                vertices[vid] = true;
                 for (facet_id next_fid : facets_by_vertex_[vid])
                 {
                     facet_connected(next_fid, fold_line, facets, vertices);
@@ -461,12 +464,14 @@ protected:
     }
 
 public:
-    std::pair<std::unordered_set<facet_id>, std::unordered_set<vertex_id>>
-    facet_negative_set(facet_id root_id, const line& fold_line)
+    std::pair<facet_id_set, vertex_id_set> facet_negative_set(facet_id root_id,
+                                                              const line& fold_line)
     {
         // Find all facets that are connected on the negative side of the fold_line
-        std::unordered_set<facet_id> facets;
-        std::unordered_set<vertex_id> vertices;
+        facet_id_set facets;
+        facets.resize(facet_size(), false);
+        vertex_id_set vertices;
+        vertices.resize(vertex_size(), false);
         facet_connected(root_id, fold_line, facets, vertices);
         return { facets, vertices };
     }
@@ -481,16 +486,21 @@ public:
         auto facets_and_vertices = facet_negative_set(id, fold_line);
         const auto& facets = facets_and_vertices.first;
         const auto& vertices = facets_and_vertices.second;
-        for (auto fid : facets)
+        for (facet_id fid = 0; fid < facets.size(); fid++)
         {
-            facet_fold(fid, fold_line);
+            if (facets[fid])
+            {
+                facet_fold(fid, fold_line);
+            }
         }
         auto mirror = reflection(fold_line);
-        for (auto vid : vertices)
+        for (vertex_id vid = 0; vid < vertices.size(); vid++)
         {
-            auto& destination_position = destination_positions_[vid];
-            assert(fold_line.has_on_negative_side(destination_position));
-            destination_position = mirror(destination_position);
+            if (vertices[vid])
+            {
+                assert(fold_line.has_on_negative_side(destination_position(vid)));
+                destination_positions_[vid] = mirror(destination_position(vid));
+            }
         }
     }
 
@@ -697,9 +707,8 @@ public:
         return poly().outer_boundary();
     }
 
-    static solution from_file(const std::string filename) {
-        solution ret;
-
+    static solution from_file(const std::string filename)
+    {
         std::ifstream in(filename);
         assert(in);
 
@@ -708,40 +717,58 @@ public:
         getline(in, s);
         int source_points_count = std::stoi(s);
 
-        for (int i = 0; i < source_points_count; i += 1) {
+        std::vector<point> sps, dps;
+        for (int i = 0; i < source_points_count; i += 1)
+        {
             s = "";
             getline(in, s);
-            ret.source_positions.push_back(point_from_string(s));
+            sps.push_back(point_from_string(s));
         }
 
         s = "";
         getline(in, s);
         int facets_count = std::stoi(s);
-
-        for (int i = 0; i < facets_count; i += 1) {
+        std::vector<facet> facets;
+        for (int i = 0; i < facets_count; i += 1)
+        {
             getline(in, s, ' ');
             int vertex_count = std::stoi(s);
 
-            facet fc;
-
-            for (int j = 0; j < vertex_count; j += 1) {
+            std::vector<vertex_id> vids;
+            for (int j = 0; j < vertex_count; j += 1)
+            {
                 s = "";
-                if (j < vertex_count-1) {
+                if (j < vertex_count - 1)
+                {
                     getline(in, s, ' ');
-                } else {
+                }
+                else
+                {
                     getline(in, s);
                 }
                 int vertex = std::stoi(s);
-                fc.vertex_ids.push_back(vertex);
+                vids.push_back(vertex);
             }
 
-            ret.facets.push_back(fc);
+            facets.emplace_back(vids);
         }
 
-        for (int i = 0; i < source_points_count; i += 1) {
+        for (int i = 0; i < source_points_count; i += 1)
+        {
             s = "";
             getline(in, s);
-            ret.destination_positions.push_back(point_from_string(s));
+            dps.push_back(point_from_string(s));
+        }
+
+        solution ret;
+
+        for (vertex_id vid = 0; vid < source_points_count; vid++)
+        {
+            ret.vertex_add(sps[vid], dps[vid]);
+        }
+        for (facet f : facets)
+        {
+            ret.facet_add(f);
         }
 
         return ret;
