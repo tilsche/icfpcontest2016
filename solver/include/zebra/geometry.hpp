@@ -30,6 +30,29 @@ transformation reflection(line l)
     auto bc = b * c * -2;
     return transformation(aa, ab, ac, ab, bb, bc, de);
 }
+
+transformation rotation(const line_segment& segment)
+{
+    auto& source = segment.source();
+    auto& target = segment.target();
+
+    auto cos_rho = target.x() - source.x();
+    auto sin_rho = target.y() - source.y();
+
+    auto hw2 = segment.squared_length();
+
+    return transformation(CGAL::ROTATION, sin_rho, cos_rho, hw2);
+}
+
+transformation translation(const vector& d)
+{
+    return transformation(CGAL::TRANSLATION, d);
+}
+
+transformation translation(const point& p)
+{
+    return translation(vector(p.x(), p.y()));
+}
 }
 
 #endif // SOLVER_GEOMETRY_HPP
