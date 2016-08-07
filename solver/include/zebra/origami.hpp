@@ -84,12 +84,12 @@ public:
             {
                 vertex_positive++;
             }
-        } /*
-         if (vertex_positive == 0)
-         {
-             logging::debug() << "ignoring useless fold";
-             return results;
-         }*/
+        }
+        if (vertex_positive == 0)
+        {
+            logging::debug() << "ignoring useless fold";
+            return results;
+        }
         logging::debug() << "facets affected: " << fold_facets.size();
         while (!fold_facets.empty())
         {

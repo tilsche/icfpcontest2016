@@ -9,19 +9,25 @@
 
 #include <chrono>
 #include <exception>
+#include <iostream>
 
 namespace zebra
 {
 class brutesolver : public solver
 {
+    using clock = std::chrono::system_clock;
+
     class solution_found : public std::exception
+    {
+    };
+    class timeout : public std::exception
     {
     };
 
     class state
     {
     public:
-        state(const task& tt, int md = 2) : t(tt), max_depth(md)
+        state(const task& tt, int md, clock::time_point dl) : t(tt), max_depth(md), deadline(dl)
         {
         }
 
@@ -39,6 +45,10 @@ class brutesolver : public solver
                 {
                     throw solution_found();
                 }
+            }
+            if (clock::now() > deadline)
+            {
+                throw timeout();
             }
             if (depth > max_depth)
             {
@@ -86,9 +96,9 @@ class brutesolver : public solver
         solution best_solution;
         double best_resemblance = 0;
         int max_depth;
+        clock::time_point deadline;
     };
 
-    using clock = std::chrono::system_clock;
     clock::time_point deadline;
 
 public:
@@ -106,7 +116,7 @@ public:
         for (int rec = 1;; rec++)
         {
             logging::info() << "Brute forcing recursion: " << rec;
-            state st(t, rec);
+            state st(t, rec, deadline);
             try
             {
                 st.align_recurse(ori);
@@ -114,11 +124,13 @@ public:
             catch (solution_found&)
             {
                 logging::info() << "PERFECT SOLUTION FOUND";
+                std::cout << st.best_resemblance << std::endl;
                 return st.best_solution;
             }
-            logging::info() << "Best: " << st.best_resemblance;
-            if (clock::now() > deadline)
+            catch (timeout&)
             {
+                logging::info() << "TIMEOUT";
+                std::cout << st.best_resemblance << std::endl;
                 return st.best_solution;
             }
         }
