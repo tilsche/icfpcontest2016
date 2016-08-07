@@ -24,6 +24,9 @@ int main(int argc, char** argv)
     po::positional_options_description positional_options;
     positional_options.add("task-file", -1);
 
+    po::positional_options_description positional_options;
+    positional_options.add("task-file", -1);
+
     po::options_description options("");
     // clang-format off
     options.add_options()("help", "show help message")
@@ -82,14 +85,23 @@ int main(int argc, char** argv)
     b( t );
     //std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::simple>();
 
+    auto filename = vm["task-file"].as<std::string>();
+    zebra::logging::info() << "filename: " << filename;
+    // do something useful
+    auto t = zebra::read_task(filename);
+    zebra::node_graph ng(t);
+    zebra::print_node_graph(ng);
+    zebra::backward b;
+    b( t );
+    //std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::simple>();
     //zebra::logging::info() << "solving...";
     //auto solu = (*solve)(t);
     //zebra::logging::info() << "solution found...";
 
-    if (vm.count("visualize") > 0)
-    {
-        solu.to_png(filename + ".png");
-    }
+    //if (vm.count("visualize") > 0)
+    //{
+        //solu.to_png(filename + ".png");
+    //}
 
     // std::ofstream ofs(filename_out);
     // ofs << solu;

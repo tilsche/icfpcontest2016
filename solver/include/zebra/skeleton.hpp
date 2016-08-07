@@ -38,6 +38,7 @@ public:
 private:
     std::vector<line> lines_;
 };
+
 }
 
 #endif // SOLVER_SKELETON_HPP
