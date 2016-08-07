@@ -43,10 +43,10 @@ def submit_work(task, version, constraint, seed, solution, resemblance):
     print("version:\t" + version.reference)
     print("task:\t" + task.path)
     #print("score:\t" + score)
-    print("resemblence: " + resemblance)
+    print("resemblence: ", resemblance)
 
     connect()
-    run = Run.create(task=task, version=version, constraint=constraint, seed=seed, path=solutionPath, score=resemblance, submitted=False)
+    run = Run.create(task=task, version=version, constraint=constraint, seed=seed, path=solutionPath, score=float(resemblance), submitted=False)
     #submit.submit_and_save(task.path.strip("0")[:-4], str(solutionPath), run)
     close()
 
