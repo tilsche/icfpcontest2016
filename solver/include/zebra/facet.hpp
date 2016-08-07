@@ -2,7 +2,7 @@
 #define SOLVER_FACET_HPP
 
 #include <zebra/geometry.hpp>
-#include <zebra/solution.hpp>
+#include <zebra/log.hpp>
 
 #include <vector>
 
