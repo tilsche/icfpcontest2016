@@ -53,7 +53,7 @@ class brutesolver : public solver
             {
                 return;
             }
-            for (auto l : t.skel.lines())
+            for (auto l : t.skel.unique_lines())
             {
                 for (auto o2 : o.folds(l))
                 {
