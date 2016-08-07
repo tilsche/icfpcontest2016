@@ -49,7 +49,7 @@ void test1() {
 
     //solution s;
     //s.source_positions = { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 0 } };
-    //s.facets = { facet{.vertex_ids = { 0, 1, 2, 3 } } };
+    //s.facets_ = { facet{.vertex_ids_ = { 0, 1, 2, 3 } } };
     //s.destination_positions = { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 0 } };
 
     //cerr << "s1: " << 1    << ", " << s.resemblance(s1) << endl;

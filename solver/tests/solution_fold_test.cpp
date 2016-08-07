@@ -58,7 +58,7 @@ void test1()
 
     // TODO check
 
-    // assert(s.facets.size() == 2);
+    // assert(s.facets_.size() == 2);
 }
 
 void test2()
@@ -89,7 +89,7 @@ void test2()
     // +---+
 
     // TODO check
-    // assert(s.facets.size() == 2);
+    // assert(s.facets_.size() == 2);
 }
 
 void test3()
@@ -103,18 +103,18 @@ void test3()
     // +---------+
 
     solution s;
-    s.source_positions = {
+    s.source_positions_ = {
         { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { 1, CGAL::Gmpq(1, 2) }, { 0, CGAL::Gmpq(1, 2) }
     };
 
-    s.facets = { facet{.vertex_ids = { 0, 1, 4, 5 } }, facet{.vertex_ids = { 5, 4, 2, 3 } } };
+    s.facets_ = { facet{.vertex_ids_ = { 0, 1, 4, 5 } }, facet{.vertex_ids_ = { 5, 4, 2, 3 } } };
 
     //
     //
     // +---------+
     // |         |
     // +---------+
-    s.destination_positions = {
+    s.destination_positions_ = {
         { 0, 0 }, { 1, 0 }, { 1, 0 }, { 0, 0 }, { 1, CGAL::Gmpq(1, 2) }, { 0, CGAL::Gmpq(1, 2) }
     };
 
@@ -133,7 +133,7 @@ void test3()
     //    +--+
 
     // TODO check
-    // assert(s.facets.size() == 4);
+    // assert(s.facets_.size() == 4);
 }
 
 void testmulti()
@@ -233,7 +233,7 @@ void testcross()
     //   |    |
     // 0 +----+
 
-    assert(s.source_positions.size() == 9);
+    assert(s.source_positions_.size() == 9);
 
     auto fold3 = line_segment_from_string("1,2 0,0");
     logging::info() << "Testing to fold:\n" << s;
@@ -275,7 +275,7 @@ void test1c()
 
     // TODO check
 
-    // assert(s.facets.size() == 2);
+    // assert(s.facets_.size() == 2);
 }
 
 void test1c2()
@@ -303,7 +303,7 @@ void test1c2()
 
     // TODO check
 
-    // assert(s.facets.size() == 2);
+    // assert(s.facets_.size() == 2);
 }
 
 void test2c()
@@ -335,7 +335,7 @@ void test2c()
 
     // TODO check
 
-    // assert(s.facets.size() == 2);
+    // assert(s.facets_.size() == 2);
 }
 
 void testedge()
@@ -367,5 +367,5 @@ void testedge()
 
     // TODO check
 
-    // assert(s.facets.size() == 2);
+    // assert(s.facets_.size() == 2);
 }
