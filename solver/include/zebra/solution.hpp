@@ -15,6 +15,7 @@
 
 #include <boost/algorithm/string/erase.hpp>
 
+#include <bitset>
 #include <cassert>
 #include <cstdlib>
 #include <fstream>
@@ -25,14 +26,48 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-
 namespace zebra
 {
+template <class ID>
+class id_set
+{
+public:
+    id_set(ID size)
+    {
+        data.resize(size, false);
+    }
 
-struct solution;
+    bool insert(ID id)
+    {
+        if (data[id])
+        {
+            return false;
+        }
+        data[id] = true;
+        return true;
+    }
+
+    bool contains(ID id) const
+    {
+        return data[id];
+    }
+
+    ID size() const
+    {
+        return data.size();
+    }
+
+private:
+    std::vector<bool> data;
+};
+using facet_id_set = id_set<bool>;
+using vertex_id_set = id_set<bool>;
+
+class solution;
+
 inline std::ostream& operator<<(std::ostream& os, const solution& s);
 
-struct solution
+class solution
 {
 private:
     std::vector<point> source_positions_;
@@ -60,6 +95,11 @@ public:
     const point& destination_position(vertex_id vid) const
     {
         return destination_positions_[vid];
+    }
+
+    const std::unordered_set<facet_id>& facets_by_vertex(vertex_id vid) const
+    {
+        return facets_by_vertex_[vid];
     }
 
     size_t vertex_size() const
@@ -429,32 +469,27 @@ public:
         fold(line(fold_segment.source(), fold_segment.target()));
     }
 
-    using facet_id_set = std::vector<bool>;
-    using vertex_id_set = std::vector<bool>;
-
 protected:
     template <typename T1, typename T2>
     void facet_connected(facet_id fid, const line& fold_line, T1& facets, T2& vertices)
     {
         // I will take care of this facet if not in already
-        if (facets[fid])
+        if (!facets.insert(fid))
         {
             // allready in;
             return;
         }
-        facets[fid] = true;
         // added to facets, so this will not be checked again
         for (auto vid : this->get_facet(fid).vertex_ids())
         {
             if (fold_line.has_on_negative_side(destination_position(vid)))
             {
                 // i will take care of this vertex if not done already
-                if (vertices[vid])
+                if (!vertices.insert(vid))
                 {
                     // allready in
                     continue;
                 }
-                vertices[vid] = true;
                 for (facet_id next_fid : facets_by_vertex_[vid])
                 {
                     facet_connected(next_fid, fold_line, facets, vertices);
@@ -468,10 +503,8 @@ public:
                                                               const line& fold_line)
     {
         // Find all facets that are connected on the negative side of the fold_line
-        facet_id_set facets;
-        facets.resize(facet_size(), false);
-        vertex_id_set vertices;
-        vertices.resize(vertex_size(), false);
+        facet_id_set facets(facet_size());
+        vertex_id_set vertices(vertex_size());
         facet_connected(root_id, fold_line, facets, vertices);
         return { facets, vertices };
     }
@@ -481,14 +514,14 @@ public:
         fold(id, line(fold_segment.source(), fold_segment.target()));
     }
 
-    void fold(facet_id id, const line& fold_line)
+    std::pair<facet_id_set, vertex_id_set> fold(facet_id id, const line& fold_line)
     {
         auto facets_and_vertices = facet_negative_set(id, fold_line);
         const auto& facets = facets_and_vertices.first;
         const auto& vertices = facets_and_vertices.second;
         for (facet_id fid = 0; fid < facets.size(); fid++)
         {
-            if (facets[fid])
+            if (facets.contains(fid))
             {
                 facet_fold(fid, fold_line);
             }
@@ -496,12 +529,13 @@ public:
         auto mirror = reflection(fold_line);
         for (vertex_id vid = 0; vid < vertices.size(); vid++)
         {
-            if (vertices[vid])
+            if (vertices.contains(vid))
             {
                 assert(fold_line.has_on_negative_side(destination_position(vid)));
                 destination_positions_[vid] = mirror(destination_position(vid));
             }
         }
+        return facets_and_vertices;
     }
 
     void transform(transformation t)
