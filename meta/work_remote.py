@@ -73,7 +73,7 @@ def main():
         return c[0].poll() is not None
 
     children = []
-    cores_max = 1#cpu_count()
+    cores_max = cpu_count()
     cores_used = 0
     while True:
         if cores_used >= cores_max:
@@ -88,7 +88,7 @@ def main():
                     out = child.communicate()[0]
                     print(out)
                     print("Submit")
-                    #submit_work(task, version, constraint, seed, out)
+                    submit_work(task, version, constraint, seed, out)
                 else:
                     print("child did not complete!, not submitting")
 
