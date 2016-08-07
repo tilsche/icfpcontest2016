@@ -1,7 +1,12 @@
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ! NEGATIVE WILL BE FOLDED !
+// ! NEGATIVE WILL BE FOLDED !
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 #ifndef SOLVER_SOLUTION_HPP
 #define SOLVER_SOLUTION_HPP
 
+#include <zebra/facet.hpp>
 #include <zebra/geometry.hpp>
 #include <zebra/log.hpp>
 #include <zebra/silhouette.hpp>
@@ -11,112 +16,146 @@
 #include <boost/algorithm/string/erase.hpp>
 
 #include <cassert>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
 #include <sstream>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace zebra
 {
 
-class facet
-{
-public:
-    facet()
-    {
-    }
-
-    facet(transformation t) : transform_(t)
-    {
-    }
-
-    static facet unit_facet()
-    {
-        facet f;
-        f.vertex_ids = { 0, 1, 2, 3 };
-        return f;
-    }
-
-    size_t size() const
-    {
-        return vertex_ids.size();
-    }
-
-    size_t operator[](size_t index) const
-    {
-        return vertex_ids[index % size()];
-    }
-
-    std::vector<size_t> vertex_ids;
-
-    transformation transform() const
-    {
-        return transform_;
-    }
-
-    transformation inverse() const
-    {
-        transformation i = transform_.inverse();
-        logging::trace() << "INVERTING: " << transform_;
-        logging::trace() << " = : " << i;
-        logging::trace() << "ID: " << transform_ * i;
-        return i;
-    }
-
-    void transform(transformation t)
-    {
-        logging::trace() << "Adding transformation: " << t << " to " << transform_;
-        // transform_ = transform_ * t;
-        transform_ = t * transform_;
-        logging::trace() << "= " << transform_;
-    }
-
-private:
-    transformation transform_;
-};
-
-struct solution;
-
+class solution;
 inline std::ostream& operator<<(std::ostream& os, const solution& s);
 
 struct solution
 {
-    std::vector<point> source_positions;
-    std::vector<facet> facets;
-    std::vector<point> destination_positions;
-    std::map<point, size_t> source_positions_by_point;
+private:
+    std::vector<point> source_positions_;
+    std::vector<point> destination_positions_;
+    std::map<point, vertex_id> source_positions_by_point_;
+    std::vector<facet> facets_;
+    std::vector<std::unordered_set<facet_id>> facets_by_vertex_;
 
-    size_t add_positions(point source_point, point destination_point)
+public:
+    const std::vector<point>& source_positions() const
     {
-        assert(source_positions.size() == destination_positions.size());
-        auto new_idx = source_positions.size();
+        return source_positions_;
+    }
 
-        auto try_insert = source_positions_by_point.emplace(std::make_pair(source_point, new_idx));
+    const std::vector<point>& destination_positions() const
+    {
+        return destination_positions_;
+    }
+
+    size_t vertex_size() const
+    {
+        assert(source_positions().size() == destination_positions().size());
+        return destination_positions().size();
+    }
+
+    const std::vector<facet>& facets() const
+    {
+        return facets_;
+    }
+
+    size_t facet_size() const
+    {
+        return facets_.size();
+    }
+
+    const facet& get_facet(facet_id id) const
+    {
+        return facets_[id];
+    }
+
+protected:
+    facet& get_facet(facet_id id)
+    {
+        return facets_[id];
+    }
+
+public:
+    // TODO universal reference
+    facet_id facet_add(facet f)
+    {
+        facet_id new_id = facet_size();
+        facet_register(new_id, f);
+        facets_.emplace_back(std::move(f));
+        return new_id;
+    }
+
+protected:
+    void facet_register(facet_id id)
+    {
+        facet_register(id, facets_[id]);
+    }
+
+    void facet_register(facet_id id, const facet& f)
+    {
+        for (auto v : f.vertex_ids())
+        {
+            auto r = facets_by_vertex_[v].insert(id);
+            assert(r.second);
+            (void)r;
+        }
+    }
+
+    void facet_unregister(facet_id id)
+    {
+        for (auto v : facets_[id].vertex_ids())
+        {
+            auto removed = facets_by_vertex_[v].erase(id);
+            assert(removed == 1);
+            (void)removed;
+        }
+    }
+
+    void facet_swap(facet_id old_id, facet f_new)
+    {
+        facet_unregister(old_id);
+        facets_[old_id] = std::move(f_new);
+        facet_register(old_id);
+    }
+
+public:
+    vertex_id vertex_add(point source_destination_point)
+    {
+        return vertex_add(source_destination_point, source_destination_point);
+    }
+
+    vertex_id vertex_add(point source_point, point destination_point)
+    {
+        auto new_idx = vertex_size();
+
+        auto try_insert = source_positions_by_point_.emplace(std::make_pair(source_point, new_idx));
         if (try_insert.second)
         {
-            destination_positions.push_back(destination_point);
-            source_positions.push_back(source_point);
+            destination_positions_.push_back(destination_point);
+            source_positions_.push_back(source_point);
             return new_idx;
         }
         else
         {
             auto old_id = try_insert.first->second;
-            assert(destination_positions[old_id] == destination_point);
+            assert(destination_positions_[old_id] == destination_point);
             return old_id;
         }
     }
 
     std::vector<polygon> source_facets() const
     {
-        std::vector<polygon> sf(facets.size());
+        std::vector<polygon> sf(facet_size());
         size_t i = 0;
-        for (const auto& facet : facets)
+        for (const auto& f : facets_)
         {
-            for (size_t vid = 0; vid < facet.size(); vid++)
+            for (size_t vid = 0; vid < f.size(); vid++)
             {
-                sf[i].push_back(source_positions[vid]);
+                sf[i].push_back(source_positions_[vid]);
             }
             i++;
         }
@@ -125,13 +164,13 @@ struct solution
 
     std::vector<polygon> destination_facets() const
     {
-        std::vector<polygon> sf(facets.size());
+        std::vector<polygon> sf(facet_size());
         size_t i = 0;
-        for (const auto& facet : facets)
+        for (const auto& f : facets_)
         {
-            for (size_t vid = 0; vid < facet.size(); vid++)
+            for (size_t vid = 0; vid < f.size(); vid++)
             {
-                sf[i].push_back(destination_positions[vid]);
+                sf[i].push_back(destination_positions_[vid]);
             }
             i++;
         }
@@ -143,7 +182,7 @@ struct solution
         // All source vertices in 0,0 1,1
         // No duplicate source vertex
         std::set<point> source_set;
-        for (const auto& v : source_positions)
+        for (const auto& v : source_positions_)
         {
             if (v.x() > 1 || v.x() < 0 || v.y() > 1 || v.y() < 0)
             {
@@ -156,8 +195,6 @@ struct solution
                 return false;
             }
         }
-
-        assert(source_positions.size() == destination_positions.size());
 
         auto sfs = source_facets();
         auto dfs = destination_facets();
@@ -194,11 +231,11 @@ struct solution
         return true;
     }
 
-    line_segment destination_segment(const facet& facet, size_t segment_id) const
+    line_segment destination_segment(const facet& f, size_t segment_id) const
     {
-        assert(segment_id < facet.size());
-        auto s = line_segment(destination_positions[facet[segment_id]],
-                              destination_positions[facet[segment_id + 1]]);
+        assert(segment_id < f.size());
+        auto s = line_segment(destination_positions_[f[segment_id]],
+                              destination_positions_[f[segment_id + 1]]);
         if (s.source() == s.target())
         {
             logging::error() << "Invalid destination segment: " << s;
@@ -206,11 +243,11 @@ struct solution
         return s;
     }
 
-    line_segment source_segment(const facet& facet, size_t segment_id) const
+    line_segment source_segment(const facet& f, size_t segment_id) const
     {
-        assert(segment_id < facet.size());
-        auto s = line_segment(source_positions[facet[segment_id]],
-                              source_positions[facet[segment_id + 1]]);
+        assert(segment_id < f.size());
+        auto s =
+            line_segment(source_positions_[f[segment_id]], source_positions_[f[segment_id + 1]]);
         if (s.source() == s.target())
         {
             logging::error() << "Invalid destination segment: " << s;
@@ -218,20 +255,20 @@ struct solution
         return s;
     }
 
-    void facet_mirror(facet& facet, line fold_line)
+    void facet_mirror(facet_id id, line fold_line)
     {
         // DOES NOT YET MIRROR THE POINTS
         auto mirror = reflection(fold_line);
-        facet.transform(mirror);
+        get_facet(id).transform(mirror);
     }
 
-    void facet_fold(facet& facet, line fold_line)
+    void facet_fold(facet_id id, line fold_line)
     {
         size_t positive_points = 0;
         size_t negative_points = 0;
-        for (auto vertex_id : facet.vertex_ids)
+        for (auto vertex_id : get_facet(id).vertex_ids())
         {
-            const auto& vertex = destination_positions[vertex_id];
+            const auto& vertex = destination_positions_[vertex_id];
             switch (fold_line.oriented_side(vertex))
             {
             case CGAL::ON_POSITIVE_SIDE:
@@ -247,17 +284,18 @@ struct solution
         // we really need to split
         if (positive_points > 0 && negative_points > 0)
         {
-            auto& new_facet = facet_split(facet, fold_line);
-            facet_mirror(new_facet, fold_line);
+            auto new_facet_id = facet_split(id, fold_line);
+            facet_mirror(new_facet_id, fold_line);
         }
         else if (negative_points > 0)
         {
-            facet_mirror(facet, fold_line);
+            facet_mirror(id, fold_line);
         }
     }
 
-    facet& facet_split(facet& old_facet, line fold_line)
+    facet_id facet_split(facet_id old_id, line fold_line)
     {
+        auto& old_facet = get_facet(old_id);
         facet facet_positive(old_facet.transform());
         facet facet_negative(old_facet.transform());
         for (size_t segment_id = 0; segment_id < old_facet.size(); segment_id++)
@@ -267,23 +305,23 @@ struct solution
             auto vertex = segment.source();
 
             // Not so important check
-            assert(vertex == destination_positions[vertex_id]);
+            assert(vertex == destination_positions_[vertex_id]);
 
             logging::debug() << "vertex " << vertex_id << "@" << vertex << ", segment " << segment;
             switch (fold_line.oriented_side(vertex))
             {
             case CGAL::ON_POSITIVE_SIDE:
                 logging::debug() << " POSITIVE";
-                facet_positive.vertex_ids.push_back(vertex_id);
+                facet_positive.vertex_ids_.push_back(vertex_id);
                 break;
             case CGAL::ON_NEGATIVE_SIDE:
                 logging::debug() << "NEGATVE";
-                facet_negative.vertex_ids.push_back(vertex_id);
+                facet_negative.vertex_ids_.push_back(vertex_id);
                 break;
             case CGAL::ON_ORIENTED_BOUNDARY:
                 logging::debug() << "BOUNDARY";
-                facet_positive.vertex_ids.push_back(vertex_id);
-                facet_negative.vertex_ids.push_back(vertex_id);
+                facet_positive.vertex_ids_.push_back(vertex_id);
+                facet_negative.vertex_ids_.push_back(vertex_id);
                 break;
             }
             boost::optional<boost::variant<point, line_segment>> o =
@@ -305,11 +343,11 @@ struct solution
                     {
                         // need new vertex
                         auto source_point = old_facet.inverse()(intersection_point);
-                        auto new_vertex_id = add_positions(source_point, intersection_point);
+                        auto new_vertex_id = vertex_add(source_point, intersection_point);
                         logging::debug() << "new vertex " << new_vertex_id << "@"
                                          << intersection_point;
-                        facet_positive.vertex_ids.push_back(new_vertex_id);
-                        facet_negative.vertex_ids.push_back(new_vertex_id);
+                        facet_positive.vertex_ids_.push_back(new_vertex_id);
+                        facet_negative.vertex_ids_.push_back(new_vertex_id);
                     }
                 }
                 else
@@ -321,16 +359,15 @@ struct solution
                 }
             }
         }
-        old_facet = facet_positive;
-        facets.push_back(facet_negative);
-        return facets.back();
+        facet_swap(old_id, facet_positive);
+        return facet_add(facet_negative);
     }
 
     std::vector<polygon> facet_polygons() const
     {
         std::vector<polygon> r;
-        r.reserve(facets.size());
-        for (const facet& f : facets)
+        r.reserve(facet_size());
+        for (const facet& f : facets_)
         {
             r.push_back(facet_poly(f));
         }
@@ -340,17 +377,17 @@ struct solution
     polygon facet_poly(const facet& f) const
     {
         polygon p;
-        for (auto i : f.vertex_ids)
+        for (auto i : f.vertex_ids_)
         {
-            p.push_back(destination_positions[i]);
+            p.push_back(destination_positions_[i]);
         }
         if (!p.is_counterclockwise_oriented())
         {
             p = polygon();
-            for (auto it = f.vertex_ids.rbegin(); it != f.vertex_ids.rend(); it++)
+            for (auto it = f.vertex_ids_.rbegin(); it != f.vertex_ids_.rend(); it++)
             {
                 auto id = *it;
-                p.push_back(destination_positions[id]);
+                p.push_back(destination_positions_[id]);
             }
             assert(p.is_counterclockwise_oriented());
         }
@@ -360,15 +397,13 @@ struct solution
 
     void fold(const line& fold_line)
     {
-        size_t old_facet_size = facets.size();
+        size_t old_facet_size = facet_size();
         for (auto facet_id = 0; facet_id < old_facet_size; facet_id++)
         {
-            auto& facet = facets[facet_id];
-
-            facet_fold(facet, fold_line);
+            facet_fold(facet_id, fold_line);
         }
         auto mirror = reflection(fold_line);
-        for (auto& destination_position : destination_positions)
+        for (auto& destination_position : destination_positions_)
         {
             if (fold_line.has_on_negative_side(destination_position))
             {
@@ -379,83 +414,16 @@ struct solution
 
     void fold(const line_segment& fold_segment)
     {
-
-        // auto verify_fold = [this](const line_segment& fold) {
-        //    int intersections = 0;
-        //    int is_ons = 0;
-        //    int on_segments = 0;
-        //    std::vector<line_segment> segments;
-        //    for (auto facet : facets)
-        //    {
-        //        for (int i = 1; i < facet.size(); i += 1)
-        //        {
-        //            segments.push_back(
-        //                line_segment(destination_positions[i - 1], destination_positions[i]));
-        //        }
-        //        segments.push_back(line_segment(destination_positions[facet.size() - 1],
-        //                                        destination_positions[0]));
-        //    }
-
-        //    for (const auto& s : segments)
-        //    {
-        //        boost::optional<boost::variant<point, line_segment>> o =
-        //            CGAL::intersection(s, fold);
-
-        //        if (o == boost::none)
-        //        {
-        //            continue;
-        //        }
-
-        //        if (o->which() == 0)
-        //        {
-        //            intersections++;
-        //            assert(!(s.has_on(fold.source()) && s.has_on(fold.target())));
-        //            if (s.has_on(fold.source()) || s.has_on(fold.target()))
-        //            {
-        //                is_ons++;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            on_segments++;
-        //        }
-        //    }
-
-        //    if (is_ons == 0)
-        //    {
-        //        logging::error() << "Fold does not start and end on any line segment";
-        //        assert(is_ons > 0);
-        //    }
-
-        //    if (intersections % 2 != 0)
-        //    {
-        //        logging::warn() << "Fold intersects with an odd number of segments: "
-        //                        << intersections;
-        //    }
-
-        //    if (on_segments > 0)
-        //    {
-        //        logging::info() << "Fold overlaps with segments: " << on_segments;
-        //    }
-
-        //    if (is_ons % 2 != 0)
-        //    {
-        //        logging::warn() << "Fold ends/starts on an odd number of segments: " << is_ons;
-        //    }
-        //};
-
-        // verify_fold(fold_segment);
-
         fold(line(fold_segment.source(), fold_segment.target()));
     }
 
     void transform(transformation t)
     {
-        for (auto& f : facets)
+        for (auto& f : facets_)
         {
             f.transform(t);
         }
-        for (auto& dp : destination_positions)
+        for (auto& dp : destination_positions_)
         {
             dp = t(dp);
         }
@@ -483,7 +451,7 @@ struct solution
         auto source_points_dat = prefix + "_source_points.dat";
         std::ofstream os(source_points_dat);
         unlink_files.push_back(source_points_dat);
-        for (const auto& p : source_positions)
+        for (const auto& p : source_positions_)
         {
             os << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
         }
@@ -497,11 +465,11 @@ struct solution
         oss << "set size square" << std::endl;
         oss << "plot \"" << source_points_dat << "\" ps 3 pt 3, \\" << std::endl;
 
-        // source facets
+        // source facets_
 
-        for (int i = 0; i < facets.size(); i += 1)
+        for (int i = 0; i < facet_size(); i += 1)
         {
-            auto facet = facets[i].vertex_ids;
+            auto facet = facets_[i].vertex_ids_;
             facet.push_back(facet[0]);
 
             std::stringstream facet_dats;
@@ -511,16 +479,16 @@ struct solution
             unlink_files.push_back(facet_dat);
 
             std::ofstream of(facet_dat);
-            for (int j = 0; j < facet.size(); j += 1)
+            for (int j = 0; j < facet_size(); j += 1)
             {
-                auto p = source_positions[facet[j]];
+                auto p = source_positions_[facet[j]];
                 of << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
             }
             of.close();
 
             oss << "\"" << facet_dat << "\" with lines lw 3";
 
-            if (i < facets.size() - 1)
+            if (i < facet_size() - 1)
             {
                 oss << ", \\" << std::endl;
             }
@@ -539,7 +507,7 @@ struct solution
         auto destination_points_dat = prefix + "_target.dat";
         std::ofstream od(destination_points_dat);
         unlink_files.push_back(destination_points_dat);
-        for (const auto& p : destination_positions)
+        for (const auto& p : destination_positions_)
         {
             od << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
         }
@@ -553,12 +521,12 @@ struct solution
         oss << "set size square" << std::endl;
         odd << "plot \"" << destination_points_dat << "\" ps 3 pt 3, \\" << std::endl;
 
-        // destination facets
+        // destination facets_
 
-        for (int i = 0; i < facets.size(); i += 1)
+        for (int i = 0; i < facet_size(); i += 1)
         {
-            auto facet = facets[i].vertex_ids;
-            facet.push_back(facet[0]);
+            auto vertices = facets_[i].vertex_ids_;
+            vertices.push_back(vertices[0]);
 
             std::stringstream facet_dats;
             facet_dats << prefix << "_destination_facet_" << i << ".dat";
@@ -567,16 +535,16 @@ struct solution
             unlink_files.push_back(facet_dat);
 
             std::ofstream of(facet_dat);
-            for (int j = 0; j < facet.size(); j += 1)
+            for (int j = 0; j < vertices.size(); j += 1)
             {
-                auto p = destination_positions[facet[j]];
+                auto p = destination_positions_[vertices[j]];
                 of << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
             }
             of.close();
 
             odd << "\"" << facet_dat << "\" with lines lw 3";
 
-            if (i < facets.size() - 1)
+            if (i < facet_size() - 1)
             {
                 odd << ", \\" << std::endl;
             }
@@ -599,9 +567,11 @@ struct solution
     static solution unit_square()
     {
         solution ret;
-        ret.source_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-        ret.facets = { facet::unit_facet() };
-        ret.destination_positions = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
+        ret.vertex_add(point{ 0, 0 });
+        ret.vertex_add(point{ 1, 0 });
+        ret.vertex_add(point{ 1, 1 });
+        ret.vertex_add(point{ 0, 1 });
+        ret.facet_add(facet::unit_facet());
         return ret;
     }
 
@@ -706,10 +676,10 @@ struct solution
     //      auto to_silhoutte = [this]() -> vector<polygon> const {
     //         vector<polygon> ret;
 
-    //         for (const facet& f, this->facets) {
+    //         for (const facet& f, this->facets_) {
 
     //             polygon p;
-    //             for (int i : f.vertex_ids) {
+    //             for (int i : f.vertex_ids_) {
     //                 p.push_back(destination_positions[i]);
     //             }
     //             ret.push_back(p);
@@ -779,25 +749,25 @@ struct solution
 
 inline std::ostream& operator<<(std::ostream& os, const solution& s)
 {
-    assert(s.source_positions.size() == s.destination_positions.size());
-    os << s.source_positions.size() << "\n";
-    for (const auto& vertex : s.source_positions)
+    assert(s.source_positions().size() == s.destination_positions().size());
+    os << s.source_positions().size() << "\n";
+    for (const auto& vertex : s.source_positions())
     {
         os << point_to_string(vertex) << "\n";
     }
 
-    os << s.facets.size() << "\n";
-    for (const auto& facet : s.facets)
+    os << s.facets().size() << "\n";
+    for (const auto& facet : s.facets())
     {
         os << facet.size() << " ";
-        for (auto vertex_id : facet.vertex_ids)
+        for (auto vertex_id : facet.vertex_ids())
         {
             os << vertex_id << " ";
         }
         os << "\n";
     }
 
-    for (const auto& vertex : s.destination_positions)
+    for (const auto& vertex : s.destination_positions())
     {
         os << point_to_string(vertex) << "\n";
     }
