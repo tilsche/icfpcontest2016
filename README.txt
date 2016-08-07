@@ -1,3 +1,17 @@
+Build Everything
+================
+
+    sudo apt-get install libcgal-dev
+
+    cd solver/
+    mkdir BUILD
+    cd BUILD
+    cmake ..
+    make
+
+Notes
+=====
+
 - many used programs are located in solver/tests
   such as random_solutions_test.cpp which we used to generate problems
 
