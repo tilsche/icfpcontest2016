@@ -45,7 +45,7 @@ def submit_work(task, version, constraint, seed, solution, resemblance):
     """Submit work to Master, see work_local.py"""
 
     proxy = xmlrpc.client.ServerProxy("http://localhost:8000/", use_builtin_types=True)
-    print(task, version, constraint, seed, solution)
+    # print(task, version, constraint, seed, solution)
     proxy.submit_work_pickled(*tuple(map(pickle.dumps, [task, version, constraint, seed, solution, resemblance])))
 
 PATH_GIT_REMOTE = ".icfpc/git_remote/"
@@ -97,10 +97,10 @@ def main():
                         else:
                             solution += "\n" + line
 
-                    print("Submitting... >>>")
-                    print(resemblance)
-                    print(solution)
-                    print(">>> Submit")
+                    # print("Submitting... >>>")
+                    # print(resemblance)
+                    # print(solution)
+                    # print(">>> Submit")
                     submit_work(task, version, constraint, seed, solution, float(resemblance))
                 else:
                     print("child did not complete!, not submitting")
