@@ -36,28 +36,32 @@ public:
     std::vector<origami> align_to(const line_segment& ls) const
     {
         std::vector<origami> results;
-        origami aligned = *this;
+        {
+            auto aligned = *this;
 
-        aligned.sol.transform(rotation(ls));
-        aligned.sol.transform(translation(ls.source()));
-        results.push_back(aligned);
-
-        aligned = *this;
-        aligned.sol.transform(rotation(ls));
-        aligned.sol.transform(translation(ls.target()));
-        results.push_back(aligned);
-
+            aligned.sol.transform(rotation(ls));
+            aligned.sol.transform(translation(ls.source()));
+            results.push_back(aligned);
+        }
+        {
+            auto aligned = *this;
+            aligned.sol.transform(rotation(ls));
+            aligned.sol.transform(translation(ls.target()));
+            results.push_back(aligned);
+        }
         auto lso = ls.opposite();
-        aligned = *this;
-        aligned.sol.transform(rotation(lso));
-        aligned.sol.transform(translation(lso.source()));
-        results.push_back(aligned);
-
-        aligned = *this;
-        aligned.sol.transform(rotation(lso));
-        aligned.sol.transform(translation(lso.target()));
-        results.push_back(aligned);
-
+        {
+            auto aligned = *this;
+            aligned.sol.transform(rotation(lso));
+            aligned.sol.transform(translation(lso.source()));
+            results.push_back(aligned);
+        }
+        {
+            auto aligned = *this;
+            aligned.sol.transform(rotation(lso));
+            aligned.sol.transform(translation(lso.target()));
+            results.push_back(aligned);
+        }
         return results;
     }
 

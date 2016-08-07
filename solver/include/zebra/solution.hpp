@@ -749,20 +749,13 @@ public:
     }
 
 private:
-    mutable polygon_with_holes poly_cache_;
-    mutable bool poly_cache_valid_ = false;
     void invalidate()
     {
-        poly_cache_valid_ = false;
     }
 
 public:
     polygon_with_holes poly() const
     {
-        if (poly_cache_valid_)
-        {
-            return poly_cache_;
-        }
         logging::trace() << "Generating polygon for SOLUTION[[[[\n" << *this << "SOLUTION]]]]\n";
         polygon_set ps;
         for (const facet& f : facets_)
@@ -773,8 +766,6 @@ public:
         std::vector<polygon_with_holes> union_polys;
         ps.polygons_with_holes(std::back_inserter(union_polys));
         assert(union_polys.size() == 1);
-        poly_cache_ = union_polys[0];
-        poly_cache_valid_ = true;
         return union_polys[0];
     }
 

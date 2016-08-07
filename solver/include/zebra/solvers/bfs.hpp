@@ -40,7 +40,7 @@ class bfs : public solver
         {
             origami o;
             double res;
-            double area = 0;
+            CGAL::Gmpq area;
             int depth = 0;
 
             bool operator<(const element& other) const
@@ -77,12 +77,13 @@ class bfs : public solver
 
         void queue(const origami& o)
         {
-            queue(o, o.sol.resemblance(t.sil.shape()));
+            auto p = o.sol.poly();
+            queue(o, o.sol.resemblance(t.sil.shape()), holy_area(p));
         }
 
-        void queue(const origami& o, double r)
+        void queue(const origami& o, double r, CGAL::Gmpq a)
         {
-            queue(element{ o, r });
+            queue(element{ o, r, a });
         }
 
         void queue_align(const origami& o)
@@ -120,18 +121,26 @@ class bfs : public solver
             auto elem = q_.top();
             const auto& o = elem.o;
             q_.pop();
-
+            auto old_area = elem.area;
             for (auto l : t.skel.unique_lines())
             {
                 logging::debug() << " next line " << l;
                 for (auto o2 : o.folds(l))
                 {
-                    queue(o2);
+                    auto new_area = holy_area(o2.sol.poly());
+                    if (new_area < old_area)
+                    {
+                        queue(o2);
+                    }
                 }
                 logging::debug() << " next line " << l.opposite();
                 for (auto o2 : o.folds(l.opposite()))
                 {
-                    queue(o2);
+                    auto new_area = holy_area(o2.sol.poly());
+                    if (new_area < old_area)
+                    {
+                        queue(o2);
+                    }
                 }
             }
         }
