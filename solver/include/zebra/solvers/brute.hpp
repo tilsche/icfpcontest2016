@@ -55,29 +55,33 @@ class brutesolver : public solver
             }
             for (auto l : t.skel.unique_lines())
             {
+                logging::debug() << "{{" << depth << "}} next line " << l;
                 for (auto o2 : o.folds(l))
+                {
+                    fold_recurse(o2, depth + 1);
+                }
+                logging::debug() << "{{" << depth << "}} next line " << l.opposite();
+                for (auto o2 : o.folds(l.opposite()))
                 {
                     fold_recurse(o2, depth + 1);
                 }
             }
         }
 
-        void move_recurse(const origami& o, int depth = 0)
+        void align_recurse(const origami& o, int depth = 0)
         {
             if (check(o, depth))
             {
                 return;
             }
-            auto bound = t.sil.shape().outer_boundary();
-            for (auto vx_it = bound.vertices_begin(); vx_it != bound.vertices_end(); vx_it++)
+            for (const auto& ls : t.skel.edges)
             {
-                for (auto o2 : o.move_to(*vx_it))
+                for (auto o2 : o.align_to(ls))
                 {
                     fold_recurse(o2, depth + 1);
                 }
             }
         }
-
         const task& t;
         solution best_solution;
         double best_resemblance = 0;
@@ -105,7 +109,7 @@ public:
             state st(t, rec);
             try
             {
-                st.move_recurse(ori);
+                st.align_recurse(ori);
             }
             catch (solution_found&)
             {
