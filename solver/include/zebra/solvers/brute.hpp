@@ -107,10 +107,19 @@ class brutesolver : public solver
                 return;
             }
             fold_recurse(o, depth + 1);
+
+            std::vector<polygon_with_holes> visited;
             for (const auto& ls : t.skel.edges)
             {
                 for (auto o2 : o.align_to(ls))
                 {
+                    auto p = o2.sol.poly();
+                    if (visited.end() != std::find(visited.begin(), visited.end(), p))
+                    {
+                        logging::debug() << "Skipping redundant move";
+                        continue;
+                    }
+                    visited.emplace_back(p);
                     auto res = o2.sol.resemblance(t.sil.shape());
                     if (res > 0.0)
                     {
