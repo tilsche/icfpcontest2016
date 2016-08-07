@@ -14,14 +14,16 @@ import sys
 
 def submit_with_evaluate():
     while True:
-        for run in list(Run.select().where(Run.submitted == False).join(Task).order_by(Run.score)):
+        for run in list(Run.select().where(Run.submitted == False).join(Task).order_by(Run.score.desc()) ):
             id = run.task.path[:-4]
             print("id:", id)
             print("sol", run.path)
-            time.sleep(1)
+            print(run.score)
 
             result = submit(id, run.path)
             if result is not None:
+                if result != run.score:
+                    print("submit score not equal local score")
                 run.submitted = True
                 run.save()
             print()
@@ -74,7 +76,7 @@ def submit(problemId, solutionPath):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        submit_all()
+        submit_with_evaluate()
     elif len(sys.argv) == 3:
         submit(sys.argv[1], sys.argv[2])
     else:
