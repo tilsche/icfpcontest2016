@@ -29,7 +29,7 @@
 namespace zebra
 {
 
-class solution;
+struct solution;
 inline std::ostream& operator<<(std::ostream& os, const solution& s);
 
 struct solution
