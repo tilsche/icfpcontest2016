@@ -99,7 +99,7 @@ public:
     {
         origami ori;
 
-        for (int rec = 3;; rec++)
+        for (int rec = 1;; rec++)
         {
             logging::info() << "Brute forcing recursion: " << rec;
             state st(t, rec);
