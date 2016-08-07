@@ -14,7 +14,7 @@ import sys
 
 def submit_with_evaluate():
     while True:
-        for run in list(Run.select().where(Run.submitted == False).join(Task).order_by(Run.score.desc()) ):
+        for run in list(Run.select().where(Run.submitted == False).join(Task).order_by(Run.score.desc()).limit(1)):
             id = run.task.path[:-4]
             print("id:", id)
             print("sol", run.path)
