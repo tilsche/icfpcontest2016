@@ -123,7 +123,6 @@ def main():
 
             if work is None:
                 time.sleep(1)
-            else:
                 continue
 
             task, version, constraint, seed = work
