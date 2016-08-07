@@ -97,8 +97,10 @@ def main():
                         else:
                             solution += "\n" + line
 
-                    print(out)
-                    print("Submit")
+                    print("Submitting... >>>")
+                    print(resemblance)
+                    print(solution)
+                    print(">>> Submit")
                     submit_work(task, version, constraint, seed, solution, Float(resemblance))
                 else:
                     print("child did not complete!, not submitting")
