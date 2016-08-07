@@ -57,13 +57,13 @@ def add_work(args):
 
 def add_work_imperfect(reference, constraint, count, priority):
     print("JOIN DOES NOT WORK YET :(")
-    return
     connect()
     version=Version.get(reference=reference)
     constraint=Constraint.get(name=constraint)
     #we use list() to make faster?
     tasks = Task.select().where(Run.score != 1.0 or Run << None).group_by(Task).join(Run)
     print("tasks.count", tasks.count())
+    return
     Work.enque(tasks, version, constraint, priority, count)
     close()
 
