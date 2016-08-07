@@ -47,7 +47,7 @@ public:
 
     const std::vector<vertex_id>& vertex_ids() const
     {
-        return vertex_ids();
+        return vertex_ids_;
     }
 
     const transformation& transform() const
