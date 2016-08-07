@@ -45,7 +45,7 @@ class bfs : public solver
 
             bool operator<(const element& other) const
             {
-                return res < other.res;
+                return res / (depth + 2) < other.res / (depth + 2);
             }
         };
 
@@ -75,20 +75,23 @@ class bfs : public solver
             q_.emplace(e);
         }
 
-        void queue(const origami& o)
+        void queue(const origami& o, int depth = 0)
         {
+            if (o.sol.file_size() > 5000)
+            {
+                return;
+            }
             auto p = o.sol.poly();
-            queue(o, o.sol.resemblance(t.sil.shape()), holy_area(p));
+            queue(o, o.sol.resemblance(t.sil.shape()), holy_area(p), depth);
         }
 
-        void queue(const origami& o, double r, CGAL::Gmpq a)
+        void queue(const origami& o, double r, CGAL::Gmpq a, int depth = 0)
         {
-            queue(element{ o, r, a });
+            queue(element{ o, r, a, depth });
         }
 
         void queue_align(const origami& o)
         {
-
             std::vector<polygon_with_holes> visited;
             for (const auto& ls : t.skel.edges)
             {
@@ -131,7 +134,7 @@ class bfs : public solver
                     auto new_area = holy_area(o2.sol.poly());
                     if (new_area < old_area)
                     {
-                        queue(o2);
+                        queue(o2, elem.depth + 1);
                     }
                 }
             }
