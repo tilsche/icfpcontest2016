@@ -47,10 +47,9 @@ def submit_work(task, version, constraint, seed, solution):
 
     connect()
     Run.create(task=task, version=version, constraint=constraint, seed=seed, path=solutionPath, score=None)
-    close()
 
-    submit.submit(task.path.strip("0")[:-4], str(solutionPath))
-    time.sleep(1)
+    submit.submit_and_save(task.path.strip("0")[:-4], str(solutionPath), run)
+    close()
 
 def serve():
     """Starts a server listening for Slaves requesting or submitting work"""
