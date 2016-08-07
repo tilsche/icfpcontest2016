@@ -2,11 +2,14 @@
 
 from sys import argv
 from models import *
+from os import listdir
+from os.path import isfile, join
 
 def help():
     print("Adds a task, a version or a constraint to the database.")
     print("subcommands:")
     print("\ttask <path>...\t\t\tadds tasks")
+    print("\ttask_dir <path>\t\t add all files in <path> as task")
     print("\tversion <path>...\t\tadds version")
     print("\tconstraint <name> <runtime_ms> <cores>\tadds constraint")
     print("\twork <reference> <constraintName> <count> <priority> for all  lvls")
@@ -15,6 +18,18 @@ def add_task(paths):
     connect()
     for p in paths:
         Task.create(path=p)
+    close()
+
+def add_task_dir(paths):
+    connect()
+    for p in paths:
+        onlyfiles = [f for f in listdir(p) if isfile(join(p, f))]
+        for f in onlyfiles:
+            print("add", f)
+            try:
+                Task.create(path=f)
+            except:
+                print("task exists, skipping")
     close()
 
 def add_version(paths):
@@ -39,6 +54,8 @@ def add_work(reference, constraint, count, priority):
 def add(args):
     if args[0] == "task":
         add_task(args[1:])
+    elif args[0] == "task_dir":
+        add_task_dir(args[1:])
     elif args[0] == "version":
         add_version(args[1:])
     elif args[0] == "constraint":
