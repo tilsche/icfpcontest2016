@@ -1,5 +1,6 @@
 - remove registration.txt + history rewrite
 - publish repository
 
-- ronny's key entfernen aus dem git
-- taurus /projects/zihforschung mpfr, cgal, icfp* loeschen
+- taurus /projects/zihforschung  loeschen
+
+    $ cd /projects/zihforschung && rm -rf mpfr mpfr-3.1.4 icfpcontest2016 cgal CGAL-4.8.1
