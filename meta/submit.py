@@ -18,7 +18,7 @@ def submit_with_evaluate():
         # for run in list(Run.select().where(Run.submitted == False).join(Task).order_by(Run.score.desc()).limit(1)):
         # for run in list(Run.select().where(Run.submitted == False).join(Task).order_by(Run.score.desc()).limit(1)):
 
-        for task in list(Task.select().order_by(Run.score.desc())):
+        for task in list(Task.select()):
             submitted_runs = Run.select().where(Run.task == task and Run.submitted == True).count()
 
             if submitted_runs > 0:
