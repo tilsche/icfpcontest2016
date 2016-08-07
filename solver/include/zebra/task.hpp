@@ -27,7 +27,8 @@ struct task
     skeleton skel;
 
     std::vector<polygon> to_polygon_vector() const {
-        std::vector<polygon> ret;
+
+        // ### gather all points
 
         std::map<point, int /* number of incident edges */> all_points;
 
@@ -37,27 +38,174 @@ struct task
             }
         }
 
+        // ### determine extra points from edge intersections
+
+        std::vector<line_segment> all_segments = skel.edges;
+
+        for (const auto& s : all_segments) {
+            for (const auto& t : all_segments) {
+                boost::optional<boost::variant<point, line_segment>> o = CGAL::intersection(s, t);
+                if (o != boost::none && o->which() == 0) {
+                    all_points.insert(std::make_pair(boost::get<point>(*o), 0));
+                }
+            }
+        }
+
+        // ### split edges on new points
+
+        bool changed = true;
+        while (changed) {
+            changed = false;
+            for (auto s = begin(all_segments); s != end(all_segments); ++s) {
+                for (const auto& p : all_points) {
+                    if (s->has_on(p.first) && p.first != s->source() && p.first != s->target()) {
+                        auto t = *s;
+                        all_segments.erase(s);
+                        all_segments.push_back(line_segment(t.source(), p.first));
+                        all_segments.push_back(line_segment(p.first, t.target()));
+                        changed = true;
+                        break;
+                    }
+                }
+
+                if (changed) { break; }
+            }
+        }
+
+        auto segments_on_point = [](const std::vector<line_segment>& segments, const std::map<point, int>& valid_points, const point& p) -> std::vector<line_segment> {
+            std::vector<line_segment> ret;
+            for (const auto& s : segments) {
+                if (s.has_on(p) && valid_points.find(s.source()) != valid_points.end() && valid_points.find(s.target()) != valid_points.end()) {
+                    ret.push_back(s);
+                }
+            }
+            return ret;
+        };
+
+        // ### count incident line segments
+
         for (auto&& p : all_points) {
-            for (const auto& s : skel.edges) {
+            for (const auto& s : all_segments) {
                 if (s.has_on(p.first)) {
                     p.second += 1;
                 }
             }
         }
 
-        for (const auto& p : all_points) {
-            std::cerr << point_to_string(p.first) << ": " << p.second << std::endl;
+        int j = 1;
+        std::cerr << "all segments: " << std::endl;
+        for (const auto& s : all_segments) {
+            std::cerr << j << " " << line_segment_to_string(s) << std::endl;
+            j += 1;
         }
+        std::cerr << std::endl;
 
+        std::vector<polygon> ret;
+
+        std::string asdf = "0";
         while (all_points.empty() == false) {
-            std::vector<point> v{*all_points.begin()};
-            all_points.begin().second -= 1;
 
-            if (all_points.begin().second == 0) {
-                all_points.erase(all_points.begin());
+            std::cerr << "all points: " << std::endl;
+            int i = 1;
+            for (const auto& p : all_points) {
+                std::cerr << i << " " << point_to_string(p.first) << ": " << p.second << std::endl;
+                i += 1;
             }
-        }
+            std::cerr << std::endl;
 
+            // ### new polygon: add first point and line segment ###
+
+            std::vector<point> v{all_points.begin()->first};
+            std::cerr << "first point of new polygon: " << point_to_string(v[0]) << ": " << all_points.begin()->second << std::endl;
+            all_points.begin()->second -= 1;
+
+            if (all_points.begin()->second == 0) { all_points.erase(all_points.begin()); }
+
+            std::vector<line_segment> segments = segments_on_point(all_segments, all_points, v.back());
+
+            //std::cerr << "incident line segments: " << std::endl;
+            //for (const auto& s : segments) {
+            //    std::cerr << "  " << line_segment_to_string(s) << std::endl;
+            //}
+
+            line_segment s = segments[0];
+            if (s.target() == v.back()) { s = s.opposite(); }
+
+            v.push_back(s.target());
+            all_points[v.back()] -= 1;
+            if (all_points[v.back()] == 0) { all_points.erase(v.back()); }
+
+            auto last_segment = s;
+            auto last_segment_dir = CGAL::Direction_2<kernel>(last_segment.opposite());
+
+            // ### add all other points
+
+            while (v.front() != v.back() || v.size() == 1) {
+
+                std::vector<line_segment> segments = segments_on_point(all_segments, all_points, v.back());
+
+                //std::cerr << "incident line segments: " << std::endl;
+                //for (const auto& s : segments) {
+                //    std::cerr << "  " << line_segment_to_string(s) << std::endl;
+                //}
+
+                line_segment next_segment;
+
+                for (auto s : segments) {
+                    if (s == last_segment || s == last_segment.opposite()) { continue; }
+                    if (s.target() == v.back()) { s = s.opposite(); }
+                    auto s_dir = CGAL::Direction_2<kernel>(s);
+
+                    bool correct_one = true;
+                    for (auto t : segments) {
+                        if (t == last_segment || t == last_segment.opposite()) { continue; }
+                        if (t.target() == v.back()) { t = t.opposite(); }
+                        auto t_dir = CGAL::Direction_2<kernel>(t);
+
+                        if (last_segment_dir.counterclockwise_in_between(s_dir, t_dir) == false) {
+                            correct_one = false;
+                            break;
+                        }
+                    }
+
+                    if (correct_one == true) {
+                        next_segment = s;
+                        break;
+                    }
+                }
+
+                //std::cerr << "next segment: " << line_segment_to_string(next_segment) << std::endl;
+
+                last_segment = next_segment;
+                last_segment_dir = CGAL::Direction_2<kernel>(last_segment.opposite());
+                v.push_back(next_segment.target());
+                all_points[v.back()] -= 1;
+                if (all_points[v.back()] == 0) { all_points.erase(v.back()); }
+
+                std::cerr << "current polygon: " << std::endl;
+                int k = 1;
+                for (const auto& p : v) {
+                    std::cerr << k << " " << point_to_string(p) << std::endl;
+                    k += 1;
+                }
+                std::cerr << std::endl;
+
+                std::cerr << "all points: " << std::endl;
+                int i = 1;
+                for (const auto& p : all_points) {
+                    std::cerr << i << " " << point_to_string(p.first) << ": " << p.second << std::endl;
+                    i += 1;
+                }
+                std::cerr << std::endl;
+            }
+
+            ret.push_back(polygon(v.begin(), v.end()));
+
+            polygons_to_png(ret, asdf);
+            asdf += "0";
+
+            break;
+        }
 
         return ret;
     }
