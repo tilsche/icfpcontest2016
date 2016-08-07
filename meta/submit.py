@@ -13,9 +13,9 @@ from models import *
 import sys
 
 def submit_all():
-    connect()
+    #connect()
     while True:
-        for run in Run.select().where(Run.score == None):
+        for run in list(Run.select().where(Run.score == None)):
             id = run.task.path[:-4]
             print("id:", id)
             print("sol", run.path)
@@ -24,8 +24,8 @@ def submit_all():
                 run.score = result
                 run.save()
             print()
-            time.sleep(2)
-    close()
+            time.sleep(1.1)
+    #close()
     print("Done submitting all Runs with score NULL")
 
 def submit_and_save(problemId, solutionPath, run):
@@ -37,7 +37,10 @@ def submit_and_save(problemId, solutionPath, run):
 def submit(problemId, solutionPath):
     while True:
         out = subprocess.check_output(["curl", "--compressed", "-L", "-H", "Expect:", "-H", 'X-API-Key: 191-d1229cf42703fee94dd0df16779b0074', "-F", 'problem_id=' + str(problemId) + '', "-F", 'solution_spec=@' + solutionPath + '', 'http://2016sv.icfpcontest.org/api/solution/submit'])
-        print(out)
+        out_str = str(out)
+        print(out_str)
+        if "Error" in out_str:
+            continue
         j = json.loads(str(out, "utf-8"))
         if j["ok"] == True:
             print("Resemblance:", j["resemblance"])
