@@ -38,9 +38,6 @@ public:
         std::vector<origami> results;
         origami aligned = *this;
 
-        results.push_back(aligned);
-
-        aligned = *this;
         aligned.sol.transform(rotation(ls));
         aligned.sol.transform(translation(ls.source()));
         results.push_back(aligned);
