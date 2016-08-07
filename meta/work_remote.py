@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import time
 import tempfile
 import pathlib
 import pickle
@@ -68,27 +69,46 @@ def clone_and_build(version):
     return path
  
 def main():
+    def done(c):
+        return c[0].poll() is not None
+
     children = []
-    cores_max = cpu_count()
+    cores_max = 1#cpu_count()
     cores_used = 0
     while True:
-        if cores_used + constraint.cores > cores_max:
+        if cores_used >= cores_max:
+            #check if something completed
+            print("checking for completed threads")
+            for cw in filter(done, children):
+                children.remove(cw)
+                cores_used -= 1
+                child, work = cw
+                if child.poll() == 0:
+                    task, version, constraint, seed = work
+                    out = child.communicate()[0]
+                    print(out)
+                    print("Submit")
+                    #submit_work(task, version, constraint, seed, out)
+                else:
+                    print("child did not complete!, not submitting")
+
             #wait till something completes
-            sleep(1)
+            time.sleep(1)
         else:
             print("pulling work package")
-            task, version, constraint, seed = get_work(cores_max)
+            work = get_work(cores_max)
+            task, version, constraint, seed = work
+
             print("Work package " + str(task.path))
             path = clone_and_build(version)
 
             print("executing " + path + "solver/build/solver")
             print("Constraint: " + str(constraint.runtime_ms) + ", " + str(constraint.cores))
-            try:
-                out = execute.execute(path + "solver/build/solver", "../tasks/" + task.path, 1000 * 60 * 5, constraint.cores, seed)
-                print(str(out))
-                submit_work(task, version, constraint, seed, out)
-            except:
-                print("Exception occured, did not send result")
+
+            children.append((subprocess.Popen(["./execute.py", path + "solver/build/solver", "../tasks/" + task.path, str(constraint.runtime_ms), str(constraint.cores), str(seed)], universal_newlines=True, stdout=subprocess.PIPE), work))
+            print("Created a thread for task", task.path, file=sys.stderr)
+            print(children[0])
+            cores_used += 1
 
 if __name__ == "__main__":
     main()
