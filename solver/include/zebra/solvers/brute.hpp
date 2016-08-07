@@ -31,19 +31,28 @@ class brutesolver : public solver
         {
         }
 
+        ~state()
+        {
+            logging::info() << "Total solver checks: " << check_count;
+        }
+
         // returns true if you should break;
         bool check(const origami& o, int depth)
         {
-            auto new_r = o.sol.resemblance(t.sil.shape());
-            logging::debug() << "[[[CHECKING at depth " << depth << " r " << new_r;
-            logging::debug() << o.sol << "\n]]]";
-            if (new_r > best_resemblance)
+            check_count++;
+            if (depth <= max_depth)
             {
-                best_resemblance = new_r;
-                best_solution = o.sol;
-                if (new_r == 1.0)
+                auto new_r = o.sol.resemblance(t.sil.shape());
+                logging::debug() << "[[[CHECKING at depth " << depth << " r " << new_r;
+                logging::debug() << o.sol << "\n]]]";
+                if (new_r > best_resemblance)
                 {
-                    throw solution_found();
+                    best_resemblance = new_r;
+                    best_solution = o.sol;
+                    if (new_r == 1.0)
+                    {
+                        throw solution_found();
+                    }
                 }
             }
             if (clock::now() > deadline)
@@ -97,6 +106,7 @@ class brutesolver : public solver
         double best_resemblance = 0;
         int max_depth;
         clock::time_point deadline;
+        size_t check_count = 0;
     };
 
     clock::time_point deadline;
