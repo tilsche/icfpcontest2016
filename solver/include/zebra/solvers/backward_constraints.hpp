@@ -2,24 +2,37 @@
 #define ZEBRA_SOLVER_BACKWARD_CONSTRAINTS_HPP
 #include <cmath>
 
-#include <zebra/node_graph.hpp>
 #include <zebra/geometry.hpp>
 #include <CGAL/squared_distance_2.h>
+#include <zebra/node_graph.hpp>
 
 namespace zebra{
 
     class BackwardConstraints{
 
         public:
+        static bool test(node_graph& ng)
+        {
+            // Test valid lengths
+            for (const auto& kvp : ng)
+            {
+                for (const auto& elem : kvp.second)
+                {
+                    if(!valid_length(kvp.first, elem))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 
         static bool valid_length(point s, point e)
         {
-            double distance = CGAL::to_double(CGAL::squared_distance(s, e));
-            distance = sqrt(distance);
-            return distance <= sqrt(2);
+            return CGAL::to_double(CGAL::squared_distance(s, e)) <= 2;
         }
 
-        static bool is_standard_square(node_graph & ng)
+        static bool is_standard_square(const node_graph& ng)
         {
             std::vector<point> std_square(4);
 
@@ -43,6 +56,6 @@ namespace zebra{
 
     };
 
-};
+}
 
 #endif /* ZEBRA_SOLVER_BACKWARD_CONSTRAINTS_HPP */

@@ -15,11 +15,6 @@ namespace zebra
         solution s; //TODO
         ngraph = node_graph(t);
 
-        point ps(0, 0);
-        point pe(1, 1);
-        std::cout << BackwardConstraints::valid_length(ps, pe) << '\n';
-        std::cout << BackwardConstraints::is_standard_square(ngraph) << '\n';
-
         auto res = unfold_segments(ngraph);
         logging::info() << "res size: " << res.size();
 
@@ -59,6 +54,7 @@ namespace zebra
 
             for(const auto& hull : h_list)
             {
+                auto new_graph = ngraph;
                 for(const auto& p : hull)
                 {
                     // Calc transformation parameters
@@ -76,28 +72,23 @@ namespace zebra
                     auto p_new = translate(p);
 
                     // Change point in new node_graph
-                    auto new_graph = ngraph;
                     new_graph[p_new] = ngraph[p];
                     for(const auto& p : new_graph[p_new])
                     {
                         new_graph[p].erase(p);
                         new_graph[p].insert(p_new);
                     }
-                    if (std::find(result.begin(), result.end(), new_graph) == result.end())
-                    {
-                        result.push_back(new_graph);
-                    }
+                }
+                if (std::find(result.begin(), result.end(), new_graph) == result.end()
+                 && BackwardConstraints::test(new_graph))
+                {
+                    result.push_back(new_graph);
                 }
             }
         }
 
         return result;
     }
-
-    //void backward::make_node_connections_unique(node_graph& ng)
-    //{
-        //for(auto&
-    //}
 
     void backward::transitive_hull(upoint begin,
                                    upoint end,

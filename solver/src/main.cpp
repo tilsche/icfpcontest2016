@@ -74,20 +74,20 @@ int main(int argc, char** argv)
     // do something useful
     auto t = zebra::read_task(filename);
     // std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::simple>();
-    std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::brutesolver>();
+    //std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::brutesolver>();
     // do something useful
     zebra::node_graph ng(t);
     zebra::print_node_graph(ng);
     zebra::backward b;
     b( t );
     //zebra::logging::info() << "solving...";
-    auto solu = (*solve)(t);
+    //auto solu = (*solve)(t);
     //zebra::logging::info() << "solution found...";
 
-    if (vm.count("visualize") > 0)
-    {
-        solu.to_png(filename + ".png");
-    }
+    //if (vm.count("visualize") > 0)
+    //{
+        //solu.to_png(filename + ".png");
+    //}
 
     // std::ofstream ofs(filename_out);
     // ofs << solu;
