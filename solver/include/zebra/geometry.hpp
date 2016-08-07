@@ -43,7 +43,14 @@ transformation rotation(const line_segment& segment)
 
     auto hw2 = segment.squared_length();
 
-    return transformation(CGAL::ROTATION, sin_rho, cos_rho, hw2);
+    CGAL::Gmpq hw;
+
+    if (CGAL::is_square(hw2, hw))
+    {
+        return transformation(CGAL::ROTATION, sin_rho, cos_rho, hw);
+    }
+
+    return transformation();
 }
 
 transformation translation(const vector& d)
