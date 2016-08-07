@@ -85,12 +85,17 @@ class brutesolver : public solver
             {
                 return;
             }
+            // auto old_area = holy_area(o.sol.poly());
             for (auto l : t.skel.unique_lines())
             {
                 logging::debug() << "{{" << depth << "}} next line " << l;
                 for (auto o2 : o.folds(l))
                 {
-                    fold_recurse(o2, depth + 1);
+                    // auto new_area = holy_area(o2.sol.poly());
+                    // if (new_area <= old_area)
+                    {
+                        fold_recurse(o2, depth + 1);
+                    }
                 }
                 logging::debug() << "{{" << depth << "}} next line " << l.opposite();
                 for (auto o2 : o.folds(l.opposite()))
@@ -150,7 +155,7 @@ public:
     brutesolver(D timelimit)
     {
         auto start = clock::now();
-        deadline = start + timelimit / 2;
+        deadline = start + timelimit;
     }
 
     solution operator()(const task& t) override
