@@ -117,6 +117,12 @@ def main():
         else:
             print("pulling work package")
             work = get_work(cores_max)
+
+            if work is None:
+                time.sleep(1)
+            else:
+                continue
+
             task, version, constraint, seed = work
 
             print("Work package " + str(task.path))
