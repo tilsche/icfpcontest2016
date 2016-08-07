@@ -650,6 +650,56 @@ struct solution
         return poly().outer_boundary();
     }
 
+    static solution from_file(const std::string filename) {
+        solution ret;
+
+        std::ifstream in(filename);
+        assert(in);
+
+        std::string s;
+
+        getline(in, s);
+        int source_points_count = std::stoi(s);
+
+        for (int i = 0; i < source_points_count; i += 1) {
+            s = "";
+            getline(in, s);
+            ret.source_positions.push_back(point_from_string(s));
+        }
+
+        s = "";
+        getline(in, s);
+        int facets_count = std::stoi(s);
+
+        for (int i = 0; i < facets_count; i += 1) {
+            getline(in, s, ' ');
+            int vertex_count = std::stoi(s);
+
+            facet fc;
+
+            for (int j = 0; j < vertex_count; j += 1) {
+                s = "";
+                if (j < vertex_count-1) {
+                    getline(in, s, ' ');
+                } else {
+                    getline(in, s);
+                }
+                int vertex = std::stoi(s);
+                fc.vertex_ids.push_back(vertex);
+            }
+
+            ret.facets.push_back(fc);
+        }
+
+        for (int i = 0; i < source_points_count; i += 1) {
+            s = "";
+            getline(in, s);
+            ret.destination_positions.push_back(point_from_string(s));
+        }
+
+        return ret;
+    }
+
     // double resemblance(const silhouette& them__) const
     // {
 
