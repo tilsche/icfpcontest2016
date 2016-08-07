@@ -24,13 +24,16 @@ def add_task(paths):
 def add_task_dir(paths):
     connect()
     for p in paths:
-        onlyfiles = [f for f in listdir(p) if isfile(join(p, f))]
-        for f in onlyfiles:
-            print("add", f)
-            try:
-                Task.create(path=f)
-            except:
-                print("task exists, skipping")
+        tasks = set([t.path for t in Task.select()])
+        print("Found", len(tasks), "task files.")
+
+        files = [str(f) for f in listdir(p) if isfile(join(p, f)) and f not in tasks]
+        print("Found", len(files), " tasks in DB")
+        files_dict = [{"path": f} for f in files]
+
+        with database.atomic():
+           for idx in range(0, len(files_dict), 100):
+               Task.insert_many(files_dict[idx:idx+100]).execute()
     close()
 
 def add_version(paths):
@@ -45,7 +48,7 @@ def add_constraint(name, runtime_ms, cores):
     close()
 
 def add_work(args):
-    if args[0] == "not_perfect":
+    if args[0] == "imperfect":
         help() if len(args) < 5 else add_work_imperfect(args[1], args[2], args[3], args[4])
     elif args[0] == "all":
         help() if len(args) < 5 else add_work_all(args[1], args[2], args[3], args[4])
@@ -53,21 +56,27 @@ def add_work(args):
         help()
 
 def add_work_imperfect(reference, constraint, count, priority):
+    print("JOIN DOES NOT WORK YET :(")
+    return
     connect()
     version=Version.get(reference=reference)
     constraint=Constraint.get(name=constraint)
     #we use list() to make faster?
-    for task in list(Task.select().where(Run.score != 1.0).group_by(Task).join(Run)):
-        Work.enque(task, version=version, constraint=constraint, priority=priority, count=count)
+    tasks = Task.select().where(Run.score != 1.0 or Run << None).group_by(Task).join(Run)
+    print("tasks.count", tasks.count())
+    Work.enque(tasks, version, constraint, priority, count)
     close()
 
 def add_work_all(reference, constraint, count, priority):
     connect()
     version=Version.get(reference=reference)
     constraint=Constraint.get(name=constraint)
+    tasks = Task.select()
+    print("tasks.count", tasks.count())
+    Work.enque(tasks, version, constraint, priority, count)
     #we use list() to make faster?
-    for task in list(Task.select()):
-        Work.enque(task, version=version, constraint=constraint, priority=priority, count=count)
+    #for task in list(Task.select()):
+        #Work.enque(task, version=version, constraint=constraint, priority=priority, count=count)
     close()
 
 def add(args):
