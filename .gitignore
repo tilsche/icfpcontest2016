@@ -34,3 +34,4 @@ BUILD
 
 /**/build
 /tasks/task*
+/tasks/*.png

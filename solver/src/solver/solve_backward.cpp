@@ -9,7 +9,7 @@
 
 namespace zebra
 {
-    solution backward::operator()(task t)
+    solution backward::operator()(const task& t)
     {
         logging::info() << "backward solver starting..";
         solution s; //TODO

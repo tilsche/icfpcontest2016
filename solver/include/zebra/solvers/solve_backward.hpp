@@ -16,7 +16,7 @@ namespace zebra
     class backward : public solver
     {
     public:
-        solution operator()(task t) override;
+        solution operator()(const task& t) override;
         void unfold_segment(point begin, point end);
 
     private:
