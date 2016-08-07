@@ -12,6 +12,21 @@ import json
 from models import *
 import sys
 
+def submit_with_evaluate():
+    while True:
+        for run in list(Run.select().where(Run.submitted == False).join(Task).order_by(Run.score)):
+            id = run.task.path[:-4]
+            print("id:", id)
+            print("sol", run.path)
+            time.sleep(1)
+
+            result = submit(id, run.path)
+            if result is not None:
+                run.submitted = True
+                run.save()
+            print()
+            time.sleep(1.1)
+
 def submit_all():
     #connect()
     while True:
@@ -22,6 +37,7 @@ def submit_all():
             result = submit(id, run.path)
             if result is not None:
                 run.score = result
+                run.submitted = True
                 run.save()
             print()
             time.sleep(1.1)
