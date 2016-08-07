@@ -24,9 +24,8 @@ public:
         results.reserve(sol.destination_positions().size() * 2);
         for (auto dp : sol.destination_positions())
         {
-            transformation move(CGAL::TRANSLATION, p - dp);
             auto moved = *this;
-            moved.sol.transform(move);
+            moved.sol.transform(translation(p - dp));
             logging::trace() << "MOVED (" << dp << ")[[[[\n" << moved.sol << "\n]]]]] MOVED";
 
             results.push_back(moved);
