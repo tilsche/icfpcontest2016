@@ -24,8 +24,12 @@ def submit_with_evaluate():
             if result is not None:
                 if result != run.score:
                     print("submit score not equal local score")
-                run.submitted = True
-                run.save()
+                with database.atomic():
+                    for r in Run.select().where(Run.task == run.task):
+                        r.submitted = True
+                        r.save()
+                    run.submitted = True
+                    run.save()
             print()
             time.sleep(1.1)
 
