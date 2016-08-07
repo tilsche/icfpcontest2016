@@ -41,12 +41,12 @@ def get_work(cores_max):
     proxy = xmlrpc.client.ServerProxy("http://localhost:8000/", use_builtin_types=True)
     return tuple(map(pickle.loads, proxy.get_work_pickled(cores_max)))
 
-def submit_work(task, version, constraint, seed, solution):
+def submit_work(task, version, constraint, seed, solution, resemblance):
     """Submit work to Master, see work_local.py"""
 
     proxy = xmlrpc.client.ServerProxy("http://localhost:8000/", use_builtin_types=True)
     print(task, version, constraint, seed, solution)
-    proxy.submit_work_pickled(*tuple(map(pickle.dumps, [task, version, constraint, seed, solution])))
+    proxy.submit_work_pickled(*tuple(map(pickle.dumps, [task, version, constraint, seed, solution, resemblance])))
 
 PATH_GIT_REMOTE = ".icfpc/git_remote/"
 #REPO = "https://github.com/na-oma/test.git"
@@ -67,7 +67,7 @@ def clone_and_build(version):
         out = subprocess.check_output(["./build.sh", str(path)], universal_newlines=True)
         print(str(out))
     return path
- 
+
 def main():
     def done(c):
         return c[0].poll() is not None
@@ -86,9 +86,20 @@ def main():
                 task, version, constraint, seed = work
                 if child.poll() == 0:
                     out = child.communicate()[0]
+
+                    resemblance = None
+
+                    solution = ""
+
+                    for line in out.split("\n"):
+                        if resemblance is None:
+                            resemblance = line
+                        else:
+                            solution += "\n" + line
+
                     print(out)
                     print("Submit")
-                    submit_work(task, version, constraint, seed, out)
+                    submit_work(task, version, constraint, seed, solution, line)
                 else:
                     print("child did not complete!, not submitting")
                     #print("\t\t\t\tcalcing einheitsquadrat")
@@ -119,4 +130,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
