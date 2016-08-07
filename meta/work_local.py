@@ -62,7 +62,7 @@ def serve():
     #pickling over xml over rpc, yeah
     #we need to pickle because xmlrpcserver only understands few types
     #Dunno if this server can serve multiple requests concurrently
-    server = xmlrpc.server.SimpleXMLRPCServer(("localhost", 8000), use_builtin_types=True)
+    server = xmlrpc.server.SimpleXMLRPCServer(("kirk.zulan.net", 8000), use_builtin_types=True)
     print("Listening on port 8000...")
     server.register_function(get_work_pickled, "get_work_pickled")
     server.register_function(submit_work_pickled, "submit_work_pickled")
