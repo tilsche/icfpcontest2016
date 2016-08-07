@@ -26,10 +26,10 @@ namespace zebra
         return s;
     }
 
-    std::set<node_graph> backward::unfold_segments(node_graph ng)
+    std::vector<node_graph> backward::unfold_segments(node_graph ng)
     {
         std::set<std::set<upoint>> ultraset;
-        std::set<node_graph> result;
+        std::vector<node_graph> result;
 
         for (const auto& kvp : ng)
         {
@@ -83,7 +83,10 @@ namespace zebra
                         new_graph[p].erase(p);
                         new_graph[p].insert(p_new);
                     }
-                    result.insert(new_graph);
+                    if (std::find(result.begin(), result.end(), new_graph) == result.end())
+                    {
+                        result.push_back(new_graph);
+                    }
                 }
             }
         }

@@ -17,7 +17,7 @@ namespace zebra
     {
     public:
         solution operator()(const task& t) override;
-        std::set<node_graph> unfold_segments(node_graph ng);
+        std::vector<node_graph> unfold_segments(node_graph ng);
 
     private:
         node_graph ngraph;
