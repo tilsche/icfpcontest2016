@@ -76,7 +76,7 @@ def main():
         print("executing " + path + "solver/build/solver")
         print("Constraint: " + str(constraint.runtime_ms) + ", " + str(constraint.cores))
         try:
-            out = execute.execute(path + "solver/build/solver", "../../tasks/" + task.path, constraint.runtime_ms, constraint.cores, seed)
+            out = execute.execute(path + "solver/build/solver", "../tasks/" + task.path, 1000 * 60 * 5, constraint.cores, seed)
             print(str(out))
             submit_work(task, version, constraint, seed, out)
         except:
