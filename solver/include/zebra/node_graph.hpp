@@ -14,8 +14,8 @@ namespace zebra
     {
         using iterator = std::map<upoint, std::set<upoint>>::iterator;
 
-        node_graph()
-        {}
+        node_graph() = default;
+        //{}
 
         node_graph(const task& t) : m_polys(t.sil.polygons())
         {

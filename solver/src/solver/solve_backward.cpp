@@ -14,17 +14,20 @@ namespace zebra
         logging::info() << "backward solver starting..";
         solution s; //TODO
         ngraph = node_graph(t);
+        std::vector<node_graph> res({ngraph});
 
-        auto res = unfold_segments(ngraph);
-        logging::info() << "res size: " << res.size();
+        for(unsigned int i = 0; i < res.size(); ++i)
+        {
+            unfold_segments(res[i], res);
+        logging::info() << "res size" << res.size();
+        }
 
         return s;
     }
 
-    std::vector<node_graph> backward::unfold_segments(node_graph ng)
+    void backward::unfold_segments(node_graph ng, std::vector<node_graph>& result)
     {
         std::set<std::set<upoint>> ultraset;
-        std::vector<node_graph> result;
 
         for (const auto& kvp : ng)
         {
@@ -54,7 +57,7 @@ namespace zebra
 
             for(const auto& hull : h_list)
             {
-                auto new_graph = ngraph;
+                auto new_graph = ng;
                 std::vector<upoint> poly_points;
                 for(const auto& p : hull)
                 {
@@ -74,7 +77,7 @@ namespace zebra
                     poly_points.push_back(p_new);
 
                     // Change point in new node_graph
-                    new_graph[p_new] = ngraph[p];
+                    new_graph[p_new] = ng[p];
                     for(const auto& p : new_graph[p_new])
                     {
                         new_graph[p].erase(p);
@@ -91,8 +94,6 @@ namespace zebra
                 }
             }
         }
-
-        return result;
     }
 
     void backward::transitive_hull(upoint begin,
