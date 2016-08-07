@@ -14,18 +14,27 @@ public:
     skeleton()
     {
     }
-    skeleton(const std::vector<line_segment>& es) : edges(es)
+
+    skeleton(const std::vector<line_segment>& line_segments) : edges(line_segments)
     {
-        // FIXME filter unique lines
-        //        std::set<line> unique_lines;
-        for (const auto& edge : es)
+        for (const auto& s : line_segments)
         {
-            //            unique_lines.emplace(edge.source(), edge.target());
-            //            unique_lines.emplace(edge.target(), edge.source());
-            lines_.emplace_back(edge.source(), edge.target());
-            lines_.emplace_back(edge.target(), edge.source());
+            CGAL::Line_2<kernel> l(s);
+
+            bool found = false;
+            for (const auto& u : unique_lines_) {
+                if (l == u) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found == false) {
+                unique_lines_.emplace_back(l);
+            }
+
+            lines_.emplace_back(l);
         }
-        //        lines_ = std::vector<line>(unique_lines.begin(), unique_lines.end());
     }
 
     const std::vector<line>& lines() const
@@ -33,10 +42,16 @@ public:
         return lines_;
     }
 
+    const std::vector<line>& unique_lines() const
+    {
+        return unique_lines_;
+    }
+
     std::vector<line_segment> edges;
 
 private:
     std::vector<line> lines_;
+    std::vector<line> unique_lines_;
 };
 }
 
