@@ -61,7 +61,7 @@ public:
 private:
     std::vector<bool> data;
 };
-using facet_id_set = id_set<facet_id >;
+using facet_id_set = id_set<facet_id>;
 using vertex_id_set = id_set<vertex_id>;
 
 class solution;
@@ -450,6 +450,9 @@ public:
             assert(p.is_counterclockwise_oriented());
         }
         logging::trace() << "FACET_POLY = " << p;
+        assert(p.is_simple());
+        assert(p.is_convex());
+        assert(p.is_counterclockwise_oriented());
         return p;
     }
 
@@ -742,7 +745,10 @@ public:
 
         auto fpolys = facet_polygons();
         std::vector<polygon_with_holes> union_polys;
-        CGAL::join(fpolys.begin(), fpolys.end(), std::back_inserter(union_polys));
+        CGAL::join(fpolys.begin(), fpolys.end(), std::back_inserter(union_polys)
+                   // EVIL HACK to force CGAL to use safe algorithm ... or so
+                    , fpolys.size() + 1
+        );
         assert(union_polys.size() == 1);
         return union_polys[0];
     }
