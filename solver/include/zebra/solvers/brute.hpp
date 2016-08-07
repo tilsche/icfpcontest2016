@@ -106,19 +106,20 @@ class brutesolver : public solver
             {
                 return;
             }
+            fold_recurse(o, depth + 1);
             for (const auto& ls : t.skel.edges)
             {
                 for (auto o2 : o.align_to(ls))
                 {
-                    auto res = o.sol.resemblance(t.sil.shape());
+                    auto res = o2.sol.resemblance(t.sil.shape());
                     if (res > 0.0)
                     {
-                        logging::debug() << "**** Trying to allign with " << res;
+                        logging::debug() << "**** Trying to align at " << ls << " resemb " << res;
                         fold_recurse(o2, depth + 1);
                     }
                     else
                     {
-                        logging::debug() << "**** skipping useless alignment";
+                        logging::debug() << "**** skipping useless alignment at " << ls;
                     }
                 }
             }
