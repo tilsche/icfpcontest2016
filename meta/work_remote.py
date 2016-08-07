@@ -37,9 +37,12 @@ def cpu_count():
 
 def get_work(cores_max):
     """Get work from Master, see work_local.py"""
+    try:
+        proxy = xmlrpc.client.ServerProxy("http://localhost:8000/", use_builtin_types=True)
+        return tuple(map(pickle.loads, proxy.get_work_pickled(cores_max)))
+    except:
 
-    proxy = xmlrpc.client.ServerProxy("http://localhost:8000/", use_builtin_types=True)
-    return tuple(map(pickle.loads, proxy.get_work_pickled(cores_max)))
+        return None
 
 def submit_work(task, version, constraint, seed, solution, resemblance):
     """Submit work to Master, see work_local.py"""
