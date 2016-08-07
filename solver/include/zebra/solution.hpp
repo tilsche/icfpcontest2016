@@ -55,6 +55,7 @@ public:
     size_t vertex_size() const
     {
         assert(source_positions().size() == destination_positions().size());
+        assert(source_positions().size() == facets_by_vertex_.size());
         return destination_positions().size();
     }
 
@@ -137,6 +138,8 @@ public:
         {
             destination_positions_.push_back(destination_point);
             source_positions_.push_back(source_point);
+            facets_by_vertex_.resize(new_idx + 1);
+            (void)(vertex_size());
             return new_idx;
         }
         else
