@@ -50,6 +50,8 @@ transformation rotation(const line_segment& segment)
         return transformation(CGAL::ROTATION, sin_rho, cos_rho, hw);
     }
 
+    logging::debug() << "Requested rotation cannot be performed: " << segment;
+
     return transformation();
 }
 
