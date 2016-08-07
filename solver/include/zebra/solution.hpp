@@ -26,6 +26,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
 namespace zebra
 {
 template <class ID>
@@ -60,8 +61,8 @@ public:
 private:
     std::vector<bool> data;
 };
-using facet_id_set = id_set<bool>;
-using vertex_id_set = id_set<bool>;
+using facet_id_set = id_set<facet_id >;
+using vertex_id_set = id_set<vertex_id>;
 
 class solution;
 
@@ -153,6 +154,9 @@ protected:
             assert(r.second);
             (void)r;
         }
+#ifndef NDEBUG
+        facet_poly(f);
+#endif
     }
 
     void facet_unregister(facet_id id)
@@ -429,14 +433,16 @@ public:
     polygon facet_poly(const facet& f) const
     {
         polygon p;
-        for (auto i : f.vertex_ids_)
+        logging::trace() << "COMPUTING FACET_POLY: ";
+        for (auto vid : f.vertex_ids())
         {
-            p.push_back(destination_positions_[i]);
+            logging::trace() << "adding " << vid << ": " << destination_position(vid);
+            p.push_back(destination_position(vid));
         }
         if (!p.is_counterclockwise_oriented())
         {
             p = polygon();
-            for (auto it = f.vertex_ids_.rbegin(); it != f.vertex_ids_.rend(); it++)
+            for (auto it = f.vertex_ids().rbegin(); it != f.vertex_ids().rend(); it++)
             {
                 auto id = *it;
                 p.push_back(destination_positions_[id]);
@@ -595,7 +601,7 @@ public:
 
         for (int i = 0; i < facet_size(); i += 1)
         {
-            auto vertices = facets_[i].vertex_ids_;
+            auto vertices = facets_[i].vertex_ids();
             vertices.push_back(vertices[0]);
 
             std::stringstream facet_dats;
@@ -651,7 +657,7 @@ public:
 
         for (int i = 0; i < facet_size(); i += 1)
         {
-            auto vertices = facets_[i].vertex_ids_;
+            auto vertices = facets_[i].vertex_ids();
             vertices.push_back(vertices[0]);
 
             std::stringstream facet_dats;

@@ -38,6 +38,7 @@ public:
         std::vector<origami> results;
         std::unordered_set<facet_id> fold_facets;
 
+        logging::debug() << "Trying origami fold at " << l;
         for (vertex_id vid = 0; vid < sol.vertex_size(); vid++)
         {
             if (l.has_on_negative_side(sol.destination_position(vid)))
@@ -48,6 +49,7 @@ public:
                 }
             }
         }
+        logging::debug() << "facets affected: " << fold_facets.size();
         while (!fold_facets.empty())
         {
             facet_id fid = *fold_facets.begin();
@@ -62,6 +64,7 @@ public:
                     fold_facets.erase(folded_facet_id);
                 }
             }
+            results.push_back(folded);
         }
         logging::debug() << "Found " << results.size() << " separate folds.";
         return results;
