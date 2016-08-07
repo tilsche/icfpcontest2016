@@ -91,13 +91,13 @@ def main():
                     submit_work(task, version, constraint, seed, out)
                 else:
                     print("child did not complete!, not submitting")
-                    print("\t\t\t\tcalcing einheitsquadrat")
-                    print("\t\t\t\tcalcing einheitsquadrat")
-                    print("\t\t\t\tcalcing einheitsquadrat")
-                    print("\t\t\t\tcalcing einheitsquadrat")
-                    print("\t\t\t\tcalcing einheitsquadrat")
-                    children.append((subprocess.Popen(["./execute.py", PATH_GIT_REMOTE + "3937fe9f7d3c185f26f0f105a97875c2df6102a5" + "/" + "solver/build/solver", "../tasks/" + task.path, str(constraint.runtime_ms), str(constraint.cores), str(seed)], universal_newlines=True, stdout=subprocess.PIPE), work))
-                    cores_used += 1
+                    #print("\t\t\t\tcalcing einheitsquadrat")
+                    #print("\t\t\t\tcalcing einheitsquadrat")
+                    #print("\t\t\t\tcalcing einheitsquadrat")
+                    #print("\t\t\t\tcalcing einheitsquadrat")
+                    #print("\t\t\t\tcalcing einheitsquadrat")
+                    #children.append((subprocess.Popen(["./execute.py", PATH_GIT_REMOTE + "3937fe9f7d3c185f26f0f105a97875c2df6102a5" + "/" + "solver/build/solver", "../tasks/" + task.path, str(constraint.runtime_ms), str(constraint.cores), str(seed)], universal_newlines=True, stdout=subprocess.PIPE), work))
+                    #cores_used += 1
 
             #wait till something completes
             time.sleep(1)
