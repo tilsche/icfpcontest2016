@@ -51,6 +51,9 @@ def submit(problemId, solutionPath):
             if "own problem" in j["error"]:
                 print("own problem, saving -1.0")
                 return -1.0
+            elif "Invalid solution" in j["error"]:
+                print("Invalid solution, saving -2.0")
+                return -2.0
         time.sleep(1.1)
 
 if __name__ == "__main__":

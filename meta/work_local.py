@@ -29,7 +29,7 @@ def get_work(cores_max):
     close()
     return task, version, constraint, random.randrange(1e10)
 
-def submit_work(task, version, constraint, seed, solution):
+def submit_work(task, version, constraint, seed, solution, resemblance):
     """Accepts Task, Version, Constraint, seed, solution
     Saves the solution to DB
     """
@@ -43,11 +43,10 @@ def submit_work(task, version, constraint, seed, solution):
     print("version:\t" + version.reference)
     print("task:\t" + task.path)
     #print("score:\t" + score)
-    print("score will be NULL, we evaluate later")
+    print("resemblence: " + resemblance)
 
     connect()
-    run = Run.create(task=task, version=version, constraint=constraint, seed=seed, path=solutionPath, score=None)
-
+    run = Run.create(task=task, version=version, constraint=constraint, seed=seed, path=solutionPath, score=resemblance, submitted=False)
     #submit.submit_and_save(task.path.strip("0")[:-4], str(solutionPath), run)
     close()
 
