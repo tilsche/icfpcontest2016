@@ -101,7 +101,7 @@ def main():
                     print(resemblance)
                     print(solution)
                     print(">>> Submit")
-                    submit_work(task, version, constraint, seed, solution, Float(resemblance))
+                    submit_work(task, version, constraint, seed, solution, float(resemblance))
                 else:
                     print("child did not complete!, not submitting")
                     #print("\t\t\t\tcalcing einheitsquadrat")
