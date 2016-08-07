@@ -12,6 +12,8 @@ namespace zebra
 {
     struct node_graph
     {
+        using iterator = std::map<point, std::set<point>>::iterator;
+
         node_graph()
         {}
 
@@ -54,6 +56,16 @@ namespace zebra
             }
         }
 
+        iterator begin()
+        {
+            return m_graph.begin();
+        }
+
+        iterator end()
+        {
+            return m_graph.end();
+        }
+
         std::set<point>& operator[](const point& p)
         {
             return m_graph[p];
@@ -67,6 +79,60 @@ namespace zebra
         std::vector<polygon> m_polys;
         std::map<point, std::set<point>> m_graph;
     };
+
+    struct s2dmap
+    {
+        using map_iterator = std::map<point, std::set<point>>::iterator;
+
+        // maps destination points to source points
+        s2dmap()
+        {
+        }
+
+        s2dmap(const node_graph& ng)
+        {
+            for (const auto& kvp : ng.m_graph)
+            {
+                m_map[kvp.first] = std::set<point>{kvp.first};
+            }
+
+        }
+
+        std::vector<point> destination_points() const
+        {
+            std::vector<point> ret;
+            for (const auto& kvp : m_map)
+            {
+                ret.push_back(kvp.first);
+            }
+            return ret;
+        }
+
+        std::set<point>& sources_points_of_destination(const point& dest)
+        {
+            return m_map[dest];
+        }
+
+        std::set<point>& operator[](const point& p)
+        {
+            return sources_points_of_destination(p);
+        }
+
+        map_iterator begin()
+        {
+            return m_map.begin();
+
+        }
+
+        map_iterator end()
+        {
+            return m_map.end();
+        }
+
+        private:
+        std::map<point, std::set<point>> m_map;
+    };
+
 
     // JUST FOR DEBUGGING
     void print_node_graph(node_graph& ng)
