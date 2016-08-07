@@ -4,6 +4,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <set>
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
@@ -24,6 +25,42 @@ struct task
 
     silhouette sil;
     skeleton skel;
+
+    std::vector<polygon> to_polygon_vector() const {
+        std::vector<polygon> ret;
+
+        std::map<point, int /* number of incident edges */> all_points;
+
+        for (const auto& poly : sil.polygons()) {
+            for (auto p = poly.vertices_begin(); p != poly.vertices_end(); ++p) {
+                all_points.insert(std::make_pair(*p, 0));
+            }
+        }
+
+        for (auto&& p : all_points) {
+            for (const auto& s : skel.edges) {
+                if (s.has_on(p.first)) {
+                    p.second += 1;
+                }
+            }
+        }
+
+        for (const auto& p : all_points) {
+            std::cerr << point_to_string(p.first) << ": " << p.second << std::endl;
+        }
+
+        while (all_points.empty() == false) {
+            std::vector<point> v{*all_points.begin()};
+            all_points.begin().second -= 1;
+
+            if (all_points.begin().second == 0) {
+                all_points.erase(all_points.begin());
+            }
+        }
+
+
+        return ret;
+    }
 };
 
 bool for_n_lines(std::ifstream& in, uint64_t number_of_lines,
