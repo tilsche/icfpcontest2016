@@ -6,6 +6,7 @@
 #include "geometry/point.hpp"
 #include "geometry/polygon.hpp"
 
+#include <CGAL/Polygon_set_2.h>
 #include <CGAL/Aff_transformation_2.h>
 //#include <CGAL/Homogeneous/Aff_transformationH2.h>
 
@@ -15,6 +16,7 @@ using transformation = CGAL::Aff_transformation_2<kernel>;
 // using transformation = CGAL::Aff_transformationH2<kernel>;
 using vector = kernel::Vector_2;
 using line = kernel::Line_2;
+using polygon_set = CGAL::Polygon_set_2<kernel>;
 
 transformation reflection(line l)
 {

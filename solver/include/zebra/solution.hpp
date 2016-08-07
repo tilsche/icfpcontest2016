@@ -419,6 +419,7 @@ public:
         return facet_add(facet_negative);
     }
 
+private:
     std::vector<polygon> facet_polygons() const
     {
         std::vector<polygon> r;
@@ -430,6 +431,7 @@ public:
         return r;
     }
 
+public:
     polygon facet_poly(const facet& f) const
     {
         polygon p;
@@ -741,14 +743,14 @@ public:
     polygon_with_holes poly() const
     {
         logging::trace() << "Generating polygon for SOLUTION[[[[\n" << *this << "SOLUTION]]]]\n";
-        polygon_with_holes ret;
-
-        auto fpolys = facet_polygons();
+        polygon_set ps;
+        for (const facet& f : facets_)
+        {
+            ps.join(facet_poly(f));
+        }
+        assert(ps.number_of_polygons_with_holes() == 1);
         std::vector<polygon_with_holes> union_polys;
-        CGAL::join(fpolys.begin(), fpolys.end(), std::back_inserter(union_polys)
-                   // EVIL HACK to force CGAL to use safe algorithm ... or so
-                    , fpolys.size() + 1
-        );
+        ps.polygons_with_holes(std::back_inserter(union_polys));
         assert(union_polys.size() == 1);
         return union_polys[0];
     }
