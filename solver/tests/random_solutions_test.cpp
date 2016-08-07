@@ -45,6 +45,8 @@ void random_fold(solution& s)
     std::cerr << "point 2: " << point_to_string(p2) << std::endl;
 
     s.fold(fid, line_segment(p1, p2));
+    s.rotate(p1, line_segment(p1, p2));
+    s.translate(p2);
 }
 
 int main(int argc, char** args)

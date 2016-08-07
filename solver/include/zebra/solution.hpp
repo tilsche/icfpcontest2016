@@ -566,6 +566,11 @@ public:
         transform(translation(p) * rotation(segment) * translation(vector(-p.x(), -p.y())));
     }
 
+    void translate(const point& p)
+    {
+        transform(translation(p));
+    }
+
     std::size_t file_size() const
     {
         std::stringstream s;
