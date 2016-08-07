@@ -12,12 +12,23 @@ import json
 from models import *
 import sys
 
+
 def submit_with_evaluate():
     while True:
-        for run in list(Run.select().where(Run.submitted == False).join(Task).order_by(Run.score.desc()).limit(1)):
+        # for run in list(Run.select().where(Run.submitted == False).join(Task).order_by(Run.score.desc()).limit(1)):
+        # for run in list(Run.select().where(Run.submitted == False).join(Task).order_by(Run.score.desc()).limit(1)):
+
+        for task in list(Task.select().order_by(Run.score.desc())):
+            submitted_runs = Run.select().where(Run.task == task and Run.submitted == True).count()
+
+            if submitted_runs > 0:
+                continue
+
+            run = Run.select().where(Run.submitted == False).order_by(Run.score.desc()).limit(1).get()
+
             if run.score < 1.0:
                 return
-            id = run.task.path[:-4]
+            id = task.path[:-4]
             print("id:", id)
             print("sol", run.path)
             print(run.score)
@@ -27,13 +38,14 @@ def submit_with_evaluate():
                 if result != run.score:
                     print("submit score not equal local score")
                 with database.atomic():
-                    for r in Run.select().where(Run.task == run.task):
+                    for r in Run.select().where(Run.task == task):
                         r.submitted = True
                         r.save()
                     run.submitted = True
                     run.save()
             print()
             time.sleep(1.1)
+            
 
 def submit_all():
     #connect()
@@ -87,4 +99,3 @@ if __name__ == "__main__":
         submit(sys.argv[1], sys.argv[2])
     else:
         print("To submit single problem: args: problemId +  solutionPath")
-
