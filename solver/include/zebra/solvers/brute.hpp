@@ -7,6 +7,7 @@
 #include <zebra/log.hpp>
 #include <zebra/origami.hpp>
 
+#include <chrono>
 #include <exception>
 
 namespace zebra
@@ -83,24 +84,40 @@ class brutesolver : public solver
         int max_depth;
     };
 
+    using clock = std::chrono::system_clock;
+    clock::time_point deadline;
+
 public:
+    template <class D>
+    brutesolver(D timelimit)
+    {
+        auto start = clock::now();
+        deadline = start + timelimit / 2;
+    }
+
     solution operator()(const task& t) override
     {
-        logging::info() << "Brute force solver starting..";
-
         origami ori;
 
-        state st(t);
-        try
+        for (int rec = 1;; rec++)
         {
-            st.move_recurse(ori);
+            logging::info() << "Brute forcing recursion: " << rec;
+            state st(t, rec);
+            try
+            {
+                st.move_recurse(ori);
+            }
+            catch (solution_found&)
+            {
+                logging::info() << "PERFECT SOLUTION FOUND";
+                return st.best_solution;
+            }
+            logging::info() << "Best: " << st.best_resemblance;
+            if (clock::now() > deadline)
+            {
+                return st.best_solution;
+            }
         }
-        catch (solution_found&)
-        {
-            logging::info() << "PERFECT SOLUTION FOUND";
-        }
-        logging::info() << "Best solution: " << st.best_resemblance;
-        return st.best_solution;
     }
 };
 }

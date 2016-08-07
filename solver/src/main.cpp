@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <zebra/log.hpp>
 #include <zebra/task.hpp>
 
@@ -8,6 +6,9 @@
 #include <zebra/solvers/brute.hpp>
 #include <zebra/solvers/simple.hpp>
 #include <zebra/solvers/stupid.hpp>
+
+#include <chrono>
+#include <iostream>
 
 namespace po = boost::program_options;
 
@@ -61,6 +62,11 @@ int main(int argc, char** argv)
         help(options);
         return EXIT_SUCCESS;
     }
+    std::chrono::seconds runtime(10);
+    if (vm.count("runtime"))
+    {
+        runtime = std::chrono::seconds(vm["runtime"].as<long>());
+    }
 
     if (vm.count("task-file") == 0)
     {
@@ -73,7 +79,7 @@ int main(int argc, char** argv)
     // do something useful
     auto t = zebra::read_task(filename);
     // std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::simple>();
-    std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::brutesolver>();
+    std::unique_ptr<zebra::solver> solve = std::make_unique<zebra::brutesolver>(runtime);
 
     zebra::logging::info() << "solving...";
     auto solu = (*solve)(t);
