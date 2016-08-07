@@ -3,6 +3,7 @@
 #define SOLVER_SKELETON_HPP
 
 #include "geometry/line_segment.hpp"
+#include <zebra/log.hpp>
 
 #include <vector>
 
@@ -22,17 +23,20 @@ public:
             CGAL::Line_2<kernel> l(s);
 
             bool found = false;
-            for (const auto& u : unique_lines_) {
-                if (l == u) {
+            for (const auto& u : unique_lines_)
+            {
+                if (l == u)
+                {
                     found = true;
                     break;
                 }
             }
 
-            if (found == false) {
+            if (found == false)
+            {
                 unique_lines_.emplace_back(l);
             }
-
+            logging::debug() << "Skeleting ls: " << s << " -> " << l;
             lines_.emplace_back(l);
         }
     }

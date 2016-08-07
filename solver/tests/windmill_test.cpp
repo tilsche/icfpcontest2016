@@ -38,7 +38,7 @@ void test_windmill()
     logging::info() << "Testing to fold:\n" << s;
     logging::info() << "with line segment " << fold4;
 
-    s.fold(2, fold4);
+    s.fold(3, fold4);
     s.to_png(std::string(__func__) + "_post4");
     logging::info() << "Result:\n" << s;
 
