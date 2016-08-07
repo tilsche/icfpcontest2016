@@ -12,7 +12,7 @@ def execute(programFile, taskFile, runtime_ms, cores, seed):
     #change timeout to current ICFPC rules
     #if your program does not print just one solution at the end
     #  but continually spits out solutions, you should just print the best solution
-    return subprocess.check_output([programFile, taskFile, "--cores", str(cores)], timeout=int(runtime_ms)/1000, universal_newlines=True)
+    return subprocess.check_output([programFile, taskFile, "--cores", str(cores), "--runtime", str(runtime_ms)], timeout=int(runtime_ms)/1000, universal_newlines=True)
 
 def main():
     if len(argv) < 6:
