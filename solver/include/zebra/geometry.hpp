@@ -65,6 +65,16 @@ transformation translation(const point& p)
 {
     return translation(vector(p.x(), p.y()));
 }
+
+CGAL::Gmpq holy_area(const polygon_with_holes& pholy)
+{
+    auto a = pholy.outer_boundary().area();
+    for (auto holeit = pholy.holes_begin(); holeit != pholy.holes_end(); holeit++)
+    {
+        a -= holeit->area();
+    }
+    return a;
+}
 }
 
 #endif // SOLVER_GEOMETRY_HPP

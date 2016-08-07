@@ -110,7 +110,16 @@ class brutesolver : public solver
             {
                 for (auto o2 : o.align_to(ls))
                 {
-                    fold_recurse(o2, depth + 1);
+                    auto res = o.sol.resemblance(t.sil.shape());
+                    if (res > 0.0)
+                    {
+                        logging::debug() << "**** Trying to allign with " << res;
+                        fold_recurse(o2, depth + 1);
+                    }
+                    else
+                    {
+                        logging::debug() << "**** skipping useless alignment";
+                    }
                 }
             }
         }
