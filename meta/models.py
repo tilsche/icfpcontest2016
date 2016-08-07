@@ -56,6 +56,7 @@ class Run(BaseModel):
     constraint = ForeignKeyField(Constraint, related_name='runs')
     path = TextField(unique=True)
     score = FloatField(null=True)
+    submitted = BooleanField()
 
 class Tag(BaseModel):
     name = TextField(unique=True)
