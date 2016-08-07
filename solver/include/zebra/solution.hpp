@@ -186,6 +186,11 @@ public:
     {
         auto new_idx = vertex_size();
 
+        assert(source_point.x() >= 0);
+        assert(source_point.y() >= 0);
+        assert(source_point.x() <= 1);
+        assert(source_point.y() <= 1);
+
         auto try_insert = source_positions_by_point_.emplace(std::make_pair(source_point, new_idx));
         if (try_insert.second)
         {

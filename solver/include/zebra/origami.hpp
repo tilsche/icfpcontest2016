@@ -67,11 +67,20 @@ public:
 
     std::vector<origami> folds(const line& l) const
     {
+        auto r1 = folds2(l);
+        auto r2 = folds2(l.opposite());
+        r1.insert(r1.end(), r2.begin(), r2.end());
+        return r2;
+    }
+
+    std::vector<origami> folds2(const line& l) const
+    {
         std::vector<origami> results;
         std::unordered_set<facet_id> fold_facets;
 
         int vertex_positive = 0;
         logging::debug() << "Trying origami fold at " << l;
+        logging::trace() << "@@@ " << sol;
         for (vertex_id vid = 0; vid < sol.vertex_size(); vid++)
         {
             if (l.has_on_negative_side(sol.destination_position(vid)))

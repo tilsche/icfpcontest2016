@@ -88,7 +88,6 @@ class bfs : public solver
 
         void queue_align(const origami& o)
         {
-            queue(o);
 
             std::vector<polygon_with_holes> visited;
             for (const auto& ls : t.skel.edges)
@@ -114,27 +113,20 @@ class bfs : public solver
                     }
                 }
             }
+            queue(o);
         }
 
         void queue_fold()
         {
             auto elem = q_.top();
-            const auto& o = elem.o;
             q_.pop();
+
+            const auto& o = elem.o;
             auto old_area = elem.area;
             for (auto l : t.skel.unique_lines())
             {
                 logging::debug() << " next line " << l;
                 for (auto o2 : o.folds(l))
-                {
-                    auto new_area = holy_area(o2.sol.poly());
-                    if (new_area < old_area)
-                    {
-                        queue(o2);
-                    }
-                }
-                logging::debug() << " next line " << l.opposite();
-                for (auto o2 : o.folds(l.opposite()))
                 {
                     auto new_area = holy_area(o2.sol.poly());
                     if (new_area < old_area)
