@@ -34,7 +34,7 @@ namespace zebra
                     m_graph[edge.target()].insert(edge.source());
                 }
             }
-            
+
             for(const auto& edge : t.skel.edges)
             {
                 for(const auto& map_entry : m_graph)
