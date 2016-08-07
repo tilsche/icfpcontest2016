@@ -43,8 +43,12 @@ class Work(BaseModel):
                 return work
         except Work.DoesNotExist:
             return None
-    def enque(task, version, constraint, priority, count):
-        return Work.create(task=task, version=version, constraint=constraint, priority=priority, count=count)
+    def enque(tasks, version, constraint, priority, count):
+        work_dict = [{"task": task, "version": version, "constraint": constraint, "priority": priority, "count": count} for task in tasks]
+        with database.atomic():
+            for idx in range(0, len(work_dict), 100):
+                Work.insert_many(work_dict[idx:idx+100]).execute()
+        #return Work.create(task=task, version=version, constraint=constraint, priority=priority, count=count)
 
 class Run(BaseModel):
     task = ForeignKeyField(Task, related_name='runs')
