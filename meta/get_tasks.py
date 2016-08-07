@@ -3,7 +3,7 @@ import time
 import subprocess
 
 
-j = json.load(open("snapshot.1470502800.txt"))
+j = json.load(open("snapshot.1470560400.txt"))
 
 problems = j["problems"]
 
@@ -27,5 +27,5 @@ for p in problems:
         correct = load(hash, id)
         if not correct:
             print("retry", hash, id)
-        time.sleep(1)
+        time.sleep(1.5)
 
