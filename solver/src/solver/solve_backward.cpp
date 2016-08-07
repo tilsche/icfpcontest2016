@@ -20,50 +20,75 @@ namespace zebra
         std::cout << BackwardConstraints::valid_length(ps, pe) << '\n';
         std::cout << BackwardConstraints::is_standard_square(ngraph) << '\n';
 
+        auto res = unfold_segments(ngraph);
+        logging::info() << "res size: " << res.size();
+
         return s;
     }
 
-    //std::set<node_graph> backward::unfold_segment(node_graph ng)
-    void backward::unfold_segment(upoint begin, upoint end)
+    std::set<node_graph> backward::unfold_segments(node_graph ng)
     {
-        //for
-        // Get hulls
-        std::vector<upoint> stack;
-        hull_list h_list;
+        std::set<std::set<upoint>> ultraset;
+        std::set<node_graph> result;
 
-        transitive_hull(begin, end, stack, h_list);
-
-        // Get normal
-        line_segment seg( begin, end );
-        auto dir = seg.direction();
-        kernel::Vector_2 normal(-dir.dy(), dir.dx());
-
-        for(const auto& hull : h_list)
+        for (const auto& kvp : ng)
         {
-            for(const auto& p : hull)
+            for (const auto& elem : kvp.second)
             {
-                // Calc transformation parameters
-                upoint beg2point(p.x() - begin.x(), p.y() - begin.y());
-                auto dist = CGAL::to_double(beg2point.x() * normal.x() + beg2point.y() * normal.y()) / sqrt(CGAL::to_double(normal.squared_length()));
+                ultraset.insert({kvp.first, elem});
+            }
+        }
 
-                // Build tranlation matrix
-                vector translate_vec = (-2 * dist) * normal;
-                CGAL::Gmpq zero(0,0);
-                transformation translate(zero, zero, translate_vec.hx(), zero, zero, translate_vec.hy(), translate_vec.hw());
+        for (const auto& line : ultraset)
+        {
+            assert(line.size() == 2);
 
-                // Move point
-                auto p_new = translate(p);
+            auto ultraiter = line.begin();
+            auto begin = *ultraiter;
+            auto end = *(++ultraiter);
+            // Get hulls
+            std::vector<upoint> stack;
+            hull_list h_list;
 
-                // Change point in new node_graph
-                auto new_graph = ngraph;
-                new_graph[p_new] = ngraph[p];
-                for(const auto& p : new_graph[p_new])
+            transitive_hull(begin, end, stack, h_list);
+
+            // Get normal
+            line_segment seg( begin, end );
+            auto dir = seg.direction();
+            kernel::Vector_2 normal(-dir.dy(), dir.dx());
+
+            for(const auto& hull : h_list)
+            {
+                for(const auto& p : hull)
                 {
-                    new_graph[p].erase(p);
-                    new_graph[p].insert(p_new);
+                    // Calc transformation parameters
+                    upoint beg2point(p.x() - begin.x(), p.y() - begin.y());
+                    auto dist = CGAL::to_double(beg2point.x() * normal.x() + beg2point.y() * normal.y())
+                            / sqrt(CGAL::to_double(normal.squared_length()));
+
+                    // Build tranlation matrix
+                    vector translate_vec = (-2 * dist) * normal;
+                    CGAL::Gmpq zero(0,0);
+                    transformation translate(zero, zero, translate_vec.hx(),
+                                zero, zero, translate_vec.hy(), translate_vec.hw());
+
+                    // Move point
+                    auto p_new = translate(p);
+
+                    // Change point in new node_graph
+                    auto new_graph = ngraph;
+                    new_graph[p_new] = ngraph[p];
+                    for(const auto& p : new_graph[p_new])
+                    {
+                        new_graph[p].erase(p);
+                        new_graph[p].insert(p_new);
+                    }
+                    result.insert(new_graph);
                 }
             }
         }
+
+        return result;
     }
 
     //void backward::make_node_connections_unique(node_graph& ng)

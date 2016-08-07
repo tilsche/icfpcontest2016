@@ -71,7 +71,22 @@ namespace zebra
             return m_graph[p];
         }
 
-        size_t size()
+        bool operator<(const node_graph& other) const
+        {
+            return size() < other.size();
+        }
+
+        bool operator==(const node_graph& other) const
+        {
+            return m_graph == other.m_graph;
+        }
+
+        bool operator!=(const node_graph& other) const
+        {
+            return !(*this == other);
+        }
+
+        size_t size() const
         {
             return m_graph.size();
         }

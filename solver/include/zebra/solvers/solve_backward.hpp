@@ -12,12 +12,12 @@ namespace zebra
 {
     using hull = std::set<upoint>;
     using hull_list = std::vector<hull>;
-    
+
     class backward : public solver
     {
     public:
         solution operator()(const task& t) override;
-        void unfold_segment(upoint begin, upoint end);
+        std::set<node_graph> unfold_segments(node_graph ng);
 
     private:
         node_graph ngraph;
