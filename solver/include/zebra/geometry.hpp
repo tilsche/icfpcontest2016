@@ -5,7 +5,7 @@
 #include "geometry/line_segment.hpp"
 #include "geometry/point.hpp"
 #include "geometry/polygon.hpp"
-#include <zebgra/log.hpp>
+#include <zebra/log.hpp>
 
 #include <CGAL/Aff_transformation_2.h>
 #include <CGAL/Polygon_set_2.h>
