@@ -47,9 +47,19 @@ public:
         return source_positions_;
     }
 
+    const point& source_position(vertex_id vid) const
+    {
+        return source_positions_[vid];
+    }
+
     const std::vector<point>& destination_positions() const
     {
         return destination_positions_;
+    }
+
+    const point& destination_position(vertex_id vid) const
+    {
+        return destination_positions_[vid];
     }
 
     size_t vertex_size() const
@@ -420,6 +430,71 @@ public:
         fold(line(fold_segment.source(), fold_segment.target()));
     }
 
+protected:
+    template <typename T1, typename T2>
+    void facet_connected(facet_id fid, const line& fold_line, T1& facets, T2& vertices)
+    {
+        // I will take care of this facet if not in already
+        auto ins_f = facets.insert(fid);
+        if (!ins_f.second)
+        {
+            // allready in;
+            return;
+        }
+        // added to facets, so this will not be checked again
+        for (auto vid : this->get_facet(fid).vertex_ids())
+        {
+            if (fold_line.has_on_negative_side(destination_position(vid)))
+            {
+                // i will take care of this vertex if not done already
+                auto ins_v = vertices.insert(vid);
+                if (!ins_v.second)
+                {
+                    // allready in
+                    continue;
+                }
+                for (facet_id next_fid : facets_by_vertex_[vid])
+                {
+                    facet_connected(next_fid, fold_line, facets, vertices);
+                }
+            }
+        }
+    }
+
+public:
+    std::pair<std::unordered_set<facet_id>, std::unordered_set<vertex_id>>
+    facet_negative_set(facet_id root_id, const line& fold_line)
+    {
+        // Find all facets that are connected on the negative side of the fold_line
+        std::unordered_set<facet_id> facets;
+        std::unordered_set<vertex_id> vertices;
+        facet_connected(root_id, fold_line, facets, vertices);
+        return { facets, vertices };
+    }
+
+    void fold(facet_id id, const line_segment& fold_segment)
+    {
+        fold(id, line(fold_segment.source(), fold_segment.target()));
+    }
+
+    void fold(facet_id id, const line& fold_line)
+    {
+        auto facets_and_vertices = facet_negative_set(id, fold_line);
+        const auto& facets = facets_and_vertices.first;
+        const auto& vertices = facets_and_vertices.second;
+        for (auto fid : facets)
+        {
+            facet_fold(fid, fold_line);
+        }
+        auto mirror = reflection(fold_line);
+        for (auto vid : vertices)
+        {
+            auto& destination_position = destination_positions_[vid];
+            assert(fold_line.has_on_negative_side(destination_position));
+            destination_position = mirror(destination_position);
+        }
+    }
+
     void transform(transformation t)
     {
         for (auto& f : facets_)
@@ -472,8 +547,8 @@ public:
 
         for (int i = 0; i < facet_size(); i += 1)
         {
-            auto facet = facets_[i].vertex_ids_;
-            facet.push_back(facet[0]);
+            auto vertices = facets_[i].vertex_ids_;
+            vertices.push_back(vertices[0]);
 
             std::stringstream facet_dats;
             facet_dats << prefix << "_source_facet_" << i << ".dat";
@@ -482,9 +557,9 @@ public:
             unlink_files.push_back(facet_dat);
 
             std::ofstream of(facet_dat);
-            for (int j = 0; j < facet_size(); j += 1)
+            for (int j = 0; j < vertices.size(); j += 1)
             {
-                auto p = source_positions_[facet[j]];
+                auto p = source_positions_[vertices[j]];
                 of << gmpq_to_double(p.x()) << ' ' << gmpq_to_double(p.y()) << std::endl;
             }
             of.close();
