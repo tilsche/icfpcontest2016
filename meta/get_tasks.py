@@ -3,7 +3,7 @@ import time
 import subprocess
 import os
 
-j = json.load(open("snapshot.1470571200.txt"))
+j = json.load(open("snapshot.1470585600.txt"))
 
 problems = j["problems"]
 
