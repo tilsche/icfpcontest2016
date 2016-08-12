@@ -2,7 +2,7 @@
 #ifndef SOLVER_BRUTESOLVER_HPP
 #define SOLVER_BRUTESOLVER_HPP
 
-#include <zebra/solver.hpp>
+#include <zebra/solvers/base.hpp>
 
 #include <zebra/log.hpp>
 #include <zebra/origami.hpp>
@@ -13,7 +13,8 @@
 
 namespace zebra
 {
-class brutesolver : public solver
+namespace solver{
+class brute : public base
 {
     using clock = std::chrono::system_clock;
 
@@ -34,7 +35,7 @@ class brutesolver : public solver
 
         ~state()
         {
-            logging::info() << "Total solver checks: " << check_count;
+            logging::info() << "Total base checks: " << check_count;
         }
 
         // returns true if you should break;
@@ -152,7 +153,7 @@ class brutesolver : public solver
 
 public:
     template <class D>
-    brutesolver(D timelimit)
+    brute(D timelimit)
     {
         auto start = clock::now();
         deadline = start + timelimit;
@@ -185,5 +186,5 @@ public:
         }
     }
 };
-}
+}}
 #endif // SOLVER_BRUTESOLVER_HPP
