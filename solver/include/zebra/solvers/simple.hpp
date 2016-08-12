@@ -2,43 +2,46 @@
 #ifndef SOLVER_SIMPLE_HPP
 #define SOLVER_SIMPLE_HPP
 
-#include <zebra/solver.hpp>
+#include <zebra/solvers/base.hpp>
 
 #include <zebra/log.hpp>
 #include <zebra/origami.hpp>
 
 namespace zebra
 {
-class simple : public solver
+namespace solver
 {
-public:
-    solution operator()(const task& t) override
+    class simple : public base
     {
-        logging::info() << "Simple solver starting..";
-
-        polygon target = t.sil.shape().outer_boundary();
-        assert(target.is_counterclockwise_oriented());
-
-        origami ori;
-
-        double best_r = 0;
-        origami best_ori;
-        for (auto vx_it = target.vertices_begin(); vx_it != target.vertices_end(); vx_it++)
+    public:
+        solution operator()(const task& t) override
         {
-            for (auto o2 : ori.move_to(*vx_it))
+            logging::info() << "Simple solver starting..";
+
+            polygon target = t.sil.shape().outer_boundary();
+            assert(target.is_counterclockwise_oriented());
+
+            origami ori;
+
+            double best_r = 0;
+            origami best_ori;
+            for (auto vx_it = target.vertices_begin(); vx_it != target.vertices_end(); vx_it++)
             {
-                auto new_r = o2.sol.resemblance(target);
-                if (new_r > best_r)
+                for (auto o2 : ori.move_to(*vx_it))
                 {
-                    best_r = new_r;
-                    best_ori = o2;
+                    auto new_r = o2.sol.resemblance(target);
+                    if (new_r > best_r)
+                    {
+                        best_r = new_r;
+                        best_ori = o2;
+                    }
                 }
             }
-        }
-        logging::info() << "Simple found best resemblence " << best_r;
+            logging::info() << "Simple found best resemblence " << best_r;
 
-        return best_ori.sol;
-    }
-};
+            return best_ori.sol;
+        }
+    };
+}
 }
 #endif // SOLVER_SIMPLE_HPP

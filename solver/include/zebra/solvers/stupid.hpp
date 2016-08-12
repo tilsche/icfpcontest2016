@@ -2,18 +2,21 @@
 #ifndef SOLVER_STUPIDSOLVE_HPP
 #define SOLVER_STUPIDSOLVE_HPP
 
-#include <zebra/solver.hpp>
+#include <zebra/solvers/base.hpp>
 
 namespace zebra
 {
-class stupid : public solver
+namespace solver
 {
-public:
-    solution operator()(const task&) override
+    class stupid : public base
     {
-        origami o;
-        return o.sol;
-    }
-};
+    public:
+        solution operator()(const task&) override
+        {
+            origami o;
+            return o.sol;
+        }
+    };
+}
 }
 #endif // SOLVER_STUPIDSOLVE_HPP
