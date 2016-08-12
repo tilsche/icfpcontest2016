@@ -1,3 +1,8 @@
+Post Mortem
+================
+
+https://github.com/tilsche/icfpcontest2016/wiki/Post-Mortem
+
 Build Everything
 ================
 
