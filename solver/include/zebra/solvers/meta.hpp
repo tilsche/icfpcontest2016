@@ -2,7 +2,7 @@
 #define SOLVER_META_HPP
 
 #include "bfs.hpp"
-#include "brute.hpp"
+#include "idfs.hpp"
 #include "simple.hpp"
 #include "stupid.hpp"
 
@@ -30,9 +30,9 @@ namespace solver
             {
                 backend_ = std::make_unique<solver::simple>();
             }
-            else if (name == "brute")
+            else if (name == "idfs")
             {
-                backend_ = std::make_unique<solver::brute>(timelimit);
+                backend_ = std::make_unique<solver::idfs>(timelimit);
             }
             else if (name == "bfs")
             {

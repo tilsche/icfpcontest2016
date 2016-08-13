@@ -31,7 +31,8 @@ int main(int argc, char** argv)
             ("verbosity,v", po::value<std::string>()->default_value("info"),
                             "set the verbosity level")
             ("cores", po::value<int>(), "core count")
-            ("base", po::value<std::string>()->default_value("bfs"));
+            ("solver", po::value<std::string>()->default_value("bfs"),
+                       "select solver (stupid, simple, idfs, bfs");
     // clang-format on
 
     po::variables_map vm;

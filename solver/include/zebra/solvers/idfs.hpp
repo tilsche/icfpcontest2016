@@ -14,7 +14,7 @@
 namespace zebra
 {
 namespace solver{
-class brute : public base
+class idfs : public base
 {
     using clock = std::chrono::system_clock;
 
@@ -153,7 +153,7 @@ class brute : public base
 
 public:
     template <class D>
-    brute(D timelimit)
+    idfs(D timelimit)
     {
         auto start = clock::now();
         deadline = start + timelimit;
@@ -165,7 +165,7 @@ public:
 
         for (int rec = 1;; rec++)
         {
-            logging::info() << "Brute forcing recursion: " << rec;
+            logging::info() << "IDFS forcing recursion: " << rec;
             state st(t, rec, deadline);
             try
             {

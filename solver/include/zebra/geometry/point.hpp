@@ -1,9 +1,7 @@
 #ifndef ZEBRA_POINT_HPP
 #define ZEBRA_POINT_HPP
 
-#include "kernel.hpp"
-
-#include <CGAL/Gmpq.h>
+#include "cgal.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -12,8 +10,6 @@
 
 namespace zebra
 {
-
-using point = kernel::Point_2;
 
 inline point point_from_string(std::string s)
 {

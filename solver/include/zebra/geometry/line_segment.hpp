@@ -3,13 +3,11 @@
 
 #include <sstream>
 
-#include <zebra/geometry/kernel.hpp>
-#include <zebra/geometry/point.hpp>
+#include "cgal.hpp"
+#include "point.hpp"
 
 namespace zebra
 {
-
-using line_segment = kernel::Segment_2;
 
 inline line_segment line_segment_from_string(const std::string& s)
 {

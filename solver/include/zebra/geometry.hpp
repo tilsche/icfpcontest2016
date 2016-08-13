@@ -1,24 +1,16 @@
 #ifndef SOLVER_GEOMETRY_HPP
 #define SOLVER_GEOMETRY_HPP
 
-#include "geometry/kernel.hpp"
+#include "geometry/cgal.hpp"
+#include "geometry/gmp.hpp"
 #include "geometry/line_segment.hpp"
 #include "geometry/point.hpp"
 #include "geometry/polygon.hpp"
-#include <zebra/log.hpp>
 
-#include <CGAL/Aff_transformation_2.h>
-#include <CGAL/Polygon_set_2.h>
-//#include <CGAL/Homogeneous/Aff_transformationH2.h>
+#include <zebra/log.hpp>
 
 namespace zebra
 {
-using transformation = CGAL::Aff_transformation_2<kernel>;
-// using transformation = CGAL::Aff_transformationH2<kernel>;
-using vector = kernel::Vector_2;
-using line = kernel::Line_2;
-using polygon_set = CGAL::Polygon_set_2<kernel>;
-
 transformation reflection(line l)
 {
     const auto& a = l.a();
