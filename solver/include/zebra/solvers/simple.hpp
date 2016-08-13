@@ -37,8 +37,8 @@ namespace solver
                     }
                 }
             }
-            logging::info() << "Simple found best resemblence " << best_r;
-
+            logging::info() << "Simple found best resemblance " << best_r;
+            std::cout << best_r;
             return best_ori.sol;
         }
     };

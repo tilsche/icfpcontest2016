@@ -88,7 +88,7 @@ namespace solver
                     return;
                 }
                 auto p = o.sol.poly();
-                queue(o, o.sol.resemblance(t.sil.shape()), holy_area(p), depth);
+                queue(o, o.sol.resemblance(t), holy_area(p), depth);
             }
 
             void queue(const origami& o, double r, CGAL::Gmpq a, int depth = 0)
@@ -110,7 +110,7 @@ namespace solver
                             continue;
                         }
                         visited.emplace_back(p);
-                        auto res = o2.sol.resemblance(t.sil.shape());
+                        auto res = o2.sol.resemblance(t);
                         if (res > 0.0)
                         {
                             logging::debug() << "**** Trying to align at " << ls << " resemb "
@@ -185,13 +185,11 @@ namespace solver
             catch (solution_found&)
             {
                 logging::info() << "PERFECT SOLUTION FOUND";
-                std::cout << st.best_resemblance << std::endl;
                 return st.best_solution;
             }
             catch (timeout&)
             {
-                logging::info() << "TIMEOUT";
-                std::cout << st.best_resemblance << std::endl;
+                logging::info() << "TIMEOUT with resemblance " << st.best_resemblance;
                 return st.best_solution;
             }
         }

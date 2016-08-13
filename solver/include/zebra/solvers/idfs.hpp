@@ -57,7 +57,7 @@ class idfs : public base
                 if (area_error < best_area_error)
                 {
                     best_area_error = area_error;
-                    auto new_r = o.sol.resemblance(t.sil.shape());
+                    auto new_r = o.sol.resemblance(t);
                     if (new_r > best_resemblance)
                     {
                         best_resemblance = new_r;
@@ -126,7 +126,7 @@ class idfs : public base
                         continue;
                     }
                     visited.emplace_back(p);
-                    auto res = o2.sol.resemblance(t.sil.shape());
+                    auto res = o2.sol.resemblance(t);
                     if (res > 0.0)
                     {
                         logging::debug() << "**** Trying to align at " << ls << " resemb " << res;
@@ -174,13 +174,11 @@ public:
             catch (solution_found&)
             {
                 logging::info() << "PERFECT SOLUTION FOUND";
-                std::cout << st.best_resemblance << std::endl;
                 return st.best_solution;
             }
             catch (timeout&)
             {
-                logging::info() << "TIMEOUT";
-                std::cout << st.best_resemblance << std::endl;
+                logging::info() << "TIMEOUT, best resemblance is " << st.best_resemblance;
                 return st.best_solution;
             }
         }

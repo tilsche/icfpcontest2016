@@ -32,14 +32,14 @@ int main(int argc, char** argv)
     po::options_description options("");
     // clang-format off
     options.add_options()("help", "show help message")
-            ("task-file", po::value(&file_name)->required(), "path to file containing the task")
-            ("runtime", po::value(&runtime_ms), "runtime in milliseconds")
+            ("task-file,f", po::value(&file_name)->required(), "path to file containing the task")
+            ("runtime,t", po::value(&runtime_ms), "runtime in milliseconds")
             ("visualize,z", po::bool_switch(&visualize), "visualize the solutoin")
             ("verbosity,v", po::value(&verbosity_name),
                             "verbosity level (error,warn,info,debug,trace)")
-            ("cores", po::value(&core_count), "core count (currently not supported)")
-            ("solver", po::value(&solver_name),
-                       "select solver (stupid, simple, idfs, bfs)");
+            ("cores,c", po::value(&core_count), "core count (currently not supported)")
+            ("solver,s", po::value(&solver_name),
+                         "select solver (stupid, simple, idfs, bfs)");
     // clang-format on
 
     po::variables_map vm;
@@ -93,6 +93,7 @@ int main(int argc, char** argv)
 
     // std::ofstream ofs(filename_out);
     // ofs << solu;
+    std::cout << solu.resemblance(t);
     std::cout << solu;
 
     return 0;

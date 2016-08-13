@@ -725,6 +725,11 @@ public:
         return ret;
     }
 
+    double resemblance(const task& t) const
+    {
+        return resemblance(t.sil.shape());
+    }
+
     template <class POLY>
     double resemblance(POLY target) const
     {
