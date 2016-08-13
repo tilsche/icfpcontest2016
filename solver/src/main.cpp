@@ -19,19 +19,26 @@ void help(po::options_description& desc)
 
 int main(int argc, char** argv)
 {
+    std::string file_name;
+    std::string verbosity_name = "info";
+    int core_count;
+    long runtime_ms = 10000;
+    bool visualize = false;
+    std::string solver_name = "bfs";
+
     po::positional_options_description positional_options;
     positional_options.add("task-file", -1);
 
     po::options_description options("");
     // clang-format off
     options.add_options()("help", "show help message")
-            ("task-file", po::value<std::string>(), "File containing the task.")
-            ("runtime", po::value<long>()->default_value(10000), "runtime in milliseconds")
-            ("visualize,z", po::value<std::string>(), "visualize")
-            ("verbosity,v", po::value<std::string>()->default_value("info"),
-                            "set the verbosity level")
-            ("cores", po::value<int>(), "core count")
-            ("solver", po::value<std::string>()->default_value("bfs"),
+            ("task-file", po::value(&file_name)->required(), "path to file containing the task")
+            ("runtime", po::value(&runtime_ms), "runtime in milliseconds")
+            ("visualize,z", po::bool_switch(&visualize), "visualize the solutoin")
+            ("verbosity,v", po::value(&verbosity_name),
+                            "verbosity level (error,warn,info,debug,trace)")
+            ("cores", po::value(&core_count), "core count (currently not supported)")
+            ("solver", po::value(&solver_name),
                        "select solver (stupid, simple, idfs, bfs)");
     // clang-format on
 
@@ -55,14 +62,14 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    zebra::log::set_min_severity_level(vm["verbosity"].as<std::string>());
+    zebra::log::set_min_severity_level(verbosity_name);
 
     if (vm.count("help"))
     {
         help(options);
         return EXIT_SUCCESS;
     }
-    auto runtime = std::chrono::milliseconds(long(vm["runtime"].as<long>() * 0.95));
+    auto runtime = std::chrono::milliseconds(long(runtime_ms * 0.95));
 
     if (vm.count("task-file") == 0)
     {
@@ -70,12 +77,9 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    auto filename = vm["task-file"].as<std::string>();
-    zebra::logging::info() << "filename: " << filename;
     // do something useful
-    auto t = zebra::read_task(filename);
+    auto t = zebra::read_task(file_name);
 
-    auto solver_name = vm["solver"].as<std::string>();
     zebra::solver::meta solve(solver_name, runtime);
 
     zebra::logging::info() << "solving...";
@@ -84,7 +88,7 @@ int main(int argc, char** argv)
 
     if (vm.count("visualize") > 0)
     {
-        solu.to_png(filename + ".png");
+        solu.to_png(file_name + "_" + solver_name + ".png");
     }
 
     // std::ofstream ofs(filename_out);
