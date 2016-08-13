@@ -32,7 +32,7 @@ int main(int argc, char** argv)
                             "set the verbosity level")
             ("cores", po::value<int>(), "core count")
             ("solver", po::value<std::string>()->default_value("bfs"),
-                       "select solver (stupid, simple, idfs, bfs");
+                       "select solver (stupid, simple, idfs, bfs)");
     // clang-format on
 
     po::variables_map vm;
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
     // do something useful
     auto t = zebra::read_task(filename);
 
-    auto solver_name = vm["base"].as<std::string>();
+    auto solver_name = vm["solver"].as<std::string>();
     zebra::solver::meta solve(solver_name, runtime);
 
     zebra::logging::info() << "solving...";
