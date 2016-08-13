@@ -3,6 +3,9 @@ project(solver)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")
 
+include(cotire)
+set (COTIRE_MINIMUM_NUMBER_OF_TARGET_SOURCES 1)
+
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Debug' as none was specified.")
@@ -53,6 +56,9 @@ file(GLOB SOURCE_FILES src/*.cpp)
 add_executable(solver ${SOURCE_FILES})
 
 target_link_libraries(solver ${GMP_LIBRARIES} ${Boost_LIBRARIES} ${Steven_LIBRARIES})
+set_target_properties(solver PROPERTIES COTIRE_ADD_UNITY_BUILD FALSE)
+cotire(solver)
+get_target_property(_prefixHeader solver COTIRE_CXX_PREFIX_HEADER)
 
 add_subdirectory(tests)
 

@@ -10,6 +10,9 @@ foreach(TEST ${TESTS})
 
     add_executable(${TEST_NAME} ${TEST})
     target_link_libraries(${TEST_NAME} ${GMP_LIBRARIES} ${Boost_LIBRARIES} ${Steven_LIBRARIES})
+    set_target_properties(${TEST_NAME} PROPERTIES COTIRE_ADD_UNITY_BUILD FALSE)
+    set_target_properties(${TEST_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "${_prefixHeader}")
+    cotire(${TEST_NAME})
 
     add_test(${TEST_NAME} ${TEST_NAME})
 
