@@ -1,0 +1,33 @@
+We were quite hyped for this year's contest, but actually at first we were quite frustrated that the announcement of the contest dates was only done via twitter, while the official website continued to promise that "details will be announced in due time". We only noticed after someone on r/icfpcontest figured it out. Seriously, announcing the dates exclusively on twitter is just a bewilderingly stupid way to make sure no one gets the memo. For some people, scheduling a free 3-day-weekend in summer is already incredibly difficult. _Please_, dear future contest organizers, put the date announcement on the official page **ASAP**.
+
+Anyway, we managed to recruit a total of 9 (average around 7) talented minds. We were also eager to prepare for the contest. Last year we lost all of our points because I submitted new solutions with minor syntax errors 10 minutes before the deadline, and the submission system used the last results. So we conceived this meta-system that handles tasks, levels and allows distributed workers to work on those without knowing whether we actually could use it.
+
+With the last few hints, I actually presumed the task could be related to imperfect information games (check/fold -> Poker). I couldn't have been more wrong. The first thought that came to me when reading the actual task was _"Oh shit... how are we ever going to solve that?"_
+
+So we convened around T+8 reading the spec and trying to figure out what information out there could be useful and of course started to fold little square pieces of paper, which fortunately were stocked up in our office.
+
+At first we figured that using the GNU Multiple Precision Arithmetic Library would be good and started putting together geometry primitives together. Then we found CGAL and it sounded super mega awesome. So we quickly adapted that. I think we can all agree that computational geometry is not the most enjoyable thing to do. The prospect of it being taken care of by a library was very pleasant. In fact it took care of many primitives like polygons, (counter)-clockwise detection, transformation chaining, joining & intersection. But CGAL was also almost as much a pain to use as writing geometry manually. Let's say the documentation could be improved at some points. How to compute the square root of a Gmpq? No it's not documented on Gmpq page (there is no such member), there is also no sqrt function or the like. Fortunately is_square does just what we needed. But I'm jumping ahead...
+
+We popped together the primitives for problems & solutions and by the end of day 1 we could shift a unit square to another unit square given by a problem. We also got a crude visualization using gnuplot, it actually served us quite well, except for the guy with a mac. But we were nowhere near a real solver. In our discussion we couldn't really figure out whether to search starting at the unit square and folding (top-down) towards the silhouette or the other way around (bottom-up). Apparently, starting from the silhouette won't find anything but perfect solutions, while it seemed better at utilizing the skeleton. So we kind of started at both ends using two sub-teams. On the top-down approach initially we were lacking a good way to represent the origami during the fold. I was stuck in my mind with using a silhouette-type date (Polygon_with_holes) which is kind of impossible to fold. It wasn't until I got some fresh air while biking home after the first day when It dawned me that the solution structure (facets & source / destination positions) is much easier to fold. We also didn't have a way to create problems at the end of day 1, so we used the easiest fold we could think of and submitted a couple of shifted versions of it as problems so we wen't wasting all of our points.
+
+So on day 2 we actually got started implementing the actual folding. The main problem was getting the transformation for mirroring, seems we were struck by [a nasty CGAL bug](https://github.com/CGAL/cgal/issues/1216). After lot's of digging, and checking with wolfram alpha, we found this magic code somewhere deep inside the darkest corners of CGAL that does the actual reflection but we had to copy-paste it:
+
+    const auto& a = l.a();
+    const auto& b = l.b();
+    const auto& c = l.c();
+    auto de = a * a + b * b;
+    auto aa = b * b - a * a;
+    auto bb = a * a - b * b;
+    auto ab = a * b * -2;
+    auto ac = a * c * -2;
+    auto bc = b * c * -2;
+    return transformation(aa, ab, ac, ab, bb, bc, de);
+
+This is the kind of just-sacrifice-this-one-black-goat type of stuff that makes geometry horrifying for outsiders. Seriously, -2 as a magic constant?! But it actually worked. So we started to write a quick random-fold tool to generate problems.
+
+Before going on we took a quick look around the problems and found task 98. Having zero collective experience with origami and no notion of squash folds we actually couldn't see how this is even possible. So we found this YouTube video of how to fold a windmill and were frustrated and wasted some more time thinking on how to implement such a transition in multiple steps before giving up.
+
+By the end of day 2 we had a very simple brute force solver that moves the unit square to one of the vertices of the silhouette and then folds along the lines inside the skeleton. Using the skeleton lines for folding might be clever, but I suspect this is not sufficient in all cases.
+
+On day 3 we started folding a vertex along a given line (instead of the whole intermediate origami).
+This uses a graph in which edges are the vertices and facets are nodes. A flood-fill along all vertices that are on one side of the graph - starting with the ones from the facet to be folded, gives all facets that are affected by the fold. We figured out that this generalized fold can even handle the dreaded squash/windmill fold by folding through paper - a constraint neither the spec nor our code would care about. Having a working test that folds 1/4 part of a windmill was a huge achievement for us geometry ignoramuses. 
